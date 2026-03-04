@@ -28,11 +28,13 @@
 <url><loc>https://gillescolling.com/restrictR/reference/require_length_max.html</loc></url>
 <url><loc>https://gillescolling.com/restrictR/reference/require_length_min.html</loc></url>
 <url><loc>https://gillescolling.com/restrictR/reference/require_logical.html</loc></url>
+<url><loc>https://gillescolling.com/restrictR/reference/require_negative.html</loc></url>
 <url><loc>https://gillescolling.com/restrictR/reference/require_no_na.html</loc></url>
 <url><loc>https://gillescolling.com/restrictR/reference/require_nrow_matches.html</loc></url>
 <url><loc>https://gillescolling.com/restrictR/reference/require_nrow_min.html</loc></url>
 <url><loc>https://gillescolling.com/restrictR/reference/require_numeric.html</loc></url>
 <url><loc>https://gillescolling.com/restrictR/reference/require_one_of.html</loc></url>
+<url><loc>https://gillescolling.com/restrictR/reference/require_positive.html</loc></url>
 <url><loc>https://gillescolling.com/restrictR/reference/restrict.html</loc></url>
 <url><loc>https://gillescolling.com/restrictR/reference/restrictR-package.html</loc></url>
 </urlset>

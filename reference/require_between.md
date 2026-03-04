@@ -44,4 +44,6 @@ The modified `restriction` object.
 ## See also
 
 Other value checks:
-[`require_one_of()`](https://gillescolling.com/restrictR/reference/require_one_of.md)
+[`require_negative()`](https://gillescolling.com/restrictR/reference/require_negative.md),
+[`require_one_of()`](https://gillescolling.com/restrictR/reference/require_one_of.md),
+[`require_positive()`](https://gillescolling.com/restrictR/reference/require_positive.md)

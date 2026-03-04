@@ -75,6 +75,10 @@ Validate individual columns with path-aware errors
 
 Validate value ranges and set membership
 
+- [`require_positive()`](https://gillescolling.com/restrictR/reference/require_positive.md)
+  : Require Positive Values
+- [`require_negative()`](https://gillescolling.com/restrictR/reference/require_negative.md)
+  : Require Negative Values
 - [`require_between()`](https://gillescolling.com/restrictR/reference/require_between.md)
   : Require Value in Range
 - [`require_one_of()`](https://gillescolling.com/restrictR/reference/require_one_of.md)
