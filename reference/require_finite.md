@@ -24,4 +24,5 @@ The modified `restriction` object.
 ## See also
 
 Other missingness checks:
-[`require_no_na()`](https://gillescolling.com/restrictR/reference/require_no_na.md)
+[`require_no_na()`](https://gillescolling.com/restrictR/reference/require_no_na.md),
+[`require_not_null()`](https://gillescolling.com/restrictR/reference/require_not_null.md)

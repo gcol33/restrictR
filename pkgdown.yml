@@ -3,7 +3,7 @@ pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   restrictR: restrictR.html
-last_built: 2026-03-04T16:12Z
+last_built: 2026-03-04T16:16Z
 urls:
   reference: https://gillescolling.com/restrictR/reference
   article: https://gillescolling.com/restrictR/articles

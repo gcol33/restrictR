@@ -30,10 +30,12 @@ Validate value types
 - [`require_logical()`](https://gillescolling.com/restrictR/reference/require_logical.md)
   : Require Logical Type
 
-## Missingness & Finiteness
+## Null & Missingness
 
-Check for NA and non-finite values
+Check for NULL, NA, and non-finite values
 
+- [`require_not_null()`](https://gillescolling.com/restrictR/reference/require_not_null.md)
+  : Require Non-NULL Value
 - [`require_no_na()`](https://gillescolling.com/restrictR/reference/require_no_na.md)
   : Require No NA Values
 - [`require_finite()`](https://gillescolling.com/restrictR/reference/require_finite.md)
@@ -41,8 +43,12 @@ Check for NA and non-finite values
 
 ## Structure Checks
 
-Validate length, columns, and row counts
+Validate length, names, columns, and row counts
 
+- [`require_scalar()`](https://gillescolling.com/restrictR/reference/require_scalar.md)
+  : Require Scalar Value
+- [`require_named()`](https://gillescolling.com/restrictR/reference/require_named.md)
+  : Require Named Value
 - [`require_length()`](https://gillescolling.com/restrictR/reference/require_length.md)
   : Require Specific Length
 - [`require_length_min()`](https://gillescolling.com/restrictR/reference/require_length_min.md)
@@ -83,3 +89,5 @@ Validate value ranges and set membership
   : Require Value in Range
 - [`require_one_of()`](https://gillescolling.com/restrictR/reference/require_one_of.md)
   : Require Value from a Set
+- [`require_unique()`](https://gillescolling.com/restrictR/reference/require_unique.md)
+  : Require Unique Values

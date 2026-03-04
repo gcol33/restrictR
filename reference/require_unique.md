@@ -1,12 +1,12 @@
-# Require Positive Values
+# Require Unique Values
 
-Validates that all elements are positive. By default uses `>= 0`
-(non-negative); set `strict = TRUE` for `> 0`.
+Validates that the value contains no duplicates. Reports the positions
+of duplicated elements.
 
 ## Usage
 
 ``` r
-require_positive(restriction, strict = FALSE)
+require_unique(restriction)
 ```
 
 ## Arguments
@@ -14,11 +14,6 @@ require_positive(restriction, strict = FALSE)
 - restriction:
 
   a `restriction` object.
-
-- strict:
-
-  logical; if `TRUE`, requires `> 0`. If `FALSE` (default), requires
-  `>= 0`.
 
 ## Value
 
@@ -30,4 +25,4 @@ Other value checks:
 [`require_between()`](https://gillescolling.com/restrictR/reference/require_between.md),
 [`require_negative()`](https://gillescolling.com/restrictR/reference/require_negative.md),
 [`require_one_of()`](https://gillescolling.com/restrictR/reference/require_one_of.md),
-[`require_unique()`](https://gillescolling.com/restrictR/reference/require_unique.md)
+[`require_positive()`](https://gillescolling.com/restrictR/reference/require_positive.md)
