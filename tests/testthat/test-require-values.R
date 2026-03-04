@@ -1,3 +1,35 @@
+test_that("require_not_null() accepts non-NULL values", {
+  v <- restrict("x") |> require_not_null()
+  expect_invisible(v(42))
+  expect_invisible(v(""))
+  expect_invisible(v(NA))
+  expect_invisible(v(integer(0)))
+})
+
+test_that("require_not_null() rejects NULL", {
+  v <- restrict("x") |> require_not_null()
+  expect_error(v(NULL), "must not be NULL")
+})
+
+test_that("require_unique() accepts unique values", {
+  v <- restrict("x") |> require_unique()
+  expect_invisible(v(c(1, 2, 3)))
+  expect_invisible(v(c("a", "b", "c")))
+  expect_invisible(v(1L))
+})
+
+test_that("require_unique() rejects duplicates", {
+  v <- restrict("x") |> require_unique()
+  expect_error(v(c(1, 2, 1, 3, 2)), "contains duplicate values")
+  expect_error(v(c(1, 2, 1, 3, 2)), "At: 3, 5")
+  expect_error(v(c("a", "b", "a")), "contains duplicate values")
+})
+
+test_that("require_unique() shows Found: with duplicated values", {
+  v <- restrict("x") |> require_unique()
+  expect_error(v(c(1, 2, 1)), "Found:")
+})
+
 test_that("require_between() checks bounds", {
   v <- restrict("x") |> require_between(lower = 0, upper = 1)
   expect_invisible(v(0.5))

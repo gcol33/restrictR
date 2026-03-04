@@ -1,3 +1,32 @@
+test_that("require_scalar() accepts length-1 values", {
+  v <- restrict("x") |> require_scalar()
+  expect_invisible(v(42))
+  expect_invisible(v("hello"))
+  expect_invisible(v(TRUE))
+  expect_invisible(v(NA))
+})
+
+test_that("require_scalar() rejects non-scalar values", {
+  v <- restrict("x") |> require_scalar()
+  expect_error(v(1:5), "must be scalar")
+  expect_error(v(1:5), "Found: length 5")
+  expect_error(v(NULL), "must be scalar")
+  expect_error(v(NULL), "Found: length 0")
+  expect_error(v(character(0)), "must be scalar")
+})
+
+test_that("require_named() accepts named values", {
+  v <- restrict("x") |> require_named()
+  expect_invisible(v(c(a = 1, b = 2)))
+  expect_invisible(v(list(x = 1, y = 2)))
+})
+
+test_that("require_named() rejects unnamed values", {
+  v <- restrict("x") |> require_named()
+  expect_error(v(1:3), "must be named")
+  expect_error(v(list(1, 2)), "must be named")
+})
+
 test_that("require_length() checks exact length", {
   v <- restrict("x") |> require_length(3L)
   expect_invisible(v(1:3))

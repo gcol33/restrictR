@@ -33,6 +33,7 @@ Validates that all elements of a numeric value fall within a specified range.
 Other value checks: 
 \code{\link{require_negative}()},
 \code{\link{require_one_of}()},
-\code{\link{require_positive}()}
+\code{\link{require_positive}()},
+\code{\link{require_unique}()}
 }
 \concept{value checks}

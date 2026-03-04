@@ -1,3 +1,13 @@
+# restrictR 0.1.2
+
+* New steps: `require_scalar()`, `require_not_null()`, `require_unique()`,
+  `require_named()`.
+* New steps: `require_positive()` and `require_negative()` with `strict`
+  argument (non-strict by default).
+* `require_integer()` gains a `strict` argument. Default (`strict = FALSE`)
+  accepts any numeric whole number; `strict = TRUE` requires the R `integer`
+  type.
+
 # restrictR 0.1.1
 
 * Export `fail()` so custom steps produce canonical structured errors.

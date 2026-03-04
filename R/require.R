@@ -166,6 +166,33 @@ require_logical <- function(restriction, no_na = FALSE) {
 }
 
 
+# ---- Null checks ----
+
+#' Require Non-NULL Value
+#'
+#' Validates that the value is not `NULL`. Place this step first in the
+#' pipeline when `NULL` is a possible input.
+#'
+#' @param restriction a `restriction` object.
+#'
+#' @return The modified `restriction` object.
+#'
+#' @family missingness checks
+#' @export
+require_not_null <- function(restriction) {
+  add_step(restriction, list(
+    label = "must not be NULL",
+    deps = character(0L),
+    fields = NULL,
+    fn = function(value, name, ctx) {
+      if (is.null(value)) {
+        fail(name, "must not be NULL")
+      }
+    }
+  ))
+}
+
+
 # ---- Missingness / finiteness ----
 
 #' Require No NA Values
@@ -219,6 +246,56 @@ require_finite <- function(restriction) {
 
 
 # ---- Structure checks ----
+
+#' Require Scalar Value
+#'
+#' Validates that the value has length 1. Rejects `NULL`, zero-length vectors,
+#' and vectors with more than one element.
+#'
+#' @param restriction a `restriction` object.
+#'
+#' @return The modified `restriction` object.
+#'
+#' @family structure checks
+#' @export
+require_scalar <- function(restriction) {
+  add_step(restriction, list(
+    label = "must be scalar",
+    deps = character(0L),
+    fields = NULL,
+    fn = function(value, name, ctx) {
+      if (length(value) != 1L) {
+        fail(name, "must be scalar (length 1)",
+             found = sprintf("length %d", length(value)))
+      }
+    }
+  ))
+}
+
+
+#' Require Named Value
+#'
+#' Validates that the value has names. Useful for named vectors and lists.
+#'
+#' @param restriction a `restriction` object.
+#'
+#' @return The modified `restriction` object.
+#'
+#' @family structure checks
+#' @export
+require_named <- function(restriction) {
+  add_step(restriction, list(
+    label = "must be named",
+    deps = character(0L),
+    fields = NULL,
+    fn = function(value, name, ctx) {
+      if (is.null(names(value))) {
+        fail(name, "must be named")
+      }
+    }
+  ))
+}
+
 
 #' Require Specific Length
 #'
@@ -603,6 +680,36 @@ require_col_one_of <- function(restriction, col, values) {
           paste0('"', values, '"', collapse = ", ")
         ), found = paste0('"', unique(x[bad]), '"', collapse = ", "),
         at = bad)
+      }
+    }
+  ))
+}
+
+
+# ---- Uniqueness checks ----
+
+#' Require Unique Values
+#'
+#' Validates that the value contains no duplicates. Reports the positions
+#' of duplicated elements.
+#'
+#' @param restriction a `restriction` object.
+#'
+#' @return The modified `restriction` object.
+#'
+#' @family value checks
+#' @export
+require_unique <- function(restriction) {
+  add_step(restriction, list(
+    label = "must contain unique values",
+    deps = character(0L),
+    fields = NULL,
+    fn = function(value, name, ctx) {
+      dupes <- which(duplicated(value))
+      if (length(dupes) > 0L) {
+        fail(name, "contains duplicate values",
+             found = paste0(deparse(unique(value[dupes])), collapse = ", "),
+             at = dupes)
       }
     }
   ))

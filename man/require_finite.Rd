@@ -18,6 +18,7 @@ Does not check for \code{NA} (use \code{\link[=require_no_na]{require_no_na()}} 
 }
 \seealso{
 Other missingness checks: 
-\code{\link{require_no_na}()}
+\code{\link{require_no_na}()},
+\code{\link{require_not_null}()}
 }
 \concept{missingness checks}

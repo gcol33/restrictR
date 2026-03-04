@@ -57,14 +57,17 @@ reference:
   - require_integer
   - require_character
   - require_logical
-- title: Missingness & Finiteness
-  desc: Check for NA and non-finite values
+- title: Null & Missingness
+  desc: Check for NULL, NA, and non-finite values
   contents:
+  - require_not_null
   - require_no_na
   - require_finite
 - title: Structure Checks
-  desc: Validate length, columns, and row counts
+  desc: Validate length, names, columns, and row counts
   contents:
+  - require_scalar
+  - require_named
   - require_length
   - require_length_min
   - require_length_max
@@ -86,6 +89,7 @@ reference:
   - require_negative
   - require_between
   - require_one_of
+  - require_unique
 articles:
 - title: Getting Started
   navbar: ~

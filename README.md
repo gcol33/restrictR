@@ -165,9 +165,9 @@ require_weights <- restrict("weights") |>
 | Category | Steps |
 |----------|-------|
 | **Type checks** | `require_df()`, `require_numeric()`, `require_integer()`, `require_character()`, `require_logical()` |
-| **Missingness** | `require_no_na()`, `require_finite()` |
-| **Structure** | `require_length()`, `require_length_min()`, `require_length_max()`, `require_length_matches()`, `require_nrow_min()`, `require_nrow_matches()`, `require_has_cols()` |
-| **Values** | `require_positive()`, `require_negative()`, `require_between()`, `require_one_of()` |
+| **Null / Missingness** | `require_not_null()`, `require_no_na()`, `require_finite()` |
+| **Structure** | `require_scalar()`, `require_named()`, `require_length()`, `require_length_min()`, `require_length_max()`, `require_length_matches()`, `require_nrow_min()`, `require_nrow_matches()`, `require_has_cols()` |
+| **Values** | `require_positive()`, `require_negative()`, `require_between()`, `require_one_of()`, `require_unique()` |
 | **Columns** | `require_col_numeric()`, `require_col_character()`, `require_col_between()`, `require_col_one_of()` |
 | **Extension** | `require_custom()` |
 

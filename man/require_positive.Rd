@@ -23,6 +23,7 @@ Validates that all elements are positive. By default uses \verb{>= 0}
 Other value checks: 
 \code{\link{require_between}()},
 \code{\link{require_negative}()},
-\code{\link{require_one_of}()}
+\code{\link{require_one_of}()},
+\code{\link{require_unique}()}
 }
 \concept{value checks}
