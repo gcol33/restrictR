@@ -38,7 +38,8 @@ restrict <- function(name) {
 #' The closure is the validator function itself.
 #'
 #' @param name character(1) validator name.
-#' @param steps list of step objects.
+#' @param steps list of step objects (each with `label`, `deps`, `fields`,
+#'   `fn`).
 #'
 #' @return A `restriction` object (callable function).
 #'
@@ -49,8 +50,10 @@ make_validator <- function(name, steps) {
 
   validator <- function(value, ...) {
     ctx <- list(...)
-    for (step in steps) {
-      step$check(value, name = name, ctx = ctx)
+    s <- steps
+    nm <- name
+    for (i in seq_along(s)) {
+      s[[i]]$fn(value, nm, ctx)
     }
     invisible(value)
   }
@@ -66,8 +69,8 @@ make_validator <- function(name, steps) {
 #' the original.
 #'
 #' @param restriction a `restriction` object.
-#' @param step a list with `description` (character), `depends_on` (character),
-#'   and `check` (function).
+#' @param step a list with `label` (character), `deps` (character vector),
+#'   `fields` (named list or NULL), and `fn` (function(value, name, ctx)).
 #'
 #' @return A new `restriction` object with the step appended.
 #'
@@ -118,12 +121,12 @@ print.restriction <- function(x, ...) {
   } else {
     cat("\n")
     for (i in seq_along(steps)) {
-      cat(sprintf("  %d. %s\n", i, steps[[i]]$description))
+      cat(sprintf("  %d. %s\n", i, steps[[i]]$label))
     }
   }
 
   # Show dependencies
-  deps <- unique(unlist(lapply(steps, function(s) s$depends_on)))
+  deps <- unique(unlist(lapply(steps, function(s) s$deps)))
   if (length(deps) > 0L) {
     cat(sprintf("\n  Depends on: %s\n", paste(deps, collapse = ", ")))
   }
@@ -153,11 +156,11 @@ as_contract_text <- function(x) {
   }
   steps <- restriction_steps(x)
   if (length(steps) == 0L) return("No validation constraints.")
-  descriptions <- vapply(steps, function(s) s$description, character(1L))
+  labels <- vapply(steps, function(s) s$label, character(1L))
   # Capitalize first, collapse with periods
-  descriptions[1L] <- paste0(
-    toupper(substring(descriptions[1L], 1L, 1L)),
-    substring(descriptions[1L], 2L)
+  labels[1L] <- paste0(
+    toupper(substring(labels[1L], 1L, 1L)),
+    substring(labels[1L], 2L)
   )
-  paste0(paste(descriptions, collapse = ". "), ".")
+  paste0(paste(labels, collapse = ". "), ".")
 }

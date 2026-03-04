@@ -11,9 +11,10 @@
 #' @export
 require_df <- function(restriction) {
   add_step(restriction, list(
-    description = "must be a data.frame",
-    depends_on = character(0L),
-    check = function(value, name, ctx) {
+    label = "must be a data.frame",
+    deps = character(0L),
+    fields = NULL,
+    fn = function(value, name, ctx) {
       if (!is.data.frame(value)) {
         fail(name, sprintf("must be a data.frame, got %s", class(value)[1L]))
       }
@@ -35,48 +36,19 @@ require_df <- function(restriction) {
 #'
 #' @export
 require_numeric <- function(restriction, no_na = FALSE, finite = FALSE) {
-  desc_parts <- "must be numeric"
-  if (no_na) desc_parts <- paste0(desc_parts, ", no NA")
-  if (finite) desc_parts <- paste0(desc_parts, ", finite")
+  lbl <- "must be numeric"
+  if (no_na) lbl <- paste0(lbl, ", no NA")
+  if (finite) lbl <- paste0(lbl, ", finite")
 
   add_step(restriction, list(
-    description = desc_parts,
-    depends_on = character(0L),
-    check = function(value, name, ctx) {
+    label = lbl,
+    deps = character(0L),
+    fields = list(no_na = no_na, finite = finite),
+    fn = function(value, name, ctx) {
       if (!is.numeric(value)) {
         fail(name, sprintf("must be numeric, got %s", class(value)[1L]))
       }
-      if (no_na) {
-        na_count <- sum(is.na(value))
-        if (na_count > 0L) {
-          pos <- which(is.na(value))
-          pos_msg <- if (length(pos) <= 5L) {
-            paste("at position", paste(pos, collapse = ", "))
-          } else {
-            sprintf("at positions %s, ... (%d total)",
-                    paste(pos[1:5], collapse = ", "), na_count)
-          }
-          fail(name, sprintf("must not contain NA values (%d NA found %s)",
-                             na_count, pos_msg))
-        }
-      }
-      if (finite) {
-        non_finite <- which(!is.finite(value))
-        if (no_na) non_finite <- setdiff(non_finite, which(is.na(value)))
-        if (length(non_finite) > 0L) {
-          pos_msg <- if (length(non_finite) <= 5L) {
-            paste("at position", paste(non_finite, collapse = ", "))
-          } else {
-            sprintf("at positions %s, ... (%d total)",
-                    paste(non_finite[1:5], collapse = ", "),
-                    length(non_finite))
-          }
-          fail(name, sprintf(
-            "must be finite (%d non-finite value %s)",
-            length(non_finite), pos_msg
-          ))
-        }
-      }
+      check_na_finite(value, name, no_na, finite)
     }
   ))
 }
@@ -93,29 +65,17 @@ require_numeric <- function(restriction, no_na = FALSE, finite = FALSE) {
 #'
 #' @export
 require_character <- function(restriction, no_na = FALSE) {
-  desc <- if (no_na) "must be character (no NA)" else "must be character"
+  lbl <- if (no_na) "must be character (no NA)" else "must be character"
 
   add_step(restriction, list(
-    description = desc,
-    depends_on = character(0L),
-    check = function(value, name, ctx) {
+    label = lbl,
+    deps = character(0L),
+    fields = list(no_na = no_na),
+    fn = function(value, name, ctx) {
       if (!is.character(value)) {
         fail(name, sprintf("must be character, got %s", class(value)[1L]))
       }
-      if (no_na) {
-        na_count <- sum(is.na(value))
-        if (na_count > 0L) {
-          pos <- which(is.na(value))
-          pos_msg <- if (length(pos) <= 5L) {
-            paste("at position", paste(pos, collapse = ", "))
-          } else {
-            sprintf("at positions %s, ... (%d total)",
-                    paste(pos[1:5], collapse = ", "), na_count)
-          }
-          fail(name, sprintf("must not contain NA values (%d NA found %s)",
-                             na_count, pos_msg))
-        }
-      }
+      if (no_na) check_no_na(value, name)
     }
   ))
 }
@@ -135,9 +95,10 @@ require_character <- function(restriction, no_na = FALSE) {
 #' @export
 require_length <- function(restriction, n) {
   add_step(restriction, list(
-    description = sprintf("must have length %d", n),
-    depends_on = character(0L),
-    check = function(value, name, ctx) {
+    label = sprintf("must have length %d", n),
+    deps = character(0L),
+    fields = list(n = n),
+    fn = function(value, name, ctx) {
       if (length(value) != n) {
         fail(name, sprintf("must have length %d, got %d", n, length(value)))
       }
@@ -149,7 +110,8 @@ require_length <- function(restriction, n) {
 #' Require Length Matching an Expression
 #'
 #' Validates that `length(value)` equals the result of evaluating a formula.
-#' The formula is evaluated using only explicitly passed context arguments.
+#' The formula is evaluated using only explicitly passed context arguments,
+#' plus `.value` (the validated value) and `.name` (the restriction name).
 #'
 #' @param restriction a `restriction` object.
 #' @param formula a one-sided formula (e.g. `~ nrow(newdata)`).
@@ -166,10 +128,11 @@ require_length_matches <- function(restriction, formula) {
   deps <- all.vars(formula)
 
   add_step(restriction, list(
-    description = sprintf("length must match %s", expr_text),
-    depends_on = deps,
-    check = function(value, name, ctx) {
-      expected <- eval_formula(formula, ctx, name)
+    label = sprintf("length must match %s", expr_text),
+    deps = deps,
+    fields = list(formula = formula),
+    fn = function(value, name, ctx) {
+      expected <- eval_formula(formula, value, name, ctx)
       actual <- length(value)
       if (actual != expected) {
         fail(name, sprintf(
@@ -194,10 +157,11 @@ require_length_matches <- function(restriction, formula) {
 #' @export
 require_nrow_min <- function(restriction, n) {
   add_step(restriction, list(
-    description = sprintf("must have at least %d row%s", n,
-                          if (n == 1L) "" else "s"),
-    depends_on = character(0L),
-    check = function(value, name, ctx) {
+    label = sprintf("must have at least %d row%s", n,
+                    if (n == 1L) "" else "s"),
+    deps = character(0L),
+    fields = list(n = n),
+    fn = function(value, name, ctx) {
       if (nrow(value) < n) {
         fail(name, sprintf("must have at least %d row%s, got %d",
                            n, if (n == 1L) "" else "s", nrow(value)))
@@ -219,10 +183,11 @@ require_nrow_min <- function(restriction, n) {
 #' @export
 require_has_cols <- function(restriction, cols) {
   add_step(restriction, list(
-    description = sprintf('must have columns: %s',
-                          paste0('"', cols, '"', collapse = ", ")),
-    depends_on = character(0L),
-    check = function(value, name, ctx) {
+    label = sprintf('must have columns: %s',
+                    paste0('"', cols, '"', collapse = ", ")),
+    deps = character(0L),
+    fields = list(cols = cols),
+    fn = function(value, name, ctx) {
       missing_cols <- setdiff(cols, names(value))
       if (length(missing_cols) > 0L) {
         fail(name, sprintf(
@@ -253,64 +218,29 @@ require_has_cols <- function(restriction, cols) {
 #' @export
 require_col_numeric <- function(restriction, col, no_na = FALSE,
                                 finite = FALSE) {
-  desc_parts <- sprintf("$%s must be numeric", col)
-  if (no_na) desc_parts <- paste0(desc_parts, " (no NA")
+  lbl <- sprintf("$%s must be numeric", col)
+  if (no_na) lbl <- paste0(lbl, " (no NA")
   if (finite) {
-    desc_parts <- if (no_na) paste0(desc_parts, ", finite)") else
-      paste0(desc_parts, " (finite)")
+    lbl <- if (no_na) paste0(lbl, ", finite)") else paste0(lbl, " (finite)")
   } else if (no_na) {
-    desc_parts <- paste0(desc_parts, ")")
+    lbl <- paste0(lbl, ")")
   }
 
   add_step(restriction, list(
-    description = desc_parts,
-    depends_on = character(0L),
-    check = function(value, name, ctx) {
+    label = lbl,
+    deps = character(0L),
+    fields = list(col = col, no_na = no_na, finite = finite),
+    fn = function(value, name, ctx) {
       path <- col_path(name, col)
       x <- value[[col]]
 
       if (is.null(x)) {
         fail(name, sprintf("column \"%s\" does not exist", col))
-        return(invisible(NULL))
       }
-
       if (!is.numeric(x)) {
-        fail(name, sprintf("%s must be numeric, got %s",
-                           path, class(x)[1L]))
+        fail(name, sprintf("%s must be numeric, got %s", path, class(x)[1L]))
       }
-      if (no_na) {
-        na_count <- sum(is.na(x))
-        if (na_count > 0L) {
-          pos <- which(is.na(x))
-          pos_msg <- if (length(pos) <= 5L) {
-            paste("at position", paste(pos, collapse = ", "))
-          } else {
-            sprintf("at positions %s, ... (%d total)",
-                    paste(pos[1:5], collapse = ", "), na_count)
-          }
-          fail(name, sprintf(
-            "%s must not contain NA values (%d NA found %s)",
-            path, na_count, pos_msg
-          ))
-        }
-      }
-      if (finite) {
-        non_finite <- which(!is.finite(x))
-        if (no_na) non_finite <- setdiff(non_finite, which(is.na(x)))
-        if (length(non_finite) > 0L) {
-          pos_msg <- if (length(non_finite) <= 5L) {
-            paste("at position", paste(non_finite, collapse = ", "))
-          } else {
-            sprintf("at positions %s, ... (%d total)",
-                    paste(non_finite[1:5], collapse = ", "),
-                    length(non_finite))
-          }
-          fail(name, sprintf(
-            "%s must be finite (%d non-finite value %s)",
-            path, length(non_finite), pos_msg
-          ))
-        }
-      }
+      check_na_finite(x, name, no_na, finite, prefix = path)
     }
   ))
 }
@@ -329,41 +259,25 @@ require_col_numeric <- function(restriction, col, no_na = FALSE,
 #'
 #' @export
 require_col_character <- function(restriction, col, no_na = FALSE) {
-  desc <- sprintf("$%s must be character", col)
-  if (no_na) desc <- paste0(desc, " (no NA)")
+  lbl <- sprintf("$%s must be character", col)
+  if (no_na) lbl <- paste0(lbl, " (no NA)")
 
   add_step(restriction, list(
-    description = desc,
-    depends_on = character(0L),
-    check = function(value, name, ctx) {
+    label = lbl,
+    deps = character(0L),
+    fields = list(col = col, no_na = no_na),
+    fn = function(value, name, ctx) {
       path <- col_path(name, col)
       x <- value[[col]]
 
       if (is.null(x)) {
         fail(name, sprintf("column \"%s\" does not exist", col))
-        return(invisible(NULL))
       }
-
       if (!is.character(x)) {
         fail(name, sprintf("%s must be character, got %s",
                            path, class(x)[1L]))
       }
-      if (no_na) {
-        na_count <- sum(is.na(x))
-        if (na_count > 0L) {
-          pos <- which(is.na(x))
-          pos_msg <- if (length(pos) <= 5L) {
-            paste("at position", paste(pos, collapse = ", "))
-          } else {
-            sprintf("at positions %s, ... (%d total)",
-                    paste(pos[1:5], collapse = ", "), na_count)
-          }
-          fail(name, sprintf(
-            "%s must not contain NA values (%d NA found %s)",
-            path, na_count, pos_msg
-          ))
-        }
-      }
+      if (no_na) check_no_na(x, name, prefix = path)
     }
   ))
 }
@@ -388,18 +302,20 @@ require_col_range <- function(restriction, col, lower = -Inf, upper = Inf,
                               exclusive_upper = FALSE) {
   lb <- if (exclusive_lower) sprintf("(%s", lower) else sprintf("[%s", lower)
   ub <- if (exclusive_upper) sprintf("%s)", upper) else sprintf("%s]", upper)
-  desc <- sprintf("$%s must be in %s, %s", col, lb, ub)
+  lbl <- sprintf("$%s must be in %s, %s", col, lb, ub)
 
   add_step(restriction, list(
-    description = desc,
-    depends_on = character(0L),
-    check = function(value, name, ctx) {
+    label = lbl,
+    deps = character(0L),
+    fields = list(col = col, lower = lower, upper = upper,
+                  exclusive_lower = exclusive_lower,
+                  exclusive_upper = exclusive_upper),
+    fn = function(value, name, ctx) {
       path <- col_path(name, col)
       x <- value[[col]]
 
       if (is.null(x)) {
         fail(name, sprintf("column \"%s\" does not exist", col))
-        return(invisible(NULL))
       }
 
       too_low <- if (exclusive_lower) x <= lower else x < lower
@@ -441,12 +357,15 @@ require_range <- function(restriction, lower = -Inf, upper = Inf,
                           exclusive_lower = FALSE, exclusive_upper = FALSE) {
   lb <- if (exclusive_lower) "(" else "["
   ub <- if (exclusive_upper) ")" else "]"
-  desc <- sprintf("must be in %s%s, %s%s", lb, lower, upper, ub)
+  lbl <- sprintf("must be in %s%s, %s%s", lb, lower, upper, ub)
 
   add_step(restriction, list(
-    description = desc,
-    depends_on = character(0L),
-    check = function(value, name, ctx) {
+    label = lbl,
+    deps = character(0L),
+    fields = list(lower = lower, upper = upper,
+                  exclusive_lower = exclusive_lower,
+                  exclusive_upper = exclusive_upper),
+    fn = function(value, name, ctx) {
       too_low <- if (exclusive_lower) {
         any(value <= lower, na.rm = TRUE)
       } else {
@@ -490,10 +409,11 @@ require_range <- function(restriction, lower = -Inf, upper = Inf,
 #' @export
 require_one_of <- function(restriction, values) {
   add_step(restriction, list(
-    description = sprintf('must be one of: %s',
-                          paste0('"', values, '"', collapse = ", ")),
-    depends_on = character(0L),
-    check = function(value, name, ctx) {
+    label = sprintf('must be one of: %s',
+                    paste0('"', values, '"', collapse = ", ")),
+    deps = character(0L),
+    fields = list(values = values),
+    fn = function(value, name, ctx) {
       if (!all(value %in% values)) {
         bad <- value[!value %in% values]
         fail(name, sprintf(

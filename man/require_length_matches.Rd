@@ -16,5 +16,6 @@ The modified \code{restriction} object.
 }
 \description{
 Validates that \code{length(value)} equals the result of evaluating a formula.
-The formula is evaluated using only explicitly passed context arguments.
+The formula is evaluated using only explicitly passed context arguments,
+plus \code{.value} (the validated value) and \code{.name} (the restriction name).
 }
