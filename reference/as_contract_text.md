@@ -24,6 +24,7 @@ A character(1) string describing the validation contract.
 
 Other core:
 [`as_contract_block()`](https://gillescolling.com/restrictR/reference/as_contract_block.md),
+[`fail()`](https://gillescolling.com/restrictR/reference/fail.md),
 [`require_custom()`](https://gillescolling.com/restrictR/reference/require_custom.md),
 [`restrict()`](https://gillescolling.com/restrictR/reference/restrict.md)
 
@@ -32,5 +33,5 @@ Other core:
 ``` r
 v <- restrict("x") |> require_numeric(no_na = TRUE) |> require_length(1L)
 as_contract_text(v)
-#> [1] "Must be numeric, no NA. must have length 1."
+#> [1] "Must be numeric, no NA. Must have length 1."
 ```

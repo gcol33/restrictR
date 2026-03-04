@@ -8,16 +8,19 @@ library(restrictR)
 
 `restrictR` lets you define reusable input contracts from small building
 blocks using the base pipe `|>`. A contract is defined once and called
-like a function to validate data at runtime.
+like a function to validate data at runtime. Validators are immutable:
+each `|>` returns a new validator, so you can safely branch from a
+shared base without side effects.
 
-| Section                                                     | What you’ll learn                                                                                                                                                                             |
-|-------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Reusable schemas](#reusable-schemas)                       | Define and reuse data.frame contracts                                                                                                                                                         |
-| [Dependent validation](#dependent-validation)               | Constraints that reference other arguments                                                                                                                                                    |
-| [Enum arguments](#enum-arguments)                           | Restrict string arguments to a fixed set                                                                                                                                                      |
-| [Custom steps](#custom-steps)                               | Domain-specific invariants                                                                                                                                                                    |
-| [Self-documentation](#self-documentation)                   | Print, [`as_contract_text()`](https://gillescolling.com/restrictR/reference/as_contract_text.md), [`as_contract_block()`](https://gillescolling.com/restrictR/reference/as_contract_block.md) |
-| [Using contracts in packages](#using-contracts-in-packages) | The recommended pattern for R packages                                                                                                                                                        |
+| Section                                                                 | What you’ll learn                                                                                                                                                                             |
+|-------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [Reusable schemas](#reusable-schemas)                                   | Define and reuse data.frame contracts                                                                                                                                                         |
+| [Dependent validation](#dependent-validation)                           | Constraints that reference other arguments                                                                                                                                                    |
+| [Enum arguments](#enum-arguments)                                       | Restrict string arguments to a fixed set                                                                                                                                                      |
+| [Data frame with mixed constraints](#data-frame-with-mixed-constraints) | Columns + enums + ranges in one contract                                                                                                                                                      |
+| [Custom steps](#custom-steps)                                           | Domain-specific invariants                                                                                                                                                                    |
+| [Self-documentation](#self-documentation)                               | Print, [`as_contract_text()`](https://gillescolling.com/restrictR/reference/as_contract_text.md), [`as_contract_block()`](https://gillescolling.com/restrictR/reference/as_contract_block.md) |
+| [Using contracts in packages](#using-contracts-in-packages)             | The recommended pattern for R packages                                                                                                                                                        |
 
 ## Reusable Schemas
 
@@ -130,7 +133,43 @@ require_method("chebyshev")
 #> Error:
 #> ! method: must be one of ["euclidean", "manhattan", "cosine"]
 #>   Found: "chebyshev"
-#>   At: 1
+```
+
+## Data Frame with Mixed Constraints
+
+Contracts work well for functions that accept a data frame with typed
+columns, value ranges, and categorical fields in one go:
+
+``` r
+require_survey <- restrict("survey") |>
+  require_df() |>
+  require_has_cols(c("age", "income", "status")) |>
+  require_col_numeric("age", no_na = TRUE) |>
+  require_col_between("age", lower = 0, upper = 150) |>
+  require_col_numeric("income", no_na = TRUE, finite = TRUE) |>
+  require_col_one_of("status", c("active", "inactive", "pending"))
+```
+
+``` r
+good_survey <- data.frame(
+  age = c(25, 40, 33),
+  income = c(35000, 60000, 45000),
+  status = c("active", "inactive", "active")
+)
+require_survey(good_survey)
+```
+
+``` r
+bad_survey <- data.frame(
+  age = c(25, -5, 200),
+  income = c(35000, 60000, 45000),
+  status = c("active", "inactive", "active")
+)
+require_survey(bad_survey)
+#> Error:
+#> ! survey$age: must be >= 0 and <= 150
+#>   Found: -5
+#>   At: 2, 3
 ```
 
 ## Custom Steps
@@ -139,7 +178,8 @@ For domain-specific invariants that don’t belong in the built-in set,
 use
 [`require_custom()`](https://gillescolling.com/restrictR/reference/require_custom.md).
 The step function receives `(value, name, ctx)` and should call
-[`stop()`](https://rdrr.io/r/base/stop.html) on failure:
+[`fail()`](https://gillescolling.com/restrictR/reference/fail.md) on
+failure to produce the same structured errors as built-in steps:
 
 ``` r
 require_weights <- restrict("weights") |>
@@ -149,8 +189,8 @@ require_weights <- restrict("weights") |>
     label = "must sum to 1",
     fn = function(value, name, ctx) {
       if (abs(sum(value) - 1) > 1e-8) {
-        stop(sprintf("%s: must sum to 1, sums to %g", name, sum(value)),
-             call. = FALSE)
+        fail(name, "must sum to 1",
+             found = sprintf("sum = %g", sum(value)))
       }
     }
   )
@@ -163,7 +203,8 @@ require_weights(c(0.5, 0.3, 0.2))
 ``` r
 require_weights(c(0.5, 0.5, 0.5))
 #> Error:
-#> ! weights: must sum to 1, sums to 1.5
+#> ! weights: must sum to 1
+#>   Found: sum = 1.5
 ```
 
 Custom steps can also declare dependencies:
@@ -176,8 +217,8 @@ require_probs <- restrict("probs") |>
     deps = "n_classes",
     fn = function(value, name, ctx) {
       if (length(value) != ctx$n_classes) {
-        stop(sprintf("%s: expected %d probabilities, got %d",
-                     name, ctx$n_classes, length(value)), call. = FALSE)
+        fail(name, sprintf("expected %d probabilities", ctx$n_classes),
+             found = sprintf("length %d", length(value)))
       }
     }
   )
@@ -205,7 +246,7 @@ to generate a one-line summary for roxygen `@param`:
 
 ``` r
 as_contract_text(require_newdata)
-#> [1] "Must be a data.frame. must have columns: \"x1\", \"x2\". $x1 must be numeric (no NA, finite). $x2 must be numeric (no NA, finite). must have at least 1 row."
+#> [1] "Must be a data.frame. Must have columns: \"x1\", \"x2\". $x1 must be numeric (no NA, finite). $x2 must be numeric (no NA, finite). Must have at least 1 row."
 ```
 
 Use
@@ -223,8 +264,9 @@ cat(as_contract_block(require_newdata))
 
 ## Using Contracts in Packages
 
-The recommended pattern: define contracts in `R/contracts.R`, call them
-at the top of exported functions.
+The recommended pattern: define contracts near the top of the file that
+uses them, or in a dedicated `R/contracts.R` if several files share the
+same validators. Call them at the top of exported functions.
 
 ``` r
 # R/contracts.R
@@ -244,7 +286,7 @@ require_pred <- restrict("pred") |>
 
 #' Predict from a fitted model
 #'
-#' @param newdata Must be a data.frame. must have columns: "x1", "x2". $x1 must be numeric (no NA, finite). $x2 must be numeric (no NA, finite). must have at least 1 row.
+#' @param newdata Must be a data.frame. Must have columns: "x1", "x2". $x1 must be numeric (no NA, finite). $x2 must be numeric (no NA, finite). Must have at least 1 row.
 #' @param ... additional arguments passed to the underlying model.
 #'
 #' @export
@@ -296,7 +338,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] restrictR_0.1.0
+#> [1] restrictR_0.1.1
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] digest_0.6.39     desc_1.4.3        R6_2.6.1          fastmap_1.2.0    

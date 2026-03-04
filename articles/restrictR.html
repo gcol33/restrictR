@@ -35,7 +35,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">restrictR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -99,8 +99,10 @@ Colling</h4>
 </h2>
 <p><code>restrictR</code> lets you define reusable input contracts from
 small building blocks using the base pipe <code>|&gt;</code>. A contract
-is defined once and called like a function to validate data at
-runtime.</p>
+is defined once and called like a function to validate data at runtime.
+Validators are immutable: each <code>|&gt;</code> returns a new
+validator, so you can safely branch from a shared base without side
+effects.</p>
 <table class="table">
 <colgroup>
 <col width="32%">
@@ -124,16 +126,21 @@ runtime.</p>
 <td>Restrict string arguments to a fixed set</td>
 </tr>
 <tr class="even">
+<td><a href="#data-frame-with-mixed-constraints">Data frame with mixed
+constraints</a></td>
+<td>Columns + enums + ranges in one contract</td>
+</tr>
+<tr class="odd">
 <td><a href="#custom-steps">Custom steps</a></td>
 <td>Domain-specific invariants</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#self-documentation">Self-documentation</a></td>
 <td>Print, <code><a href="../reference/as_contract_text.html">as_contract_text()</a></code>,
 <code><a href="../reference/as_contract_block.html">as_contract_block()</a></code>
 </td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#using-contracts-in-packages">Using contracts in
 packages</a></td>
 <td>The recommended pattern for R packages</td>
@@ -222,17 +229,48 @@ same length as the rows in <code>newdata</code>:</p>
 <code class="sourceCode R"><span><span class="fu">require_method</span><span class="op">(</span><span class="st">"chebyshev"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> method: must be one of ["euclidean", "manhattan", "cosine"]</span></span>
-<span><span class="co">#&gt;   Found: "chebyshev"</span></span>
-<span><span class="co">#&gt;   At: 1</span></span></code></pre></div>
+<span><span class="co">#&gt;   Found: "chebyshev"</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="data-frame-with-mixed-constraints">Data Frame with Mixed Constraints<a class="anchor" aria-label="anchor" href="#data-frame-with-mixed-constraints"></a>
+</h2>
+<p>Contracts work well for functions that accept a data frame with typed
+columns, value ranges, and categorical fields in one go:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">require_survey</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/restrict.html">restrict</a></span><span class="op">(</span><span class="st">"survey"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/require_df.html">require_df</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/require_has_cols.html">require_has_cols</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"income"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/require_col_numeric.html">require_col_numeric</a></span><span class="op">(</span><span class="st">"age"</span>, no_na <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/require_col_between.html">require_col_between</a></span><span class="op">(</span><span class="st">"age"</span>, lower <span class="op">=</span> <span class="fl">0</span>, upper <span class="op">=</span> <span class="fl">150</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/require_col_numeric.html">require_col_numeric</a></span><span class="op">(</span><span class="st">"income"</span>, no_na <span class="op">=</span> <span class="cn">TRUE</span>, finite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/require_col_one_of.html">require_col_one_of</a></span><span class="op">(</span><span class="st">"status"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"active"</span>, <span class="st">"inactive"</span>, <span class="st">"pending"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">good_survey</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">40</span>, <span class="fl">33</span><span class="op">)</span>,</span>
+<span>  income <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">35000</span>, <span class="fl">60000</span>, <span class="fl">45000</span><span class="op">)</span>,</span>
+<span>  status <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"active"</span>, <span class="st">"inactive"</span>, <span class="st">"active"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu">require_survey</span><span class="op">(</span><span class="va">good_survey</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">bad_survey</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="op">-</span><span class="fl">5</span>, <span class="fl">200</span><span class="op">)</span>,</span>
+<span>  income <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">35000</span>, <span class="fl">60000</span>, <span class="fl">45000</span><span class="op">)</span>,</span>
+<span>  status <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"active"</span>, <span class="st">"inactive"</span>, <span class="st">"active"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu">require_survey</span><span class="op">(</span><span class="va">bad_survey</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> survey$age: must be &gt;= 0 and &lt;= 150</span></span>
+<span><span class="co">#&gt;   Found: -5</span></span>
+<span><span class="co">#&gt;   At: 2, 3</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="custom-steps">Custom Steps<a class="anchor" aria-label="anchor" href="#custom-steps"></a>
 </h2>
 <p>For domain-specific invariants that don’t belong in the built-in set,
 use <code><a href="../reference/require_custom.html">require_custom()</a></code>. The step function receives
-<code>(value, name, ctx)</code> and should call <code><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop()</a></code> on
-failure:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code>(value, name, ctx)</code> and should call <code><a href="../reference/fail.html">fail()</a></code> on
+failure to produce the same structured errors as built-in steps:</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">require_weights</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/restrict.html">restrict</a></span><span class="op">(</span><span class="st">"weights"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/require_numeric.html">require_numeric</a></span><span class="op">(</span>no_na <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/require_between.html">require_between</a></span><span class="op">(</span>lower <span class="op">=</span> <span class="fl">0</span>, upper <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -240,19 +278,20 @@ failure:</p>
 <span>    label <span class="op">=</span> <span class="st">"must sum to 1"</span>,</span>
 <span>    fn <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">value</span>, <span class="va">name</span>, <span class="va">ctx</span><span class="op">)</span> <span class="op">{</span></span>
 <span>      <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">1e-8</span><span class="op">)</span> <span class="op">{</span></span>
-<span>        <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%s: must sum to 1, sums to %g"</span>, <span class="va">name</span>, <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>             call. <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span>        <span class="fu"><a href="../reference/fail.html">fail</a></span><span class="op">(</span><span class="va">name</span>, <span class="st">"must sum to 1"</span>,</span>
+<span>             found <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"sum = %g"</span>, <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span>      <span class="op">}</span></span>
 <span>    <span class="op">}</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">require_weights</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.3</span>, <span class="fl">0.2</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">require_weights</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> weights: must sum to 1, sums to 1.5</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> weights: must sum to 1</span></span>
+<span><span class="co">#&gt;   Found: sum = 1.5</span></span></code></pre></div>
 <p>Custom steps can also declare dependencies:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">require_probs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/restrict.html">restrict</a></span><span class="op">(</span><span class="st">"probs"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/require_numeric.html">require_numeric</a></span><span class="op">(</span>no_na <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/require_custom.html">require_custom</a></span><span class="op">(</span></span>
@@ -260,8 +299,8 @@ failure:</p>
 <span>    deps <span class="op">=</span> <span class="st">"n_classes"</span>,</span>
 <span>    fn <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">value</span>, <span class="va">name</span>, <span class="va">ctx</span><span class="op">)</span> <span class="op">{</span></span>
 <span>      <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span> <span class="op">!=</span> <span class="va">ctx</span><span class="op">$</span><span class="va">n_classes</span><span class="op">)</span> <span class="op">{</span></span>
-<span>        <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%s: expected %d probabilities, got %d"</span>,</span>
-<span>                     <span class="va">name</span>, <span class="va">ctx</span><span class="op">$</span><span class="va">n_classes</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span><span class="op">)</span>, call. <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span>        <span class="fu"><a href="../reference/fail.html">fail</a></span><span class="op">(</span><span class="va">name</span>, <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"expected %d probabilities"</span>, <span class="va">ctx</span><span class="op">$</span><span class="va">n_classes</span><span class="op">)</span>,</span>
+<span>             found <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"length %d"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span>      <span class="op">}</span></span>
 <span>    <span class="op">}</span></span>
 <span>  <span class="op">)</span></span>
@@ -272,7 +311,7 @@ failure:</p>
 <h2 id="self-documentation">Self-Documentation<a class="anchor" aria-label="anchor" href="#self-documentation"></a>
 </h2>
 <p>Print a validator to see its full contract:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">require_newdata</span></span>
 <span><span class="co">#&gt; &lt;restriction newdata&gt;</span></span>
 <span><span class="co">#&gt;   1. must be a data.frame</span></span>
@@ -282,12 +321,12 @@ failure:</p>
 <span><span class="co">#&gt;   5. must have at least 1 row</span></span></code></pre></div>
 <p>Use <code><a href="../reference/as_contract_text.html">as_contract_text()</a></code> to generate a one-line summary
 for roxygen <code>@param</code>:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/as_contract_text.html">as_contract_text</a></span><span class="op">(</span><span class="va">require_newdata</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "Must be a data.frame. must have columns: \"x1\", \"x2\". $x1 must be numeric (no NA, finite). $x2 must be numeric (no NA, finite). must have at least 1 row."</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "Must be a data.frame. Must have columns: \"x1\", \"x2\". $x1 must be numeric (no NA, finite). $x2 must be numeric (no NA, finite). Must have at least 1 row."</span></span></code></pre></div>
 <p>Use <code><a href="../reference/as_contract_block.html">as_contract_block()</a></code> for multi-line output suitable
 for <code>@details</code>:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="../reference/as_contract_block.html">as_contract_block</a></span><span class="op">(</span><span class="va">require_newdata</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; - must be a data.frame</span></span>
 <span><span class="co">#&gt; - must have columns: "x1", "x2"</span></span>
@@ -298,10 +337,11 @@ for <code>@details</code>:</p>
 <div class="section level2">
 <h2 id="using-contracts-in-packages">Using Contracts in Packages<a class="anchor" aria-label="anchor" href="#using-contracts-in-packages"></a>
 </h2>
-<p>The recommended pattern: define contracts in
-<code>R/contracts.R</code>, call them at the top of exported
+<p>The recommended pattern: define contracts near the top of the file
+that uses them, or in a dedicated <code>R/contracts.R</code> if several
+files share the same validators. Call them at the top of exported
 functions.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># R/contracts.R</span></span>
 <span><span class="va">require_newdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/restrict.html">restrict</a></span><span class="op">(</span><span class="st">"newdata"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/require_df.html">require_df</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -312,12 +352,12 @@ functions.</p>
 <span><span class="va">require_pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/restrict.html">restrict</a></span><span class="op">(</span><span class="st">"pred"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/require_numeric.html">require_numeric</a></span><span class="op">(</span>no_na <span class="op">=</span> <span class="cn">TRUE</span>, finite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/require_length_matches.html">require_length_matches</a></span><span class="op">(</span><span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">newdata</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># R/predict.R</span></span>
 <span></span>
 <span><span class="co">#' Predict from a fitted model</span></span>
 <span><span class="co">#'</span></span>
-<span><span class="co">#' @param newdata Must be a data.frame. must have columns: "x1", "x2". $x1 must be numeric (no NA, finite). $x2 must be numeric (no NA, finite). must have at least 1 row.</span></span>
+<span><span class="co">#' @param newdata Must be a data.frame. Must have columns: "x1", "x2". $x1 must be numeric (no NA, finite). $x2 must be numeric (no NA, finite). Must have at least 1 row.</span></span>
 <span><span class="co">#' @param ... additional arguments passed to the underlying model.</span></span>
 <span><span class="co">#'</span></span>
 <span><span class="co">#' @export</span></span>
@@ -329,7 +369,7 @@ functions.</p>
 <span><span class="op">}</span></span></code></pre></div>
 <p>Contracts compose naturally with the pipe and branch safely (each
 <code>|&gt;</code> creates a new validator):</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">base</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/restrict.html">restrict</a></span><span class="op">(</span><span class="st">"x"</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/require_numeric.html">require_numeric</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">v1</span> <span class="op">&lt;-</span> <span class="va">base</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/require_length.html">require_length</a></span><span class="op">(</span><span class="fl">1L</span><span class="op">)</span></span>
 <span><span class="va">v2</span> <span class="op">&lt;-</span> <span class="va">base</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/require_between.html">require_between</a></span><span class="op">(</span>lower <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
@@ -341,7 +381,7 @@ functions.</p>
 <span><span class="co">#&gt; [1] 2</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="va">v2</span><span class="op">)</span><span class="op">$</span><span class="va">steps</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 2</span></span></code></pre></div>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R version 4.5.2 (2025-10-31)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
@@ -364,7 +404,7 @@ functions.</p>
 <span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] restrictR_0.1.0</span></span>
+<span><span class="co">#&gt; [1] restrictR_0.1.1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span><span class="co">#&gt;  [1] digest_0.6.39     desc_1.4.3        R6_2.6.1          fastmap_1.2.0    </span></span>

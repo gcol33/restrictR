@@ -39,6 +39,7 @@ early if not.
 Other core:
 [`as_contract_block()`](https://gillescolling.com/restrictR/reference/as_contract_block.md),
 [`as_contract_text()`](https://gillescolling.com/restrictR/reference/as_contract_text.md),
+[`fail()`](https://gillescolling.com/restrictR/reference/fail.md),
 [`require_custom()`](https://gillescolling.com/restrictR/reference/require_custom.md)
 
 ## Examples

@@ -1,5 +1,21 @@
 # Changelog
 
+## restrictR 0.1.1
+
+- Export
+  [`fail()`](https://gillescolling.com/restrictR/reference/fail.md) so
+  custom steps produce canonical structured errors.
+- [`as_contract_text()`](https://gillescolling.com/restrictR/reference/as_contract_text.md)
+  now capitalizes every sentence, not just the first.
+- [`require_between()`](https://gillescolling.com/restrictR/reference/require_between.md)
+  and
+  [`require_one_of()`](https://gillescolling.com/restrictR/reference/require_one_of.md)
+  omit the `At:` line for scalar values where it adds no information.
+- Vignette: added “Data Frame with Mixed Constraints” section, surfaced
+  immutability in the overview, updated custom step examples to use
+  [`fail()`](https://gillescolling.com/restrictR/reference/fail.md).
+- README: tightened prose, removed AI-ish phrasing.
+
 ## restrictR 0.1.0
 
 - Initial release.

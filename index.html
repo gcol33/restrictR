@@ -41,7 +41,7 @@ operator. Define runtime contracts once and enforce them anywhere.
 
     <a class="navbar-brand me-2" href="index.html">restrictR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -85,7 +85,7 @@ operator. Define runtime contracts once and enforce them anywhere.
 </h1></div>
 <p><a href="https://github.com/gcol33/restrictR/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/gcol33/restrictR/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/gcol33/restrictR" class="external-link"><img src="https://codecov.io/gh/gcol33/restrictR/graph/badge.svg" alt="Codecov test coverage"></a> <a href="https://opensource.org/licenses/MIT" class="external-link"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a></p>
 <p><strong>Composable Runtime Contracts for R</strong></p>
-<p>The <code>restrictR</code> package lets you <strong>define reusable input contracts</strong> from small building blocks using the base pipe <code>|&gt;</code>. Define a validator once, enforce it anywhere. Validators compose naturally, support dependent rules via formulas, and produce clear, path-aware error messages. No DSL, no operator overloading, just idiomatic R.</p>
+<p>Build reusable input validators from small <code>require_*()</code> blocks, composed with the base pipe <code>|&gt;</code>. Each <code>|&gt;</code> returns a new immutable validator you can call like a function. Dependent rules use formulas with explicit context. Errors are structured and path-aware. No DSL, no operator overloading, just R.</p>
 <div class="section level2">
 <h2 id="quick-start">Quick Start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
 </h2>
@@ -101,20 +101,13 @@ operator. Define runtime contracts once and enforce them anywhere.
 <span><span class="co"># Enforce anywhere</span></span>
 <span><span class="fu">require_positive_scalar</span><span class="op">(</span><span class="fl">3.14</span><span class="op">)</span>   <span class="co"># passes silently</span></span>
 <span><span class="fu">require_positive_scalar</span><span class="op">(</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span>     <span class="co"># Error: x: must be in (0, Inf]</span></span>
-<span>                                <span class="co">#   Found: -1</span></span>
-<span>                                <span class="co">#   At: 1</span></span></code></pre></div>
+<span>                                <span class="co">#   Found: -1</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="statement-of-need">Statement of Need<a class="anchor" aria-label="anchor" href="#statement-of-need"></a>
 </h2>
-<p>R has no built-in way to define reusable input contracts. Developers copy-paste the same <code><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot()</a></code> / <code>if (!is.numeric(...)) stop(...)</code> blocks across functions. When the contract changes, you hunt for every validation site. Error messages are inconsistent: one function says <code>"x must be numeric"</code>, another says <code>"expected numeric input"</code>.</p>
-<p><code>restrictR</code> replaces that with composable, pipe-friendly validators that:</p>
-<ul>
-<li>are defined once and called like functions,</li>
-<li>produce structured, grep-friendly error messages,</li>
-<li>support dependent rules via explicit context,</li>
-<li>are self-documenting via <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> and <code><a href="reference/as_contract_text.html">as_contract_text()</a></code>.</li>
-</ul>
+<p>R has no built-in way to define reusable input contracts. You end up copy-pasting the same <code><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot()</a></code> / <code>if (!is.numeric(...)) stop(...)</code> blocks across functions. When the contract changes, you hunt for every copy. One function says <code>"x must be numeric"</code>, the next says <code>"expected numeric input"</code>.</p>
+<p><code>restrictR</code> gives you pipe-composable validators instead. Define once, call like a function, get structured errors every time. Validators also print their own contracts, so your documentation stays in sync with what actually runs.</p>
 </div>
 <div class="section level2">
 <h2 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a>
@@ -163,7 +156,8 @@ operator. Define runtime contracts once and enforce them anywhere.
 <span><span class="co">#&gt;   5. must have at least 1 row</span></span>
 <span></span>
 <span><span class="fu"><a href="reference/as_contract_text.html">as_contract_text</a></span><span class="op">(</span><span class="va">require_newdata</span><span class="op">)</span></span>
-<span><span class="co">#&gt; "Must be a data.frame. Must have columns: \"x1\", \"x2\". ..."</span></span></code></pre></div>
+<span><span class="co">#&gt; "Must be a data.frame. Must have columns: \"x1\", \"x2\".</span></span>
+<span><span class="co">#&gt;  $x1 must be numeric (no NA, finite). ..."</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -223,7 +217,7 @@ operator. Define runtime contracts once and enforce them anywhere.
 <div class="section level3">
 <h3 id="custom-steps">Custom Steps<a class="anchor" aria-label="anchor" href="#custom-steps"></a>
 </h3>
-<p>For domain-specific invariants:</p>
+<p>For domain-specific invariants, <code><a href="reference/require_custom.html">require_custom()</a></code> lets you write your own check while keeping the same error format via <code><a href="reference/fail.html">fail()</a></code>:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">require_weights</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/restrict.html">restrict</a></span><span class="op">(</span><span class="st">"weights"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/require_numeric.html">require_numeric</a></span><span class="op">(</span>no_na <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -232,8 +226,8 @@ operator. Define runtime contracts once and enforce them anywhere.
 <span>    label <span class="op">=</span> <span class="st">"must sum to 1"</span>,</span>
 <span>    fn <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">value</span>, <span class="va">name</span>, <span class="va">ctx</span><span class="op">)</span> <span class="op">{</span></span>
 <span>      <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">1e-8</span><span class="op">)</span> <span class="op">{</span></span>
-<span>        <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%s: must sum to 1, sums to %g"</span>, <span class="va">name</span>, <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>             call. <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span>        <span class="fu"><a href="reference/fail.html">fail</a></span><span class="op">(</span><span class="va">name</span>, <span class="st">"must sum to 1"</span>,</span>
+<span>             found <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"sum = %g"</span>, <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span>      <span class="op">}</span></span>
 <span>    <span class="op">}</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>

@@ -23,6 +23,7 @@ A character(1) string with one step per line.
 
 Other core:
 [`as_contract_text()`](https://gillescolling.com/restrictR/reference/as_contract_text.md),
+[`fail()`](https://gillescolling.com/restrictR/reference/fail.md),
 [`require_custom()`](https://gillescolling.com/restrictR/reference/require_custom.md),
 [`restrict()`](https://gillescolling.com/restrictR/reference/restrict.md)
 

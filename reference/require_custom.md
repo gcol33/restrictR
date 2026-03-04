@@ -3,7 +3,7 @@
 Allows advanced users to define their own validation step without
 growing the package's built-in API surface. The step function receives
 `(value, name, ctx)` and should call
-[`testthat::fail()`](https://testthat.r-lib.org/reference/fail.html) on
+[`fail()`](https://gillescolling.com/restrictR/reference/fail.md) on
 validation failure.
 
 ## Usage
@@ -25,8 +25,8 @@ require_custom(restriction, label, fn, deps = character(0L))
 - fn:
 
   a function with signature `function(value, name, ctx)` that calls
-  [`stop()`](https://rdrr.io/r/base/stop.html) or `restrictR:::fail()`
-  on failure.
+  [`fail()`](https://gillescolling.com/restrictR/reference/fail.md) on
+  validation failure.
 
 - deps:
 
@@ -41,6 +41,7 @@ A new `restriction` object with the custom step appended.
 Other core:
 [`as_contract_block()`](https://gillescolling.com/restrictR/reference/as_contract_block.md),
 [`as_contract_text()`](https://gillescolling.com/restrictR/reference/as_contract_text.md),
+[`fail()`](https://gillescolling.com/restrictR/reference/fail.md),
 [`restrict()`](https://gillescolling.com/restrictR/reference/restrict.md)
 
 ## Examples
@@ -53,8 +54,7 @@ require_unique_id <- restrict("id") |>
     fn = function(value, name, ctx) {
       dupes <- which(duplicated(value))
       if (length(dupes) > 0L) {
-        stop(sprintf("%s: contains %d duplicate value(s)",
-                     name, length(dupes)), call. = FALSE)
+        fail(name, "contains duplicates", at = dupes)
       }
     }
   )

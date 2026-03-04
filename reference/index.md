@@ -12,6 +12,8 @@ Create and inspect validators
   : Convert a Validator to a Multi-Line Block
 - [`require_custom()`](https://gillescolling.com/restrictR/reference/require_custom.md)
   : Create a Custom Validation Step
+- [`fail()`](https://gillescolling.com/restrictR/reference/fail.md) :
+  Format a Validation Error
 
 ## Type Checks
 
