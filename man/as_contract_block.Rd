@@ -24,6 +24,7 @@ as_contract_block(v)
 \seealso{
 Other core: 
 \code{\link{as_contract_text}()},
+\code{\link{fail}()},
 \code{\link{require_custom}()},
 \code{\link{restrict}()}
 }

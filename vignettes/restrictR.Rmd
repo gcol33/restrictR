@@ -29,13 +29,15 @@ library(restrictR)
 
 `restrictR` lets you define reusable input contracts from small building blocks
 using the base pipe `|>`. A contract is defined once and called like a function
-to validate data at runtime.
+to validate data at runtime. Validators are immutable: each `|>` returns a new
+validator, so you can safely branch from a shared base without side effects.
 
 | Section | What you'll learn |
 |---------|-------------------|
 | [Reusable schemas](#reusable-schemas) | Define and reuse data.frame contracts |
 | [Dependent validation](#dependent-validation) | Constraints that reference other arguments |
 | [Enum arguments](#enum-arguments) | Restrict string arguments to a fixed set |
+| [Data frame with mixed constraints](#data-frame-with-mixed-constraints) | Columns + enums + ranges in one contract |
 | [Custom steps](#custom-steps) | Domain-specific invariants |
 | [Self-documentation](#self-documentation) | Print, `as_contract_text()`, `as_contract_block()` |
 | [Using contracts in packages](#using-contracts-in-packages) | The recommended pattern for R packages |
@@ -135,11 +137,45 @@ require_method("euclidean")
 require_method("chebyshev")
 ```
 
+## Data Frame with Mixed Constraints
+
+Contracts work well for functions that accept a data frame with typed columns,
+value ranges, and categorical fields in one go:
+
+```{r}
+require_survey <- restrict("survey") |>
+  require_df() |>
+  require_has_cols(c("age", "income", "status")) |>
+  require_col_numeric("age", no_na = TRUE) |>
+  require_col_between("age", lower = 0, upper = 150) |>
+  require_col_numeric("income", no_na = TRUE, finite = TRUE) |>
+  require_col_one_of("status", c("active", "inactive", "pending"))
+```
+
+```{r}
+good_survey <- data.frame(
+  age = c(25, 40, 33),
+  income = c(35000, 60000, 45000),
+  status = c("active", "inactive", "active")
+)
+require_survey(good_survey)
+```
+
+```{r}
+bad_survey <- data.frame(
+  age = c(25, -5, 200),
+  income = c(35000, 60000, 45000),
+  status = c("active", "inactive", "active")
+)
+require_survey(bad_survey)
+```
+
 ## Custom Steps
 
 For domain-specific invariants that don't belong in the built-in set, use
 `require_custom()`. The step function receives `(value, name, ctx)` and should
-call `stop()` on failure:
+call `fail()` on failure to produce the same structured errors as built-in
+steps:
 
 ```{r}
 require_weights <- restrict("weights") |>
@@ -149,8 +185,8 @@ require_weights <- restrict("weights") |>
     label = "must sum to 1",
     fn = function(value, name, ctx) {
       if (abs(sum(value) - 1) > 1e-8) {
-        stop(sprintf("%s: must sum to 1, sums to %g", name, sum(value)),
-             call. = FALSE)
+        fail(name, "must sum to 1",
+             found = sprintf("sum = %g", sum(value)))
       }
     }
   )
@@ -174,8 +210,8 @@ require_probs <- restrict("probs") |>
     deps = "n_classes",
     fn = function(value, name, ctx) {
       if (length(value) != ctx$n_classes) {
-        stop(sprintf("%s: expected %d probabilities, got %d",
-                     name, ctx$n_classes, length(value)), call. = FALSE)
+        fail(name, sprintf("expected %d probabilities", ctx$n_classes),
+             found = sprintf("length %d", length(value)))
       }
     }
   )
@@ -205,8 +241,9 @@ cat(as_contract_block(require_newdata))
 
 ## Using Contracts in Packages
 
-The recommended pattern: define contracts in `R/contracts.R`, call them at the
-top of exported functions.
+The recommended pattern: define contracts near the top of the file that uses
+them, or in a dedicated `R/contracts.R` if several files share the same
+validators. Call them at the top of exported functions.
 
 ```r
 # R/contracts.R

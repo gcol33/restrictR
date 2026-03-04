@@ -6,7 +6,7 @@
 
 **Composable Runtime Contracts for R**
 
-The `restrictR` package lets you **define reusable input contracts** from small building blocks using the base pipe `|>`. Define a validator once, enforce it anywhere. Validators compose naturally, support dependent rules via formulas, and produce clear, path-aware error messages. No DSL, no operator overloading, just idiomatic R.
+Build reusable input validators from small `require_*()` blocks, composed with the base pipe `|>`. Each `|>` returns a new immutable validator you can call like a function. Dependent rules use formulas with explicit context. Errors are structured and path-aware. No DSL, no operator overloading, just R.
 
 ## Quick Start
 
@@ -23,19 +23,13 @@ require_positive_scalar <- restrict("x") |>
 require_positive_scalar(3.14)   # passes silently
 require_positive_scalar(-1)     # Error: x: must be in (0, Inf]
                                 #   Found: -1
-                                #   At: 1
 ```
 
 ## Statement of Need
 
-R has no built-in way to define reusable input contracts. Developers copy-paste the same `stopifnot()` / `if (!is.numeric(...)) stop(...)` blocks across functions. When the contract changes, you hunt for every validation site. Error messages are inconsistent: one function says `"x must be numeric"`, another says `"expected numeric input"`.
+R has no built-in way to define reusable input contracts. You end up copy-pasting the same `stopifnot()` / `if (!is.numeric(...)) stop(...)` blocks across functions. When the contract changes, you hunt for every copy. One function says `"x must be numeric"`, the next says `"expected numeric input"`.
 
-`restrictR` replaces that with composable, pipe-friendly validators that:
-
-- are defined once and called like functions,
-- produce structured, grep-friendly error messages,
-- support dependent rules via explicit context,
-- are self-documenting via `print()` and `as_contract_text()`.
+`restrictR` gives you pipe-composable validators instead. Define once, call like a function, get structured errors every time. Validators also print their own contracts, so your documentation stays in sync with what actually runs.
 
 ## Features
 
@@ -89,7 +83,8 @@ print(require_newdata)
 #>   5. must have at least 1 row
 
 as_contract_text(require_newdata)
-#> "Must be a data.frame. Must have columns: \"x1\", \"x2\". ..."
+#> "Must be a data.frame. Must have columns: \"x1\", \"x2\".
+#>  $x1 must be numeric (no NA, finite). ..."
 ```
 
 ## Installation
@@ -147,7 +142,8 @@ require_survey <- restrict("survey") |>
 
 ### Custom Steps
 
-For domain-specific invariants:
+For domain-specific invariants, `require_custom()` lets you write your own
+check while keeping the same error format via `fail()`:
 
 ```r
 require_weights <- restrict("weights") |>
@@ -157,8 +153,8 @@ require_weights <- restrict("weights") |>
     label = "must sum to 1",
     fn = function(value, name, ctx) {
       if (abs(sum(value) - 1) > 1e-8) {
-        stop(sprintf("%s: must sum to 1, sums to %g", name, sum(value)),
-             call. = FALSE)
+        fail(name, "must sum to 1",
+             found = sprintf("sum = %g", sum(value)))
       }
     }
   )

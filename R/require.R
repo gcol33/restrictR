@@ -620,7 +620,8 @@ require_between <- function(restriction, lower = -Inf, upper = Inf,
 
       if (length(bad) > 0L) {
         fail(name, sprintf("must be in %s%s, %s%s", lb, lower, upper, ub),
-             found = value[bad[1L]], at = bad)
+             found = value[bad[1L]],
+             at = if (length(value) > 1L) bad)
       }
     }
   ))
@@ -651,7 +652,7 @@ require_one_of <- function(restriction, values) {
           'must be one of [%s]',
           paste0('"', values, '"', collapse = ", ")
         ), found = paste0('"', unique(value[bad]), '"', collapse = ", "),
-        at = bad)
+        at = if (length(value) > 1L) bad)
       }
     }
   ))

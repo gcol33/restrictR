@@ -1,6 +1,10 @@
 #' Format a Validation Error
 #'
 #' Produces a consistently formatted error message and stops execution.
+#' Intended for use inside custom validation steps created with
+#' [require_custom()], so they produce the same structured errors as built-in
+#' steps.
+#'
 #' Format: `path: message`, with optional `Found:` and `At:` lines.
 #'
 #' @param path the full path (e.g. `"x"` or `"newdata$x2"`).
@@ -8,7 +12,16 @@
 #' @param found optional value to show on a `Found:` line.
 #' @param at optional integer positions to show on an `At:` line.
 #'
-#' @noRd
+#' @examples
+#' \dontrun{
+#' fail("x", "must be positive", found = -3, at = 2L)
+#' # Error: x: must be positive
+#' #   Found: -3
+#' #   At: 2
+#' }
+#'
+#' @family core
+#' @export
 fail <- function(path, message, found = NULL, at = NULL) {
   msg <- sprintf("%s: %s", path, message)
   if (!is.null(found)) {

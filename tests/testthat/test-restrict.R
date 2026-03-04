@@ -48,7 +48,7 @@ test_that("as_contract_text() produces plain text", {
   expect_type(txt, "character")
   expect_length(txt, 1L)
   expect_match(txt, "Must be numeric")
-  expect_match(txt, "must have length 1")
+  expect_match(txt, "Must have length 1")
 })
 
 test_that("as_contract_text() handles empty restriction", {

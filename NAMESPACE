@@ -3,6 +3,7 @@
 S3method(print,restriction)
 export(as_contract_block)
 export(as_contract_text)
+export(fail)
 export(require_between)
 export(require_character)
 export(require_col_between)

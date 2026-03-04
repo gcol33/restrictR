@@ -1,6 +1,6 @@
 Package: restrictR
 Title: Composable Runtime Contracts for R
-Version: 0.1.0
+Version: 0.1.1
 Authors@R:
     person("Gilles", "Colling", email = "gilles.colling051@gmail.com",
            role = c("aut", "cre", "cph"),
