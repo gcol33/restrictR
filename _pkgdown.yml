@@ -1,29 +1,33 @@
 url: https://gillescolling.com/restrictR/
-
 template:
   bootstrap: 5
   bootswatch: sandstone
   light-switch: yes
-
+  includes:
+    in_header: pkgdown/mathjax-config.html
 figures:
   dev: svglite::svglite
   fig.ext: svg
   bg: '#F5F6F8'
-
 home:
   title: 'restrictR: Composable Runtime Contracts for R'
   description: |
     Build reusable validators from small building blocks using the base pipe
     operator. Define runtime contracts once and enforce them anywhere.
-
 authors:
   Gilles Colling:
     href: https://github.com/gcol33
-
 navbar:
   structure:
-    left: [intro, reference, articles, news]
-    right: [search, lightswitch, github]
+    left:
+    - intro
+    - reference
+    - articles
+    - news
+    right:
+    - search
+    - lightswitch
+    - github
   components:
     intro:
       text: Get Started
@@ -36,61 +40,53 @@ navbar:
     github:
       icon: fab fa-github
       href: https://github.com/gcol33/restrictR
-
 reference:
-  - title: Core
-    desc: Create and inspect validators
-    contents:
-      - restrict
-      - as_contract_text
-      - as_contract_block
-      - require_custom
-
-  - title: Type Checks
-    desc: Validate value types
-    contents:
-      - require_df
-      - require_numeric
-      - require_integer
-      - require_character
-      - require_logical
-
-  - title: Missingness & Finiteness
-    desc: Check for NA and non-finite values
-    contents:
-      - require_no_na
-      - require_finite
-
-  - title: Structure Checks
-    desc: Validate length, columns, and row counts
-    contents:
-      - require_length
-      - require_length_min
-      - require_length_max
-      - require_length_matches
-      - require_nrow_min
-      - require_nrow_matches
-      - require_has_cols
-
-  - title: Column-Level Checks
-    desc: Validate individual columns with path-aware errors
-    contents:
-      - require_col_numeric
-      - require_col_character
-      - require_col_between
-      - require_col_one_of
-
-  - title: Value Checks
-    desc: Validate value ranges and set membership
-    contents:
-      - require_between
-      - require_one_of
-
+- title: Core
+  desc: Create and inspect validators
+  contents:
+  - restrict
+  - as_contract_text
+  - as_contract_block
+  - require_custom
+- title: Type Checks
+  desc: Validate value types
+  contents:
+  - require_df
+  - require_numeric
+  - require_integer
+  - require_character
+  - require_logical
+- title: Missingness & Finiteness
+  desc: Check for NA and non-finite values
+  contents:
+  - require_no_na
+  - require_finite
+- title: Structure Checks
+  desc: Validate length, columns, and row counts
+  contents:
+  - require_length
+  - require_length_min
+  - require_length_max
+  - require_length_matches
+  - require_nrow_min
+  - require_nrow_matches
+  - require_has_cols
+- title: Column-Level Checks
+  desc: Validate individual columns with path-aware errors
+  contents:
+  - require_col_numeric
+  - require_col_character
+  - require_col_between
+  - require_col_one_of
+- title: Value Checks
+  desc: Validate value ranges and set membership
+  contents:
+  - require_between
+  - require_one_of
 articles:
-  - title: Getting Started
-    navbar: ~
-    contents: restrictR
-
+- title: Getting Started
+  navbar: ~
+  contents: restrictR
 footer:
   structure:
     left: developed_by

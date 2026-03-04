@@ -1,11 +1,17 @@
+CMD
+Codecov
 composable
 ctx
+DSL
 enum
 enums
 finiteness
+invariants
 nrow
+ORCID
 pkgdown
 roxygen
 runtime
+schemas
 validator
 validators

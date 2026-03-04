@@ -11,6 +11,7 @@ Description: Build reusable validators from small building blocks using the
     dependent rules via formulas, and produce clear, path-aware error
     messages. No DSL, no operator overloading, just idiomatic R.
 License: MIT + file LICENSE
+Language: en-US
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
