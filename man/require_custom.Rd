@@ -31,12 +31,10 @@ require_unique_id <- restrict("id") |>
   require_custom(
     label = "must contain unique values",
     fn = function(value, name, ctx) {
-      dupes <- duplicated(value)
-      if (any(dupes)) {
-        stop(sprintf(
-          "`\%s` failed validation\n  \u2716 contains \%d duplicate value(s)",
-          name, sum(dupes)
-        ), call. = FALSE)
+      dupes <- which(duplicated(value))
+      if (length(dupes) > 0L) {
+        stop(sprintf("\%s: contains \%d duplicate value(s)",
+                     name, length(dupes)), call. = FALSE)
       }
     }
   )
@@ -44,6 +42,7 @@ require_unique_id <- restrict("id") |>
 }
 \seealso{
 Other core: 
+\code{\link{as_contract_block}()},
 \code{\link{as_contract_text}()},
 \code{\link{restrict}()}
 }

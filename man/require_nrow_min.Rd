@@ -21,6 +21,9 @@ Validates that a data.frame has at least \code{n} rows.
 Other structure checks: 
 \code{\link{require_has_cols}()},
 \code{\link{require_length}()},
-\code{\link{require_length_matches}()}
+\code{\link{require_length_matches}()},
+\code{\link{require_length_max}()},
+\code{\link{require_length_min}()},
+\code{\link{require_nrow_matches}()}
 }
 \concept{structure checks}

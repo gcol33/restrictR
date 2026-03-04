@@ -18,6 +18,8 @@ Validates that the value is a \code{data.frame}.
 \seealso{
 Other type checks: 
 \code{\link{require_character}()},
+\code{\link{require_integer}()},
+\code{\link{require_logical}()},
 \code{\link{require_numeric}()}
 }
 \concept{type checks}

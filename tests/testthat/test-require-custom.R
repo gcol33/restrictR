@@ -4,8 +4,8 @@ test_that("require_custom() adds a custom step", {
       label = "must be unique",
       fn = function(value, name, ctx) {
         if (anyDuplicated(value) > 0L) {
-          stop(sprintf("`%s` failed validation\n  \u2716 contains duplicates",
-                       name), call. = FALSE)
+          fail <- get("fail", envir = asNamespace("restrictR"))
+          fail(name, "contains duplicates")
         }
       }
     )
@@ -19,8 +19,7 @@ test_that("require_custom() shows label in print", {
     require_numeric() |>
     require_custom(label = "must be sorted ascending", fn = function(value, name, ctx) {
       if (is.unsorted(value)) {
-        stop(sprintf("`%s` failed validation\n  \u2716 not sorted", name),
-             call. = FALSE)
+        stop(sprintf("%s: not sorted", name), call. = FALSE)
       }
     })
 
@@ -35,7 +34,7 @@ test_that("require_custom() with deps enforces context", {
       deps = "expected_sum",
       fn = function(value, name, ctx) {
         if (abs(sum(value) - ctx$expected_sum) > 1e-8) {
-          stop(sprintf("`%s` failed validation\n  \u2716 sum is %g, expected %g",
+          stop(sprintf("%s: sum is %g, expected %g",
                        name, sum(value), ctx$expected_sum), call. = FALSE)
         }
       }

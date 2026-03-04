@@ -1,16 +1,29 @@
 #' Format a Validation Error
 #'
 #' Produces a consistently formatted error message and stops execution.
+#' Format: `path: message`, with optional `Found:` and `At:` lines.
 #'
-#' @param name the validator name (or path like `newdata$x2`).
+#' @param path the full path (e.g. `"x"` or `"newdata$x2"`).
 #' @param message the specific failure message.
+#' @param found optional value to show on a `Found:` line.
+#' @param at optional integer positions to show on an `At:` line.
 #'
 #' @noRd
-fail <- function(name, message) {
-  stop(
-    sprintf("`%s` failed validation\n  \u2716 %s", name, message),
-    call. = FALSE
-  )
+fail <- function(path, message, found = NULL, at = NULL) {
+  msg <- sprintf("%s: %s", path, message)
+  if (!is.null(found)) {
+    msg <- paste0(msg, "\n  Found: ", found)
+  }
+  if (!is.null(at)) {
+    if (length(at) <= 5L) {
+      msg <- paste0(msg, "\n  At: ", paste(at, collapse = ", "))
+    } else {
+      msg <- paste0(msg, sprintf("\n  At: %s (and %d more)",
+                                 paste(at[1:5], collapse = ", "),
+                                 length(at) - 5L))
+    }
+  }
+  stop(msg, call. = FALSE)
 }
 
 
@@ -41,7 +54,7 @@ eval_formula <- function(formula, value, name, ctx) {
       missing_vars <- vars[!vars %in% names(env_data)]
       hint <- if (length(missing_vars) > 0L) {
         sprintf(
-          "\n  \u2139 pass `%s` as a named argument to the validator",
+          "; pass `%s` as a named argument to the validator",
           paste(missing_vars, collapse = "`, `")
         )
       } else {
@@ -76,24 +89,13 @@ col_path <- function(name, col) {
 #' Shared helper for NA checking across type and column validators.
 #'
 #' @param x the vector to check.
-#' @param name the validator name (used in `fail()` header).
-#' @param prefix optional prefix for the message body (e.g. `"newdata$x2"`).
-#'   If `NULL`, message starts directly with "must".
+#' @param path the full path for error messages (e.g. `"x"` or `"newdata$x2"`).
 #'
 #' @noRd
-check_no_na <- function(x, name, prefix = NULL) {
-  na_count <- sum(is.na(x))
-  if (na_count > 0L) {
-    pos <- which(is.na(x))
-    pos_msg <- if (length(pos) <= 5L) {
-      paste("at position", paste(pos, collapse = ", "))
-    } else {
-      sprintf("at positions %s, ... (%d total)",
-              paste(pos[1:5], collapse = ", "), na_count)
-    }
-    pfx <- if (!is.null(prefix)) paste0(prefix, " ") else ""
-    fail(name, sprintf("%smust not contain NA values (%d NA found %s)",
-                       pfx, na_count, pos_msg))
+check_no_na <- function(x, path) {
+  na_pos <- which(is.na(x))
+  if (length(na_pos) > 0L) {
+    fail(path, "must not contain NA", at = na_pos)
   }
 }
 
@@ -103,30 +105,18 @@ check_no_na <- function(x, name, prefix = NULL) {
 #' Shared helper used by `require_numeric()` and `require_col_numeric()`.
 #'
 #' @param x the numeric vector to check.
-#' @param name the validator name (used in `fail()` header).
+#' @param path the full path for error messages.
 #' @param no_na logical; check for NA.
 #' @param finite logical; check for non-finite values.
-#' @param prefix optional prefix for the message body (e.g. `"newdata$x2"`).
 #'
 #' @noRd
-check_na_finite <- function(x, name, no_na, finite, prefix = NULL) {
-  if (no_na) check_no_na(x, name, prefix)
+check_na_finite <- function(x, path, no_na, finite) {
+  if (no_na) check_no_na(x, path)
   if (finite) {
     non_finite <- which(!is.finite(x))
     if (no_na) non_finite <- setdiff(non_finite, which(is.na(x)))
     if (length(non_finite) > 0L) {
-      pos_msg <- if (length(non_finite) <= 5L) {
-        paste("at position", paste(non_finite, collapse = ", "))
-      } else {
-        sprintf("at positions %s, ... (%d total)",
-                paste(non_finite[1:5], collapse = ", "),
-                length(non_finite))
-      }
-      pfx <- if (!is.null(prefix)) paste0(prefix, " ") else ""
-      fail(name, sprintf(
-        "%smust be finite (%d non-finite value %s)",
-        pfx, length(non_finite), pos_msg
-      ))
+      fail(path, "must be finite", at = non_finite)
     }
   }
 }

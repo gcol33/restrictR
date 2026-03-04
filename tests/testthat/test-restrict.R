@@ -21,8 +21,8 @@ test_that("restriction with no steps passes anything", {
 
 test_that("print.restriction works with no steps", {
   v <- restrict("x")
-  expect_output(print(v), "<restriction: x>")
-  expect_output(print(v), "no validation steps")
+  expect_output(print(v), "<restriction x>")
+  expect_output(print(v), "no steps")
 })
 
 test_that("print.restriction shows steps", {
@@ -56,13 +56,28 @@ test_that("as_contract_text() handles empty restriction", {
   expect_equal(as_contract_text(v), "No validation constraints.")
 })
 
+test_that("as_contract_block() produces multi-line text", {
+  v <- restrict("x") |>
+    require_numeric(no_na = TRUE) |>
+    require_length(1L)
+  blk <- as_contract_block(v)
+  expect_type(blk, "character")
+  expect_length(blk, 1L)
+  expect_match(blk, "^- must be numeric")
+  expect_match(blk, "- must have length 1")
+})
+
+test_that("as_contract_block() handles empty restriction", {
+  v <- restrict("x")
+  expect_equal(as_contract_block(v), "No validation constraints.")
+})
+
 test_that("pipe steps are immutable (branching is safe)", {
   base <- restrict("x") |> require_numeric()
   v1 <- base |> require_length(1L)
-  v2 <- base |> require_range(lower = 0)
+  v2 <- base |> require_between(lower = 0)
 
   # base is unchanged: still has 1 step
-
   expect_length(environment(base)$steps, 1L)
 
   # v1 and v2 are independent: each has 2 steps

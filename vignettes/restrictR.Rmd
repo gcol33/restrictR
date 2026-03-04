@@ -1,0 +1,257 @@
+---
+title: "Runtime Contracts for R Functions"
+author: "Gilles Colling"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Runtime Contracts for R Functions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5,
+  dev = "svglite",
+  fig.ext = "svg",
+  error = TRUE
+)
+```
+
+```{r setup}
+library(restrictR)
+```
+
+## Overview
+
+`restrictR` lets you define reusable input contracts from small building blocks
+using the base pipe `|>`. A contract is defined once and called like a function
+to validate data at runtime.
+
+| Section | What you'll learn |
+|---------|-------------------|
+| [Reusable schemas](#reusable-schemas) | Define and reuse data.frame contracts |
+| [Dependent validation](#dependent-validation) | Constraints that reference other arguments |
+| [Enum arguments](#enum-arguments) | Restrict string arguments to a fixed set |
+| [Custom steps](#custom-steps) | Domain-specific invariants |
+| [Self-documentation](#self-documentation) | Print, `as_contract_text()`, `as_contract_block()` |
+| [Using contracts in packages](#using-contracts-in-packages) | The recommended pattern for R packages |
+
+## Reusable Schemas
+
+The most common use case: validating a `newdata` argument in a predict-like
+function. Instead of scattering `if`/`stop()` blocks, define the contract once:
+
+```{r}
+require_newdata <- restrict("newdata") |>
+  require_df() |>
+  require_has_cols(c("x1", "x2")) |>
+  require_col_numeric("x1", no_na = TRUE, finite = TRUE) |>
+  require_col_numeric("x2", no_na = TRUE, finite = TRUE) |>
+  require_nrow_min(1L)
+```
+
+The result is a callable function. Valid input passes silently:
+
+```{r}
+good <- data.frame(x1 = c(1, 2, 3), x2 = c(4, 5, 6))
+require_newdata(good)
+```
+
+Invalid input produces a structured error with the exact path and position:
+
+```{r}
+require_newdata(42)
+```
+
+```{r}
+require_newdata(data.frame(x1 = c(1, NA), x2 = c(3, 4)))
+```
+
+```{r}
+require_newdata(data.frame(x1 = c(1, 2), x2 = c("a", "b")))
+```
+
+Every error follows the same format: `path: message`, optionally followed by
+`Found:` and `At:` lines. This makes errors instantly recognizable and
+grep-friendly.
+
+## Dependent Validation
+
+Some contracts depend on context. A prediction vector must have the same length
+as the rows in `newdata`:
+
+```{r}
+require_pred <- restrict("pred") |>
+  require_numeric(no_na = TRUE, finite = TRUE) |>
+  require_length_matches(~ nrow(newdata))
+```
+
+The formula `~ nrow(newdata)` declares a dependency on `newdata`. Pass it
+explicitly when calling the validator:
+
+```{r}
+newdata <- data.frame(x1 = 1:5, x2 = 6:10)
+require_pred(c(0.1, 0.2, 0.3, 0.4, 0.5), newdata = newdata)
+```
+
+Mismatched lengths produce a precise diagnostic:
+
+```{r}
+require_pred(c(0.1, 0.2, 0.3), newdata = newdata)
+```
+
+Missing context is caught **before any checks run**:
+
+```{r}
+require_pred(c(0.1, 0.2, 0.3))
+```
+
+Context can also be passed as a named list via `.ctx`:
+
+```{r}
+require_pred(1:5, .ctx = list(newdata = newdata))
+```
+
+## Enum Arguments
+
+For string arguments that must be one of a fixed set:
+
+```{r}
+require_method <- restrict("method") |>
+  require_character(no_na = TRUE) |>
+  require_length(1L) |>
+  require_one_of(c("euclidean", "manhattan", "cosine"))
+```
+
+```{r}
+require_method("euclidean")
+```
+
+```{r}
+require_method("chebyshev")
+```
+
+## Custom Steps
+
+For domain-specific invariants that don't belong in the built-in set, use
+`require_custom()`. The step function receives `(value, name, ctx)` and should
+call `stop()` on failure:
+
+```{r}
+require_weights <- restrict("weights") |>
+  require_numeric(no_na = TRUE) |>
+  require_between(lower = 0, upper = 1) |>
+  require_custom(
+    label = "must sum to 1",
+    fn = function(value, name, ctx) {
+      if (abs(sum(value) - 1) > 1e-8) {
+        stop(sprintf("%s: must sum to 1, sums to %g", name, sum(value)),
+             call. = FALSE)
+      }
+    }
+  )
+```
+
+```{r}
+require_weights(c(0.5, 0.3, 0.2))
+```
+
+```{r}
+require_weights(c(0.5, 0.5, 0.5))
+```
+
+Custom steps can also declare dependencies:
+
+```{r}
+require_probs <- restrict("probs") |>
+  require_numeric(no_na = TRUE) |>
+  require_custom(
+    label = "length must match number of classes",
+    deps = "n_classes",
+    fn = function(value, name, ctx) {
+      if (length(value) != ctx$n_classes) {
+        stop(sprintf("%s: expected %d probabilities, got %d",
+                     name, ctx$n_classes, length(value)), call. = FALSE)
+      }
+    }
+  )
+
+require_probs(c(0.3, 0.7), n_classes = 2L)
+```
+
+## Self-Documentation
+
+Print a validator to see its full contract:
+
+```{r}
+require_newdata
+```
+
+Use `as_contract_text()` to generate a one-line summary for roxygen `@param`:
+
+```{r}
+as_contract_text(require_newdata)
+```
+
+Use `as_contract_block()` for multi-line output suitable for `@details`:
+
+```{r}
+cat(as_contract_block(require_newdata))
+```
+
+## Using Contracts in Packages
+
+The recommended pattern: define contracts in `R/contracts.R`, call them at the
+top of exported functions.
+
+```r
+# R/contracts.R
+require_newdata <- restrict("newdata") |>
+  require_df() |>
+  require_has_cols(c("x1", "x2")) |>
+  require_col_numeric("x1", no_na = TRUE, finite = TRUE) |>
+  require_col_numeric("x2", no_na = TRUE, finite = TRUE)
+
+require_pred <- restrict("pred") |>
+  require_numeric(no_na = TRUE, finite = TRUE) |>
+  require_length_matches(~ nrow(newdata))
+```
+
+```r
+# R/predict.R
+
+#' Predict from a fitted model
+#'
+#' @param newdata `r as_contract_text(require_newdata)`
+#' @param ... additional arguments passed to the underlying model.
+#'
+#' @export
+my_predict <- function(object, newdata, ...) {
+  require_newdata(newdata)
+  pred <- do_prediction(object, newdata)
+  require_pred(pred, newdata = newdata)
+  pred
+}
+```
+
+Contracts compose naturally with the pipe and branch safely (each `|>` creates a
+new validator):
+
+```{r}
+base <- restrict("x") |> require_numeric()
+v1 <- base |> require_length(1L)
+v2 <- base |> require_between(lower = 0)
+
+# base is unchanged
+length(environment(base)$steps)
+length(environment(v1)$steps)
+length(environment(v2)$steps)
+```
+
+```{r}
+sessionInfo()
+```

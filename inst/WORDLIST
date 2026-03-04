@@ -2,6 +2,7 @@ composable
 ctx
 enum
 enums
+finiteness
 nrow
 pkgdown
 roxygen

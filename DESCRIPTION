@@ -18,5 +18,9 @@ URL: https://gillescolling.com/restrictR/, https://github.com/gcol33/restrictR
 BugReports: https://github.com/gcol33/restrictR/issues
 Depends: R (>= 4.1.0)
 Suggests:
+    knitr,
+    rmarkdown,
+    svglite,
     testthat (>= 3.0.0)
+VignetteBuilder: knitr
 Config/testthat/edition: 3

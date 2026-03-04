@@ -22,7 +22,8 @@ path-aware error messages.
 }
 \seealso{
 Other column checks: 
+\code{\link{require_col_between}()},
 \code{\link{require_col_numeric}()},
-\code{\link{require_col_range}()}
+\code{\link{require_col_one_of}()}
 }
 \concept{column checks}

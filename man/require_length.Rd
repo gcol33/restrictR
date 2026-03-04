@@ -21,6 +21,9 @@ Validates that the value has exact length \code{n}.
 Other structure checks: 
 \code{\link{require_has_cols}()},
 \code{\link{require_length_matches}()},
+\code{\link{require_length_max}()},
+\code{\link{require_length_min}()},
+\code{\link{require_nrow_matches}()},
 \code{\link{require_nrow_min}()}
 }
 \concept{structure checks}

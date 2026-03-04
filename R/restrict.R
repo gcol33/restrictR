@@ -27,7 +27,7 @@
 #' # Define a validator
 #' require_positive <- restrict("x") |>
 #'   require_numeric(no_na = TRUE) |>
-#'   require_range(lower = 0, exclusive_lower = TRUE)
+#'   require_between(lower = 0, exclusive_lower = TRUE)
 #'
 #' # Use it
 #' require_positive(5)   # passes silently
@@ -36,7 +36,7 @@
 #' require_score <- restrict("score") |>
 #'   require_numeric() |>
 #'   require_length(1L) |>
-#'   require_range(lower = 0, upper = 100)
+#'   require_between(lower = 0, upper = 100)
 #'
 #' @family core
 #' @export
@@ -149,21 +149,19 @@ restriction_steps <- function(x) {
 print.restriction <- function(x, ...) {
   nm <- restriction_name(x)
   steps <- restriction_steps(x)
-  cat(sprintf("<restriction: %s>\n", nm))
+  cat(sprintf("<restriction %s>\n", nm))
 
   if (length(steps) == 0L) {
-    cat("\n  (no validation steps)\n")
+    cat("  (no steps)\n")
   } else {
-    cat("\n")
     for (i in seq_along(steps)) {
       cat(sprintf("  %d. %s\n", i, steps[[i]]$label))
     }
   }
 
-  # Show dependencies
   all_deps <- environment(x)$all_deps
   if (length(all_deps) > 0L) {
-    cat(sprintf("\n  Depends on: %s\n", paste(all_deps, collapse = ", ")))
+    cat(sprintf("  Depends on: %s\n", paste(all_deps, collapse = ", ")))
   }
 
   invisible(x)
@@ -202,6 +200,32 @@ as_contract_text <- function(x) {
 }
 
 
+#' Convert a Validator to a Multi-Line Block
+#'
+#' Produces a multi-line text summary suitable for roxygen `@details`
+#' documentation. Each step appears on its own line as a bullet point.
+#'
+#' @param x a `restriction` object.
+#'
+#' @return A character(1) string with one step per line.
+#'
+#' @examples
+#' v <- restrict("x") |> require_numeric(no_na = TRUE) |> require_length(1L)
+#' as_contract_block(v)
+#'
+#' @family core
+#' @export
+as_contract_block <- function(x) {
+  if (!inherits(x, "restriction")) {
+    stop("`x` must be a restriction object", call. = FALSE)
+  }
+  steps <- restriction_steps(x)
+  if (length(steps) == 0L) return("No validation constraints.")
+  labels <- vapply(steps, function(s) s$label, character(1L))
+  paste0("- ", labels, collapse = "\n")
+}
+
+
 #' Create a Custom Validation Step
 #'
 #' Allows advanced users to define their own validation step without
@@ -223,12 +247,10 @@ as_contract_text <- function(x) {
 #'   require_custom(
 #'     label = "must contain unique values",
 #'     fn = function(value, name, ctx) {
-#'       dupes <- duplicated(value)
-#'       if (any(dupes)) {
-#'         stop(sprintf(
-#'           "`%s` failed validation\n  \u2716 contains %d duplicate value(s)",
-#'           name, sum(dupes)
-#'         ), call. = FALSE)
+#'       dupes <- which(duplicated(value))
+#'       if (length(dupes) > 0L) {
+#'         stop(sprintf("%s: contains %d duplicate value(s)",
+#'                      name, length(dupes)), call. = FALSE)
 #'       }
 #'     }
 #'   )

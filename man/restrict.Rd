@@ -36,7 +36,7 @@ before running any steps and errors early if not.
 # Define a validator
 require_positive <- restrict("x") |>
   require_numeric(no_na = TRUE) |>
-  require_range(lower = 0, exclusive_lower = TRUE)
+  require_between(lower = 0, exclusive_lower = TRUE)
 
 # Use it
 require_positive(5)   # passes silently
@@ -45,11 +45,12 @@ require_positive(5)   # passes silently
 require_score <- restrict("score") |>
   require_numeric() |>
   require_length(1L) |>
-  require_range(lower = 0, upper = 100)
+  require_between(lower = 0, upper = 100)
 
 }
 \seealso{
 Other core: 
+\code{\link{as_contract_block}()},
 \code{\link{as_contract_text}()},
 \code{\link{require_custom}()}
 }

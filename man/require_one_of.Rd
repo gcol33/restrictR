@@ -15,10 +15,10 @@ require_one_of(restriction, values)
 The modified \code{restriction} object.
 }
 \description{
-Validates that the value is one of the allowed values.
+Validates that all elements of the value are among the allowed values.
 }
 \seealso{
 Other value checks: 
-\code{\link{require_range}()}
+\code{\link{require_between}()}
 }
 \concept{value checks}
