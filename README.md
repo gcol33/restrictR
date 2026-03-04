@@ -6,7 +6,7 @@
 
 **Composable Runtime Contracts for R**
 
-Build reusable input validators from small `require_*()` blocks, composed with the base pipe `|>`. Each `|>` returns a new immutable validator you can call like a function. Dependent rules use formulas with explicit context. Errors are structured and path-aware.
+Define your input rules once, enforce them everywhere, and get clear error messages when something breaks. Validators snap together with `|>`, branch safely for different use cases, and document themselves in your roxygen.
 
 ## Quick Start
 
@@ -27,9 +27,9 @@ require_positive_scalar(-1)     # Error: x: must be in (0, Inf]
 
 ## Statement of Need
 
-R has no built-in way to define reusable input contracts. You end up copy-pasting the same `stopifnot()` / `if (!is.numeric(...)) stop(...)` blocks across functions. When the contract changes, you hunt for every copy. One function says `"x must be numeric"`, the next says `"expected numeric input"`.
+You know the pattern: every exported function starts with the same `if (!is.numeric(...)) stop(...)` checks, copy-pasted and slowly drifting apart. When a contract changes, you hunt for every copy. Your users get `"x must be numeric"` from one function and `"expected numeric input"` from another.
 
-`restrictR` gives you pipe-composable validators instead. Define once, call like a function, get structured errors every time. Validators also print their own contracts, so your documentation stays in sync with what actually runs.
+With `restrictR`, you write each contract once as a pipe chain, call it like a function at the top of any method, and your users always get the same structured error format. When a rule changes, you change it in one place. Your `@param` docs can even pull their text straight from the validator, so documentation and enforcement stay in sync by construction.
 
 ## Features
 
