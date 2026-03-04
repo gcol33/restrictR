@@ -2,8 +2,8 @@ test_that("restrict() creates a restriction object", {
   v <- restrict("x")
   expect_s3_class(v, "restriction")
   expect_true(is.function(v))
-  expect_equal(attr(v, "restriction_name"), "x")
-  expect_equal(attr(v, "steps"), list())
+  expect_equal(environment(v)$name, "x")
+  expect_equal(environment(v)$steps, list())
 })
 
 test_that("restrict() validates name argument", {
@@ -54,4 +54,26 @@ test_that("as_contract_text() produces plain text", {
 test_that("as_contract_text() handles empty restriction", {
   v <- restrict("x")
   expect_equal(as_contract_text(v), "No validation constraints.")
+})
+
+test_that("pipe steps are immutable (branching is safe)", {
+  base <- restrict("x") |> require_numeric()
+  v1 <- base |> require_length(1L)
+  v2 <- base |> require_range(lower = 0)
+
+  # base is unchanged: still has 1 step
+
+  expect_length(environment(base)$steps, 1L)
+
+  # v1 and v2 are independent: each has 2 steps
+  expect_length(environment(v1)$steps, 2L)
+  expect_length(environment(v2)$steps, 2L)
+
+  # v1 rejects length > 1, v2 doesn't
+  expect_error(v1(c(1, 2)), "must have length 1")
+  expect_invisible(v2(c(1, 2)))
+
+  # v2 rejects negatives, v1 doesn't
+  expect_error(v2(-1), "must be in")
+  expect_invisible(v1(-1))
 })

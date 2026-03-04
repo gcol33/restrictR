@@ -28,34 +28,48 @@ restrict <- function(name) {
   if (!is.character(name) || length(name) != 1L || is.na(name)) {
     stop("`name` must be a single non-NA character string", call. = FALSE)
   }
+  make_validator(name, list())
+}
+
+
+#' Build a Validator Closure
+#'
+#' Creates a new closure capturing `name` and `steps` in its environment.
+#' The closure is the validator function itself.
+#'
+#' @param name character(1) validator name.
+#' @param steps list of step objects.
+#'
+#' @return A `restriction` object (callable function).
+#'
+#' @noRd
+make_validator <- function(name, steps) {
+  force(name)
+  force(steps)
 
   validator <- function(value, ...) {
-    steps <- attr(sys.function(), "steps")
-    nm <- attr(sys.function(), "restriction_name")
     ctx <- list(...)
     for (step in steps) {
-      step$check(value, name = nm, ctx = ctx)
+      step$check(value, name = name, ctx = ctx)
     }
     invisible(value)
   }
 
-  structure(
-    validator,
-    class = "restriction",
-    restriction_name = name,
-    steps = list()
-  )
+  class(validator) <- "restriction"
+  validator
 }
 
 
 #' Add a Validation Step to a Restriction
 #'
-#' Internal helper. Appends a step to the restriction's step list.
+#' Returns a new validator closure with the step appended. Never mutates
+#' the original.
 #'
 #' @param restriction a `restriction` object.
-#' @param step a list with `description` (character) and `check` (function).
+#' @param step a list with `description` (character), `depends_on` (character),
+#'   and `check` (function).
 #'
-#' @return The modified `restriction` object.
+#' @return A new `restriction` object with the step appended.
 #'
 #' @noRd
 add_step <- function(restriction, step) {
@@ -63,17 +77,40 @@ add_step <- function(restriction, step) {
     stop("first argument must be a `restriction` object created by restrict()",
          call. = FALSE)
   }
-  steps <- attr(restriction, "steps")
-  steps <- c(steps, list(step))
-  attr(restriction, "steps") <- steps
-  restriction
+  old_name <- restriction_name(restriction)
+  old_steps <- restriction_steps(restriction)
+  make_validator(old_name, c(old_steps, list(step)))
+}
+
+
+#' Access Validator Name
+#'
+#' @param x a `restriction` object.
+#'
+#' @return character(1) the validator name.
+#'
+#' @noRd
+restriction_name <- function(x) {
+  environment(x)$name
+}
+
+
+#' Access Validator Steps
+#'
+#' @param x a `restriction` object.
+#'
+#' @return list of step objects.
+#'
+#' @noRd
+restriction_steps <- function(x) {
+  environment(x)$steps
 }
 
 
 #' @export
 print.restriction <- function(x, ...) {
-  nm <- attr(x, "restriction_name")
-  steps <- attr(x, "steps")
+  nm <- restriction_name(x)
+  steps <- restriction_steps(x)
   cat(sprintf("<restriction: %s>\n", nm))
 
   if (length(steps) == 0L) {
@@ -114,7 +151,7 @@ as_contract_text <- function(x) {
   if (!inherits(x, "restriction")) {
     stop("`x` must be a restriction object", call. = FALSE)
   }
-  steps <- attr(x, "steps")
+  steps <- restriction_steps(x)
   if (length(steps) == 0L) return("No validation constraints.")
   descriptions <- vapply(steps, function(s) s$description, character(1L))
   # Capitalize first, collapse with periods
