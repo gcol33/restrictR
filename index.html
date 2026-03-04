@@ -85,7 +85,7 @@ operator. Define runtime contracts once and enforce them anywhere.
 </h1></div>
 <p><a href="https://github.com/gcol33/restrictR/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/gcol33/restrictR/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/gcol33/restrictR" class="external-link"><img src="https://codecov.io/gh/gcol33/restrictR/graph/badge.svg" alt="Codecov test coverage"></a> <a href="https://opensource.org/licenses/MIT" class="external-link"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a></p>
 <p><strong>Composable Runtime Contracts for R</strong></p>
-<p>Build reusable input validators from small <code>require_*()</code> blocks, composed with the base pipe <code>|&gt;</code>. Each <code>|&gt;</code> returns a new immutable validator you can call like a function. Dependent rules use formulas with explicit context. Errors are structured and path-aware.</p>
+<p>Define your input rules once, enforce them everywhere, and get clear error messages when something breaks. Validators snap together with <code>|&gt;</code>, branch safely for different use cases, and document themselves in your roxygen.</p>
 <div class="section level2">
 <h2 id="quick-start">Quick Start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
 </h2>
@@ -106,8 +106,8 @@ operator. Define runtime contracts once and enforce them anywhere.
 <div class="section level2">
 <h2 id="statement-of-need">Statement of Need<a class="anchor" aria-label="anchor" href="#statement-of-need"></a>
 </h2>
-<p>R has no built-in way to define reusable input contracts. You end up copy-pasting the same <code><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot()</a></code> / <code>if (!is.numeric(...)) stop(...)</code> blocks across functions. When the contract changes, you hunt for every copy. One function says <code>"x must be numeric"</code>, the next says <code>"expected numeric input"</code>.</p>
-<p><code>restrictR</code> gives you pipe-composable validators instead. Define once, call like a function, get structured errors every time. Validators also print their own contracts, so your documentation stays in sync with what actually runs.</p>
+<p>You know the pattern: every exported function starts with the same <code>if (!is.numeric(...)) stop(...)</code> checks, copy-pasted and slowly drifting apart. When a contract changes, you hunt for every copy. Your users get <code>"x must be numeric"</code> from one function and <code>"expected numeric input"</code> from another.</p>
+<p>With <code>restrictR</code>, you write each contract once as a pipe chain, call it like a function at the top of any method, and your users always get the same structured error format. When a rule changes, you change it in one place. Your <code>@param</code> docs can even pull their text straight from the validator, so documentation and enforcement stay in sync by construction.</p>
 </div>
 <div class="section level2">
 <h2 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a>
