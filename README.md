@@ -6,7 +6,7 @@
 
 **Composable Runtime Contracts for R**
 
-Define your input rules once, enforce them everywhere, and get clear error messages when something breaks. Validators snap together with `|>`, branch safely for different use cases, and can generate their own documentation.
+Define your input rules once, enforce them everywhere, and get clear error messages when something breaks. Validators snap together with `|>`, branch safely for different use cases, and can generate their own documentation for use in roxygen (R's standard doc system).
 
 ## Quick Start
 
