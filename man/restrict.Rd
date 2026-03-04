@@ -17,6 +17,21 @@ Creates a callable validation object that accumulates checks via the base
 pipe operator \verb{|>}. The resulting object behaves like a function: call it
 with a value to validate.
 }
+\section{Calling convention}{
+
+
+Validators accept \code{value} as the first argument, plus context via named
+arguments in \code{...} or as a named list in \code{.ctx}:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{require_pred(out, newdata = df)
+require_pred(out, .ctx = list(newdata = df))
+}\if{html}{\out{</div>}}
+
+Named arguments in \code{...} take precedence over \code{.ctx} entries with the
+same name. If a step declares dependencies (e.g. \code{require_length_matches(~ nrow(newdata))}), the validator checks that all required context is present
+before running any steps and errors early if not.
+}
+
 \examples{
 # Define a validator
 require_positive <- restrict("x") |>

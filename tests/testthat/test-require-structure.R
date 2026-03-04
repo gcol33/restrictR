@@ -41,8 +41,27 @@ test_that("require_length_matches() fails when context missing", {
   v <- restrict("pred") |>
     require_length_matches(~ nrow(newdata))
 
-  expect_error(v(1:5), "cannot evaluate")
-  expect_error(v(1:5), "pass `newdata` as a named argument")
+  expect_error(v(1:5), "depends on: newdata")
+  expect_error(v(1:5), "Pass newdata = ")
+})
+
+test_that(".ctx argument works and merges with ...", {
+  v <- restrict("pred") |>
+    require_numeric() |>
+    require_length_matches(~ nrow(newdata))
+
+  df <- data.frame(x = 1:5)
+
+  # via .ctx
+
+  expect_invisible(v(1:5, .ctx = list(newdata = df)))
+
+  # via ...
+  expect_invisible(v(1:5, newdata = df))
+
+  # ... takes precedence over .ctx
+  df3 <- data.frame(x = 1:3)
+  expect_invisible(v(1:5, newdata = df, .ctx = list(newdata = df3)))
 })
 
 test_that("require_length_matches() rejects two-sided formulas", {

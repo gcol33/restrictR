@@ -8,6 +8,21 @@
 #'
 #' @return A `restriction` object (callable function) with no validation steps.
 #'
+#' @section Calling convention:
+#'
+#' Validators accept `value` as the first argument, plus context via named
+#' arguments in `...` or as a named list in `.ctx`:
+#'
+#' ```
+#' require_pred(out, newdata = df)
+#' require_pred(out, .ctx = list(newdata = df))
+#' ```
+#'
+#' Named arguments in `...` take precedence over `.ctx` entries with the
+#' same name. If a step declares dependencies (e.g. `require_length_matches(~
+#' nrow(newdata))`), the validator checks that all required context is present
+#' before running any steps and errors early if not.
+#'
 #' @examples
 #' # Define a validator
 #' require_positive <- restrict("x") |>
@@ -34,8 +49,8 @@ restrict <- function(name) {
 
 #' Build a Validator Closure
 #'
-#' Creates a new closure capturing `name` and `steps` in its environment.
-#' The closure is the validator function itself.
+#' Creates a new closure capturing `name`, `steps`, and `all_deps` in its
+#' environment. The closure is the validator function itself.
 #'
 #' @param name character(1) validator name.
 #' @param steps list of step objects (each with `label`, `deps`, `fields`,
@@ -48,8 +63,27 @@ make_validator <- function(name, steps) {
   force(name)
   force(steps)
 
-  validator <- function(value, ...) {
-    ctx <- list(...)
+  # Precompute union of all deps for early context checking
+  all_deps <- unique(unlist(lapply(steps, function(s) s$deps)))
+
+  validator <- function(value, ..., .ctx = NULL) {
+    ctx <- c(list(...), .ctx %||% list())
+    # Deduplicate: ... wins over .ctx
+    ctx <- ctx[!duplicated(names(ctx))]
+
+    # Enforce deps early
+    if (length(all_deps) > 0L) {
+      missing_deps <- setdiff(all_deps, names(ctx))
+      if (length(missing_deps) > 0L) {
+        stop(sprintf(
+          "`%s` depends on: %s. Pass %s when calling the validator.",
+          name,
+          paste(missing_deps, collapse = ", "),
+          paste(sprintf("%s = ...", missing_deps), collapse = ", ")
+        ), call. = FALSE)
+      }
+    }
+
     s <- steps
     nm <- name
     for (i in seq_along(s)) {
@@ -126,9 +160,9 @@ print.restriction <- function(x, ...) {
   }
 
   # Show dependencies
-  deps <- unique(unlist(lapply(steps, function(s) s$deps)))
-  if (length(deps) > 0L) {
-    cat(sprintf("\n  Depends on: %s\n", paste(deps, collapse = ", ")))
+  all_deps <- environment(x)$all_deps
+  if (length(all_deps) > 0L) {
+    cat(sprintf("\n  Depends on: %s\n", paste(all_deps, collapse = ", ")))
   }
 
   invisible(x)
@@ -163,4 +197,50 @@ as_contract_text <- function(x) {
     substring(labels[1L], 2L)
   )
   paste0(paste(labels, collapse = ". "), ".")
+}
+
+
+#' Create a Custom Validation Step
+#'
+#' Allows advanced users to define their own validation step without
+#' growing the package's built-in API surface. The step function receives
+#' `(value, name, ctx)` and should call [fail()] on validation failure.
+#'
+#' @param restriction a `restriction` object.
+#' @param label character(1) human-readable description for printing.
+#' @param fn a function with signature `function(value, name, ctx)` that
+#'   calls `stop()` or `restrictR:::fail()` on failure.
+#' @param deps character vector of context names this step requires
+#'   (default: none).
+#'
+#' @return A new `restriction` object with the custom step appended.
+#'
+#' @examples
+#' # Custom step: require all values to be unique
+#' require_unique_id <- restrict("id") |>
+#'   require_custom(
+#'     label = "must contain unique values",
+#'     fn = function(value, name, ctx) {
+#'       dupes <- duplicated(value)
+#'       if (any(dupes)) {
+#'         stop(sprintf(
+#'           "`%s` failed validation\n  \u2716 contains %d duplicate value(s)",
+#'           name, sum(dupes)
+#'         ), call. = FALSE)
+#'       }
+#'     }
+#'   )
+#'
+#' @export
+require_custom <- function(restriction, label, fn, deps = character(0L)) {
+  if (!is.function(fn)) {
+    stop("`fn` must be a function with signature function(value, name, ctx)",
+         call. = FALSE)
+  }
+  add_step(restriction, list(
+    label = label,
+    deps = deps,
+    fields = list(custom = TRUE),
+    fn = fn
+  ))
 }
