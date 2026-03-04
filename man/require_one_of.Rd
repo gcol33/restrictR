@@ -19,6 +19,8 @@ Validates that all elements of the value are among the allowed values.
 }
 \seealso{
 Other value checks: 
-\code{\link{require_between}()}
+\code{\link{require_between}()},
+\code{\link{require_negative}()},
+\code{\link{require_positive}()}
 }
 \concept{value checks}

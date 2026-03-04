@@ -82,6 +82,8 @@ reference:
 - title: Value Checks
   desc: Validate value ranges and set membership
   contents:
+  - require_positive
+  - require_negative
   - require_between
   - require_one_of
 articles:

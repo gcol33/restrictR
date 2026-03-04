@@ -31,6 +31,8 @@ Validates that all elements of a numeric value fall within a specified range.
 }
 \seealso{
 Other value checks: 
-\code{\link{require_one_of}()}
+\code{\link{require_negative}()},
+\code{\link{require_one_of}()},
+\code{\link{require_positive}()}
 }
 \concept{value checks}

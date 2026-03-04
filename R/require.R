@@ -628,6 +628,102 @@ require_between <- function(restriction, lower = -Inf, upper = Inf,
 }
 
 
+#' Require Positive Values
+#'
+#' Validates that all elements are positive. By default uses `>= 0`
+#' (non-negative); set `strict = TRUE` for `> 0`.
+#'
+#' @param restriction a `restriction` object.
+#' @param strict logical; if `TRUE`, requires `> 0`.
+#'   If `FALSE` (default), requires `>= 0`.
+#'
+#' @return The modified `restriction` object.
+#'
+#' @family value checks
+#' @export
+require_positive <- function(restriction, strict = FALSE) {
+  if (strict) {
+    lbl <- "must be positive"
+    add_step(restriction, list(
+      label = lbl,
+      deps = character(0L),
+      fields = list(strict = strict),
+      fn = function(value, name, ctx) {
+        bad <- which(value <= 0)
+        bad <- bad[!is.na(bad)]
+        if (length(bad) > 0L) {
+          fail(name, lbl, found = value[bad[1L]],
+               at = if (length(value) > 1L) bad)
+        }
+      }
+    ))
+  } else {
+    lbl <- "must be non-negative"
+    add_step(restriction, list(
+      label = lbl,
+      deps = character(0L),
+      fields = list(strict = strict),
+      fn = function(value, name, ctx) {
+        bad <- which(value < 0)
+        bad <- bad[!is.na(bad)]
+        if (length(bad) > 0L) {
+          fail(name, lbl, found = value[bad[1L]],
+               at = if (length(value) > 1L) bad)
+        }
+      }
+    ))
+  }
+}
+
+
+#' Require Negative Values
+#'
+#' Validates that all elements are negative. By default uses `<= 0`
+#' (non-positive); set `strict = TRUE` for `< 0`.
+#'
+#' @param restriction a `restriction` object.
+#' @param strict logical; if `TRUE`, requires `< 0`.
+#'   If `FALSE` (default), requires `<= 0`.
+#'
+#' @return The modified `restriction` object.
+#'
+#' @family value checks
+#' @export
+require_negative <- function(restriction, strict = FALSE) {
+  if (strict) {
+    lbl <- "must be negative"
+    add_step(restriction, list(
+      label = lbl,
+      deps = character(0L),
+      fields = list(strict = strict),
+      fn = function(value, name, ctx) {
+        bad <- which(value >= 0)
+        bad <- bad[!is.na(bad)]
+        if (length(bad) > 0L) {
+          fail(name, lbl, found = value[bad[1L]],
+               at = if (length(value) > 1L) bad)
+        }
+      }
+    ))
+  } else {
+    lbl <- "must be non-positive"
+    add_step(restriction, list(
+      label = lbl,
+      deps = character(0L),
+      fields = list(strict = strict),
+      fn = function(value, name, ctx) {
+        bad <- which(value > 0)
+        bad <- bad[!is.na(bad)]
+        if (length(bad) > 0L) {
+          fail(name, lbl, found = value[bad[1L]],
+               at = if (length(value) > 1L) bad)
+        }
+      }
+    ))
+  }
+}
+
+
 #' Require Value from a Set
 #'
 #' Validates that all elements of the value are among the allowed values.

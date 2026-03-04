@@ -37,6 +37,54 @@ test_that("require_one_of() shows At: for vectors", {
   expect_error(v(c("a", "d", "b", "e")), "At: 2, 4")
 })
 
+test_that("require_positive() default (non-negative) allows zero", {
+  v <- restrict("x") |> require_positive()
+  expect_invisible(v(0))
+  expect_invisible(v(5))
+  expect_invisible(v(c(0, 1, 100)))
+  expect_error(v(-1), "must be non-negative")
+  expect_error(v(-1), "Found: -1")
+})
+
+test_that("require_positive(strict = TRUE) rejects zero", {
+  v <- restrict("x") |> require_positive(strict = TRUE)
+  expect_invisible(v(5))
+  expect_error(v(0), "must be positive")
+  expect_error(v(-1), "must be positive")
+})
+
+test_that("require_positive() shows At: for vectors", {
+  v <- restrict("x") |> require_positive()
+  expect_error(v(c(1, -2, 3, -4)), "At: 2, 4")
+})
+
+test_that("require_positive() omits At: for scalars", {
+  v <- restrict("x") |> require_positive()
+  err <- tryCatch(v(-1), error = conditionMessage)
+  expect_false(grepl("At:", err))
+})
+
+test_that("require_negative() default (non-positive) allows zero", {
+  v <- restrict("x") |> require_negative()
+  expect_invisible(v(0))
+  expect_invisible(v(-5))
+  expect_invisible(v(c(0, -1, -100)))
+  expect_error(v(1), "must be non-positive")
+  expect_error(v(1), "Found: 1")
+})
+
+test_that("require_negative(strict = TRUE) rejects zero", {
+  v <- restrict("x") |> require_negative(strict = TRUE)
+  expect_invisible(v(-5))
+  expect_error(v(0), "must be negative")
+  expect_error(v(1), "must be negative")
+})
+
+test_that("require_negative() shows At: for vectors", {
+  v <- restrict("x") |> require_negative()
+  expect_error(v(c(-1, 2, -3, 4)), "At: 2, 4")
+})
+
 test_that("require_no_na() standalone check", {
   v <- restrict("x") |> require_no_na()
   expect_invisible(v(c(1, 2, 3)))
