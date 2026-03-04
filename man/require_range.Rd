@@ -29,3 +29,8 @@ The modified \code{restriction} object.
 \description{
 Validates that a numeric value falls within a specified range.
 }
+\seealso{
+Other value checks: 
+\code{\link{require_one_of}()}
+}
+\concept{value checks}

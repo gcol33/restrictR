@@ -20,3 +20,9 @@ The modified \code{restriction} object.
 Validates that the value is numeric. Optionally checks for NA and
 non-finite values.
 }
+\seealso{
+Other type checks: 
+\code{\link{require_character}()},
+\code{\link{require_df}()}
+}
+\concept{type checks}

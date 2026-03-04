@@ -38,6 +38,7 @@
 #'   require_length(1L) |>
 #'   require_range(lower = 0, upper = 100)
 #'
+#' @family core
 #' @export
 restrict <- function(name) {
   if (!is.character(name) || length(name) != 1L || is.na(name)) {
@@ -183,6 +184,7 @@ print.restriction <- function(x, ...) {
 #' v <- restrict("x") |> require_numeric(no_na = TRUE) |> require_length(1L)
 #' as_contract_text(v)
 #'
+#' @family core
 #' @export
 as_contract_text <- function(x) {
   if (!inherits(x, "restriction")) {
@@ -231,6 +233,7 @@ as_contract_text <- function(x) {
 #'     }
 #'   )
 #'
+#' @family core
 #' @export
 require_custom <- function(restriction, label, fn, deps = character(0L)) {
   if (!is.function(fn)) {

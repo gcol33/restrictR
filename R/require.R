@@ -8,6 +8,7 @@
 #'
 #' @return The modified `restriction` object.
 #'
+#' @family type checks
 #' @export
 require_df <- function(restriction) {
   add_step(restriction, list(
@@ -34,6 +35,7 @@ require_df <- function(restriction) {
 #'
 #' @return The modified `restriction` object.
 #'
+#' @family type checks
 #' @export
 require_numeric <- function(restriction, no_na = FALSE, finite = FALSE) {
   lbl <- "must be numeric"
@@ -63,6 +65,7 @@ require_numeric <- function(restriction, no_na = FALSE, finite = FALSE) {
 #'
 #' @return The modified `restriction` object.
 #'
+#' @family type checks
 #' @export
 require_character <- function(restriction, no_na = FALSE) {
   lbl <- if (no_na) "must be character (no NA)" else "must be character"
@@ -92,6 +95,7 @@ require_character <- function(restriction, no_na = FALSE) {
 #'
 #' @return The modified `restriction` object.
 #'
+#' @family structure checks
 #' @export
 require_length <- function(restriction, n) {
   add_step(restriction, list(
@@ -118,6 +122,7 @@ require_length <- function(restriction, n) {
 #'
 #' @return The modified `restriction` object.
 #'
+#' @family structure checks
 #' @export
 require_length_matches <- function(restriction, formula) {
   if (!inherits(formula, "formula") || length(formula) != 2L) {
@@ -154,6 +159,7 @@ require_length_matches <- function(restriction, formula) {
 #'
 #' @return The modified `restriction` object.
 #'
+#' @family structure checks
 #' @export
 require_nrow_min <- function(restriction, n) {
   add_step(restriction, list(
@@ -180,6 +186,7 @@ require_nrow_min <- function(restriction, n) {
 #'
 #' @return The modified `restriction` object.
 #'
+#' @family structure checks
 #' @export
 require_has_cols <- function(restriction, cols) {
   add_step(restriction, list(
@@ -215,6 +222,7 @@ require_has_cols <- function(restriction, cols) {
 #'
 #' @return The modified `restriction` object.
 #'
+#' @family column checks
 #' @export
 require_col_numeric <- function(restriction, col, no_na = FALSE,
                                 finite = FALSE) {
@@ -257,6 +265,7 @@ require_col_numeric <- function(restriction, col, no_na = FALSE,
 #'
 #' @return The modified `restriction` object.
 #'
+#' @family column checks
 #' @export
 require_col_character <- function(restriction, col, no_na = FALSE) {
   lbl <- sprintf("$%s must be character", col)
@@ -296,6 +305,7 @@ require_col_character <- function(restriction, col, no_na = FALSE) {
 #'
 #' @return The modified `restriction` object.
 #'
+#' @family column checks
 #' @export
 require_col_range <- function(restriction, col, lower = -Inf, upper = Inf,
                               exclusive_lower = FALSE,
@@ -352,6 +362,7 @@ require_col_range <- function(restriction, col, lower = -Inf, upper = Inf,
 #'
 #' @return The modified `restriction` object.
 #'
+#' @family value checks
 #' @export
 require_range <- function(restriction, lower = -Inf, upper = Inf,
                           exclusive_lower = FALSE, exclusive_upper = FALSE) {
@@ -406,6 +417,7 @@ require_range <- function(restriction, lower = -Inf, upper = Inf,
 #'
 #' @return The modified `restriction` object.
 #'
+#' @family value checks
 #' @export
 require_one_of <- function(restriction, values) {
   add_step(restriction, list(

@@ -48,3 +48,9 @@ require_score <- restrict("score") |>
   require_range(lower = 0, upper = 100)
 
 }
+\seealso{
+Other core: 
+\code{\link{as_contract_text}()},
+\code{\link{require_custom}()}
+}
+\concept{core}

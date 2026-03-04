@@ -19,3 +19,10 @@ Validates that \code{length(value)} equals the result of evaluating a formula.
 The formula is evaluated using only explicitly passed context arguments,
 plus \code{.value} (the validated value) and \code{.name} (the restriction name).
 }
+\seealso{
+Other structure checks: 
+\code{\link{require_has_cols}()},
+\code{\link{require_length}()},
+\code{\link{require_nrow_min}()}
+}
+\concept{structure checks}

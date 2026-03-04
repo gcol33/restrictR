@@ -17,3 +17,10 @@ The modified \code{restriction} object.
 \description{
 Validates that the value has exact length \code{n}.
 }
+\seealso{
+Other structure checks: 
+\code{\link{require_has_cols}()},
+\code{\link{require_length_matches}()},
+\code{\link{require_nrow_min}()}
+}
+\concept{structure checks}

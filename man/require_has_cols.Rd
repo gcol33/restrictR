@@ -17,3 +17,10 @@ The modified \code{restriction} object.
 \description{
 Validates that a data.frame contains all specified columns.
 }
+\seealso{
+Other structure checks: 
+\code{\link{require_length}()},
+\code{\link{require_length_matches}()},
+\code{\link{require_nrow_min}()}
+}
+\concept{structure checks}

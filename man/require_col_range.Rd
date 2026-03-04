@@ -32,3 +32,9 @@ The modified \code{restriction} object.
 \description{
 Validates that all values in a column fall within a specified range.
 }
+\seealso{
+Other column checks: 
+\code{\link{require_col_character}()},
+\code{\link{require_col_numeric}()}
+}
+\concept{column checks}

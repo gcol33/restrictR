@@ -17,3 +17,8 @@ The modified \code{restriction} object.
 \description{
 Validates that the value is one of the allowed values.
 }
+\seealso{
+Other value checks: 
+\code{\link{require_range}()}
+}
+\concept{value checks}

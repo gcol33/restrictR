@@ -17,3 +17,9 @@ The modified \code{restriction} object.
 \description{
 Validates that the value is character. Optionally checks for NA values.
 }
+\seealso{
+Other type checks: 
+\code{\link{require_df}()},
+\code{\link{require_numeric}()}
+}
+\concept{type checks}

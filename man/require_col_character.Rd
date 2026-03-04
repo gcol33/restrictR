@@ -20,3 +20,9 @@ The modified \code{restriction} object.
 Validates that a specific column in a data.frame is character. Produces
 path-aware error messages.
 }
+\seealso{
+Other column checks: 
+\code{\link{require_col_numeric}()},
+\code{\link{require_col_range}()}
+}
+\concept{column checks}

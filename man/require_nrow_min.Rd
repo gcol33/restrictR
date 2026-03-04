@@ -17,3 +17,10 @@ The modified \code{restriction} object.
 \description{
 Validates that a data.frame has at least \code{n} rows.
 }
+\seealso{
+Other structure checks: 
+\code{\link{require_has_cols}()},
+\code{\link{require_length}()},
+\code{\link{require_length_matches}()}
+}
+\concept{structure checks}

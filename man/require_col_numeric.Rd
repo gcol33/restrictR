@@ -22,3 +22,9 @@ The modified \code{restriction} object.
 Validates that a specific column in a data.frame is numeric. Produces
 path-aware error messages (e.g. \verb{newdata$x2 must be numeric}).
 }
+\seealso{
+Other column checks: 
+\code{\link{require_col_character}()},
+\code{\link{require_col_range}()}
+}
+\concept{column checks}

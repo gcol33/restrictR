@@ -42,3 +42,9 @@ require_unique_id <- restrict("id") |>
   )
 
 }
+\seealso{
+Other core: 
+\code{\link{as_contract_text}()},
+\code{\link{restrict}()}
+}
+\concept{core}

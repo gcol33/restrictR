@@ -21,3 +21,9 @@ v <- restrict("x") |> require_numeric(no_na = TRUE) |> require_length(1L)
 as_contract_text(v)
 
 }
+\seealso{
+Other core: 
+\code{\link{require_custom}()},
+\code{\link{restrict}()}
+}
+\concept{core}
