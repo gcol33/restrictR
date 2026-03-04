@@ -56,32 +56,57 @@ require_numeric <- function(restriction, no_na = FALSE, finite = FALSE) {
 }
 
 
-#' Require Integer Type
+#' Require Integer Values
 #'
-#' Validates that the value is integer (not just numeric with integer values).
-#' Optionally checks for NA values.
+#' Validates that the value contains whole numbers. By default accepts both
+#' `integer` and `numeric` types as long as all values are whole
+#' (`x == floor(x)`). Set `strict = TRUE` to require the R `integer` type.
 #'
 #' @param restriction a `restriction` object.
 #' @param no_na logical; if `TRUE`, rejects NA values.
+#' @param strict logical; if `TRUE`, requires R `integer` type.
+#'   If `FALSE` (default), accepts any numeric value that is a whole number.
 #'
 #' @return The modified `restriction` object.
 #'
 #' @family type checks
 #' @export
-require_integer <- function(restriction, no_na = FALSE) {
-  lbl <- if (no_na) "must be integer (no NA)" else "must be integer"
-
-  add_step(restriction, list(
-    label = lbl,
-    deps = character(0L),
-    fields = list(no_na = no_na),
-    fn = function(value, name, ctx) {
-      if (!is.integer(value)) {
-        fail(name, sprintf("must be integer, got %s", class(value)[1L]))
+require_integer <- function(restriction, no_na = FALSE, strict = FALSE) {
+  if (strict) {
+    lbl <- if (no_na) "must be integer type (no NA)" else "must be integer type"
+    add_step(restriction, list(
+      label = lbl,
+      deps = character(0L),
+      fields = list(no_na = no_na, strict = strict),
+      fn = function(value, name, ctx) {
+        if (!is.integer(value)) {
+          fail(name, sprintf("must be integer type, got %s", class(value)[1L]))
+        }
+        if (no_na) check_no_na(value, name)
       }
-      if (no_na) check_no_na(value, name)
-    }
-  ))
+    ))
+  } else {
+    lbl <- if (no_na) "must be whole number (no NA)" else "must be whole number"
+    add_step(restriction, list(
+      label = lbl,
+      deps = character(0L),
+      fields = list(no_na = no_na, strict = strict),
+      fn = function(value, name, ctx) {
+        if (!is.numeric(value) && !is.integer(value)) {
+          fail(name, sprintf("must be numeric or integer, got %s",
+                             class(value)[1L]))
+        }
+        non_na <- which(!is.na(value))
+        bad <- non_na[value[non_na] != floor(value[non_na])]
+        if (length(bad) > 0L) {
+          fail(name, "must be whole number",
+               found = value[bad[1L]],
+               at = if (length(value) > 1L) bad)
+        }
+        if (no_na) check_no_na(value, name)
+      }
+    ))
+  }
 }
 
 

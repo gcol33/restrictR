@@ -2,21 +2,25 @@
 % Please edit documentation in R/require.R
 \name{require_integer}
 \alias{require_integer}
-\title{Require Integer Type}
+\title{Require Integer Values}
 \usage{
-require_integer(restriction, no_na = FALSE)
+require_integer(restriction, no_na = FALSE, strict = FALSE)
 }
 \arguments{
 \item{restriction}{a \code{restriction} object.}
 
 \item{no_na}{logical; if \code{TRUE}, rejects NA values.}
+
+\item{strict}{logical; if \code{TRUE}, requires R \code{integer} type.
+If \code{FALSE} (default), accepts any numeric value that is a whole number.}
 }
 \value{
 The modified \code{restriction} object.
 }
 \description{
-Validates that the value is integer (not just numeric with integer values).
-Optionally checks for NA values.
+Validates that the value contains whole numbers. By default accepts both
+\code{integer} and \code{numeric} types as long as all values are whole
+(\code{x == floor(x)}). Set \code{strict = TRUE} to require the R \code{integer} type.
 }
 \seealso{
 Other type checks: 

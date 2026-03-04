@@ -39,21 +39,46 @@ test_that("require_numeric(finite = TRUE) rejects Inf", {
   expect_error(v(c(1, NaN)), "must be finite")
 })
 
-test_that("require_integer() passes for integer", {
+test_that("require_integer() default accepts whole numeric values", {
   v <- restrict("x") |> require_integer()
   expect_invisible(v(1L))
   expect_invisible(v(1:5))
+  expect_invisible(v(5))
+  expect_invisible(v(c(1, 2, 3)))
   expect_invisible(v(NA_integer_))
+  expect_invisible(v(NA_real_))
 })
 
-test_that("require_integer() fails for non-integer", {
+test_that("require_integer() default rejects non-whole values", {
   v <- restrict("x") |> require_integer()
-  expect_error(v(1.5), "must be integer, got numeric")
-  expect_error(v("a"), "must be integer, got character")
+  expect_error(v(1.5), "must be whole number")
+  expect_error(v(1.5), "Found: 1.5")
+  expect_error(v("a"), "must be numeric or integer, got character")
+})
+
+test_that("require_integer() shows At: for vectors with fractional values", {
+  v <- restrict("x") |> require_integer()
+  expect_error(v(c(1, 2.5, 3, 4.1)), "At: 2, 4")
+})
+
+test_that("require_integer(strict = TRUE) requires integer type", {
+  v <- restrict("x") |> require_integer(strict = TRUE)
+  expect_invisible(v(1L))
+  expect_invisible(v(1:5))
+  expect_error(v(1.0), "must be integer type, got numeric")
+  expect_error(v("a"), "must be integer type, got character")
 })
 
 test_that("require_integer(no_na = TRUE) rejects NAs", {
   v <- restrict("x") |> require_integer(no_na = TRUE)
+  expect_invisible(v(c(1, 2, 3)))
+  expect_invisible(v(1:3))
+  expect_error(v(c(1L, NA_integer_, 3L)), "must not contain NA")
+  expect_error(v(c(1, NA, 3)), "must not contain NA")
+})
+
+test_that("require_integer(strict = TRUE, no_na = TRUE) rejects NAs", {
+  v <- restrict("x") |> require_integer(strict = TRUE, no_na = TRUE)
   expect_invisible(v(1:3))
   expect_error(v(c(1L, NA_integer_, 3L)), "must not contain NA")
 })
