@@ -1,0 +1,47 @@
+url: https://gillescolling.com/restrictR/
+
+template:
+  bootstrap: 5
+  light-switch: true
+  bslib:
+    preset: sandstone
+
+figures:
+  dev: svglite
+  fig.ext: svg
+  bg: "#F5F6F8"
+
+reference:
+  - title: Core
+    desc: Create and inspect validators
+    contents:
+      - restrict
+      - as_contract_text
+
+  - title: Type Checks
+    desc: Validate value types
+    contents:
+      - require_df
+      - require_numeric
+      - require_character
+
+  - title: Structure Checks
+    desc: Validate length, columns, and row counts
+    contents:
+      - require_length
+      - require_length_matches
+      - require_nrow_min
+      - require_has_cols
+
+  - title: Column-Level Checks
+    desc: Validate individual columns with path-aware errors
+    contents:
+      - require_col_numeric
+      - require_col_character
+      - require_col_range
+
+  - title: Value Checks
+    desc: Validate value ranges and set membership
+    contents:
+      - require_range
+      - require_one_of
