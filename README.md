@@ -6,7 +6,7 @@
 
 **Composable Runtime Contracts for R**
 
-Build reusable input validators from small `require_*()` blocks, composed with the base pipe `|>`. Each `|>` returns a new immutable validator you can call like a function. Dependent rules use formulas with explicit context. Errors are structured and path-aware. No DSL, no operator overloading, just R.
+Build reusable input validators from small `require_*()` blocks, composed with the base pipe `|>`. Each `|>` returns a new immutable validator you can call like a function. Dependent rules use formulas with explicit context. Errors are structured and path-aware.
 
 ## Quick Start
 
