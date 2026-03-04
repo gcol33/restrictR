@@ -48,6 +48,7 @@ reference:
   - as_contract_text
   - as_contract_block
   - require_custom
+  - fail
 - title: Type Checks
   desc: Validate value types
   contents:
