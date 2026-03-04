@@ -24,7 +24,7 @@ Validate value types
 - [`require_numeric()`](https://gillescolling.com/restrictR/reference/require_numeric.md)
   : Require Numeric Type
 - [`require_integer()`](https://gillescolling.com/restrictR/reference/require_integer.md)
-  : Require Integer Type
+  : Require Integer Values
 - [`require_character()`](https://gillescolling.com/restrictR/reference/require_character.md)
   : Require Character Type
 - [`require_logical()`](https://gillescolling.com/restrictR/reference/require_logical.md)
