@@ -34,6 +34,8 @@
 
 ## restrictR 0.1.0
 
+CRAN release: 2026-03-09
+
 - Initial release.
 - Core constructor:
   [`restrict()`](https://gillescolling.com/restrictR/reference/restrict.md)

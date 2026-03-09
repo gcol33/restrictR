@@ -1,5 +1,11 @@
 # restrictR
 
+[![CRAN
+status](https://www.r-pkg.org/badges/version/restrictR)](https://CRAN.R-project.org/package=restrictR)
+[![CRAN
+downloads](https://cranlogs.r-pkg.org/badges/grand-total/restrictR)](https://cran.r-project.org/package=restrictR)
+[![Monthly
+downloads](https://cranlogs.r-pkg.org/badges/restrictR)](https://cran.r-project.org/package=restrictR)
 [![R-CMD-check](https://github.com/gcol33/restrictR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/gcol33/restrictR/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/gcol33/restrictR/graph/badge.svg)](https://app.codecov.io/gh/gcol33/restrictR)
@@ -98,7 +104,10 @@ as_contract_text(require_newdata)
 ## Installation
 
 ``` r
-# Install development version from GitHub
+# From CRAN
+install.packages("restrictR")
+
+# Development version from GitHub
 # install.packages("pak")
 pak::pak("gcol33/restrictR")
 ```

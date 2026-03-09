@@ -118,6 +118,10 @@
 <li>Zero non-base dependencies at runtime</li>
 </ol></div>
 <div class="section level2">
+<h2 id="cran-notes-for-next-update">CRAN Notes (for next update)<a class="anchor" aria-label="anchor" href="#cran-notes-for-next-update"></a></h2>
+<p>From CRAN reviewer Konstanze Lauseker: - Remove “for R” from the end of the Title field in DESCRIPTION - Remove single quotes around function name <code><a href="reference/restrict.html">restrict()</a></code> in Description field</p>
+</div>
+<div class="section level2">
 <h2 id="adding-a-new-require_-step">Adding a new <code>require_*()</code> step<a class="anchor" aria-label="anchor" href="#adding-a-new-require_-step"></a></h2>
 <ol style="list-style-type: decimal"><li>Add the function in <code>R/require.R</code> under the appropriate section</li>
 <li>Use <code>add_step(restriction, list(label, deps, fields, fn))</code> — follow existing patterns</li>

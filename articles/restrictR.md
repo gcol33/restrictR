@@ -345,7 +345,7 @@ sessionInfo()
 #>  [5] xfun_0.56         glue_1.8.0        cachem_1.1.0      knitr_1.51       
 #>  [9] htmltools_0.5.9   rmarkdown_2.30    lifecycle_1.0.5   cli_3.6.5        
 #> [13] vctrs_0.7.1       svglite_2.2.2     sass_0.4.10       pkgdown_2.2.0    
-#> [17] textshaping_1.0.4 jquerylib_0.1.4   systemfonts_1.3.1 compiler_4.5.2   
+#> [17] textshaping_1.0.5 jquerylib_0.1.4   systemfonts_1.3.2 compiler_4.5.2   
 #> [21] tools_4.5.2       pillar_1.11.1     evaluate_1.0.5    bslib_0.10.0     
-#> [25] yaml_2.3.12       jsonlite_2.0.0    rlang_1.1.7       fs_1.6.6
+#> [25] yaml_2.3.12       jsonlite_2.0.0    rlang_1.1.7       fs_1.6.7
 ```
