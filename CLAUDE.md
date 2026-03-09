@@ -61,6 +61,12 @@ Formula-based steps (e.g. `require_length_matches(~ nrow(newdata))`) declare `de
 5. Error messages must be path-aware (e.g. `newdata$x2: must be numeric`)
 6. Zero non-base dependencies at runtime
 
+## CRAN Notes (for next update)
+
+From CRAN reviewer Konstanze Lauseker:
+- Remove "for R" from the end of the Title field in DESCRIPTION
+- Remove single quotes around function name `restrict()` in Description field
+
 ## Adding a new `require_*()` step
 
 1. Add the function in `R/require.R` under the appropriate section
