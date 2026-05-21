@@ -1,6 +1,7 @@
 # Runtime Contracts for R Functions
 
 ``` r
+
 library(restrictR)
 ```
 
@@ -12,15 +13,15 @@ like a function to validate data at runtime. Validators are immutable:
 each `|>` returns a new validator, so you can safely branch from a
 shared base without side effects.
 
-| Section                                                                 | What you’ll learn                                                                                                                                                                             |
-|-------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Reusable schemas](#reusable-schemas)                                   | Define and reuse data.frame contracts                                                                                                                                                         |
-| [Dependent validation](#dependent-validation)                           | Constraints that reference other arguments                                                                                                                                                    |
-| [Enum arguments](#enum-arguments)                                       | Restrict string arguments to a fixed set                                                                                                                                                      |
-| [Data frame with mixed constraints](#data-frame-with-mixed-constraints) | Columns + enums + ranges in one contract                                                                                                                                                      |
-| [Custom steps](#custom-steps)                                           | Domain-specific invariants                                                                                                                                                                    |
-| [Self-documentation](#self-documentation)                               | Print, [`as_contract_text()`](https://gillescolling.com/restrictR/reference/as_contract_text.md), [`as_contract_block()`](https://gillescolling.com/restrictR/reference/as_contract_block.md) |
-| [Using contracts in packages](#using-contracts-in-packages)             | The recommended pattern for R packages                                                                                                                                                        |
+| Section | What you’ll learn |
+|----|----|
+| [Reusable schemas](#reusable-schemas) | Define and reuse data.frame contracts |
+| [Dependent validation](#dependent-validation) | Constraints that reference other arguments |
+| [Enum arguments](#enum-arguments) | Restrict string arguments to a fixed set |
+| [Data frame with mixed constraints](#data-frame-with-mixed-constraints) | Columns + enums + ranges in one contract |
+| [Custom steps](#custom-steps) | Domain-specific invariants |
+| [Self-documentation](#self-documentation) | Print, [`as_contract_text()`](https://gillescolling.com/restrictR/reference/as_contract_text.md), [`as_contract_block()`](https://gillescolling.com/restrictR/reference/as_contract_block.md) |
+| [Using contracts in packages](#using-contracts-in-packages) | The recommended pattern for R packages |
 
 ## Reusable Schemas
 
@@ -30,6 +31,7 @@ predict-like function. Instead of scattering
 contract once:
 
 ``` r
+
 require_newdata <- restrict("newdata") |>
   require_df() |>
   require_has_cols(c("x1", "x2")) |>
@@ -41,6 +43,7 @@ require_newdata <- restrict("newdata") |>
 The result is a callable function. Valid input passes silently:
 
 ``` r
+
 good <- data.frame(x1 = c(1, 2, 3), x2 = c(4, 5, 6))
 require_newdata(good)
 ```
@@ -49,12 +52,14 @@ Invalid input produces a structured error with the exact path and
 position:
 
 ``` r
+
 require_newdata(42)
 #> Error:
 #> ! newdata: must be a data.frame, got numeric
 ```
 
 ``` r
+
 require_newdata(data.frame(x1 = c(1, NA), x2 = c(3, 4)))
 #> Error:
 #> ! newdata$x1: must not contain NA
@@ -62,6 +67,7 @@ require_newdata(data.frame(x1 = c(1, NA), x2 = c(3, 4)))
 ```
 
 ``` r
+
 require_newdata(data.frame(x1 = c(1, 2), x2 = c("a", "b")))
 #> Error:
 #> ! newdata$x2: must be numeric, got character
@@ -77,6 +83,7 @@ Some contracts depend on context. A prediction vector must have the same
 length as the rows in `newdata`:
 
 ``` r
+
 require_pred <- restrict("pred") |>
   require_numeric(no_na = TRUE, finite = TRUE) |>
   require_length_matches(~ nrow(newdata))
@@ -86,6 +93,7 @@ The formula `~ nrow(newdata)` declares a dependency on `newdata`. Pass
 it explicitly when calling the validator:
 
 ``` r
+
 newdata <- data.frame(x1 = 1:5, x2 = 6:10)
 require_pred(c(0.1, 0.2, 0.3, 0.4, 0.5), newdata = newdata)
 ```
@@ -93,6 +101,7 @@ require_pred(c(0.1, 0.2, 0.3, 0.4, 0.5), newdata = newdata)
 Mismatched lengths produce a precise diagnostic:
 
 ``` r
+
 require_pred(c(0.1, 0.2, 0.3), newdata = newdata)
 #> Error:
 #> ! pred: length must match nrow(newdata) (5)
@@ -102,6 +111,7 @@ require_pred(c(0.1, 0.2, 0.3), newdata = newdata)
 Missing context is caught **before any checks run**:
 
 ``` r
+
 require_pred(c(0.1, 0.2, 0.3))
 #> Error:
 #> ! `pred` depends on: newdata. Pass newdata = ... when calling the validator.
@@ -110,6 +120,7 @@ require_pred(c(0.1, 0.2, 0.3))
 Context can also be passed as a named list via `.ctx`:
 
 ``` r
+
 require_pred(1:5, .ctx = list(newdata = newdata))
 ```
 
@@ -118,6 +129,7 @@ require_pred(1:5, .ctx = list(newdata = newdata))
 For string arguments that must be one of a fixed set:
 
 ``` r
+
 require_method <- restrict("method") |>
   require_character(no_na = TRUE) |>
   require_length(1L) |>
@@ -125,10 +137,12 @@ require_method <- restrict("method") |>
 ```
 
 ``` r
+
 require_method("euclidean")
 ```
 
 ``` r
+
 require_method("chebyshev")
 #> Error:
 #> ! method: must be one of ["euclidean", "manhattan", "cosine"]
@@ -141,6 +155,7 @@ Contracts work well for functions that accept a data frame with typed
 columns, value ranges, and categorical fields in one go:
 
 ``` r
+
 require_survey <- restrict("survey") |>
   require_df() |>
   require_has_cols(c("age", "income", "status")) |>
@@ -151,6 +166,7 @@ require_survey <- restrict("survey") |>
 ```
 
 ``` r
+
 good_survey <- data.frame(
   age = c(25, 40, 33),
   income = c(35000, 60000, 45000),
@@ -160,6 +176,7 @@ require_survey(good_survey)
 ```
 
 ``` r
+
 bad_survey <- data.frame(
   age = c(25, -5, 200),
   income = c(35000, 60000, 45000),
@@ -182,6 +199,7 @@ The step function receives `(value, name, ctx)` and should call
 failure to produce the same structured errors as built-in steps:
 
 ``` r
+
 require_weights <- restrict("weights") |>
   require_numeric(no_na = TRUE) |>
   require_between(lower = 0, upper = 1) |>
@@ -197,10 +215,12 @@ require_weights <- restrict("weights") |>
 ```
 
 ``` r
+
 require_weights(c(0.5, 0.3, 0.2))
 ```
 
 ``` r
+
 require_weights(c(0.5, 0.5, 0.5))
 #> Error:
 #> ! weights: must sum to 1
@@ -210,6 +230,7 @@ require_weights(c(0.5, 0.5, 0.5))
 Custom steps can also declare dependencies:
 
 ``` r
+
 require_probs <- restrict("probs") |>
   require_numeric(no_na = TRUE) |>
   require_custom(
@@ -231,6 +252,7 @@ require_probs(c(0.3, 0.7), n_classes = 2L)
 Print a validator to see its full contract:
 
 ``` r
+
 require_newdata
 #> <restriction newdata>
 #>   1. must be a data.frame
@@ -245,6 +267,7 @@ Use
 to generate a one-line summary for roxygen `@param`:
 
 ``` r
+
 as_contract_text(require_newdata)
 #> [1] "Must be a data.frame. Must have columns: \"x1\", \"x2\". $x1 must be numeric (no NA, finite). $x2 must be numeric (no NA, finite). Must have at least 1 row."
 ```
@@ -254,6 +277,7 @@ Use
 for multi-line output suitable for `@details`:
 
 ``` r
+
 cat(as_contract_block(require_newdata))
 #> - must be a data.frame
 #> - must have columns: "x1", "x2"
@@ -269,6 +293,7 @@ uses them, or in a dedicated `R/contracts.R` if several files share the
 same validators. Call them at the top of exported functions.
 
 ``` r
+
 # R/contracts.R
 require_newdata <- restrict("newdata") |>
   require_df() |>
@@ -282,6 +307,7 @@ require_pred <- restrict("pred") |>
 ```
 
 ``` r
+
 # R/predict.R
 
 #' Predict from a fitted model
@@ -302,6 +328,7 @@ Contracts compose naturally with the pipe and branch safely (each `|>`
 creates a new validator):
 
 ``` r
+
 base <- restrict("x") |> require_numeric()
 v1 <- base |> require_length(1L)
 v2 <- base |> require_between(lower = 0)
@@ -316,10 +343,11 @@ length(environment(v2)$steps)
 ```
 
 ``` r
+
 sessionInfo()
-#> R version 4.5.2 (2025-10-31)
+#> R version 4.6.0 (2026-04-24)
 #> Platform: x86_64-pc-linux-gnu
-#> Running under: Ubuntu 24.04.3 LTS
+#> Running under: Ubuntu 24.04.4 LTS
 #> 
 #> Matrix products: default
 #> BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -342,10 +370,10 @@ sessionInfo()
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] digest_0.6.39     desc_1.4.3        R6_2.6.1          fastmap_1.2.0    
-#>  [5] xfun_0.56         glue_1.8.0        cachem_1.1.0      knitr_1.51       
-#>  [9] htmltools_0.5.9   rmarkdown_2.30    lifecycle_1.0.5   cli_3.6.5        
-#> [13] vctrs_0.7.1       svglite_2.2.2     sass_0.4.10       pkgdown_2.2.0    
-#> [17] textshaping_1.0.5 jquerylib_0.1.4   systemfonts_1.3.2 compiler_4.5.2   
-#> [21] tools_4.5.2       pillar_1.11.1     evaluate_1.0.5    bslib_0.10.0     
-#> [25] yaml_2.3.12       jsonlite_2.0.0    rlang_1.1.7       fs_1.6.7
+#>  [5] xfun_0.57         glue_1.8.1        cachem_1.1.0      knitr_1.51       
+#>  [9] htmltools_0.5.9   rmarkdown_2.31    lifecycle_1.0.5   cli_3.6.6        
+#> [13] vctrs_0.7.3       svglite_2.2.2     sass_0.4.10       pkgdown_2.2.0    
+#> [17] textshaping_1.0.5 jquerylib_0.1.4   systemfonts_1.3.2 compiler_4.6.0   
+#> [21] tools_4.6.0       pillar_1.11.1     evaluate_1.0.5    bslib_0.11.0     
+#> [25] yaml_2.3.12       jsonlite_2.0.0    rlang_1.2.0       fs_2.1.0
 ```

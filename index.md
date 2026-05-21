@@ -22,6 +22,7 @@ documentation for use in roxygen (R’s standard doc system).
 ## Quick Start
 
 ``` r
+
 library(restrictR)
 
 # Define once
@@ -56,6 +57,7 @@ construction.
 ### Schema Validation
 
 ``` r
+
 require_newdata <- restrict("newdata") |>
   require_df() |>
   require_has_cols(c("x1", "x2")) |>
@@ -67,6 +69,7 @@ require_newdata <- restrict("newdata") |>
 ### Dependent Rules
 
 ``` r
+
 require_pred <- restrict("pred") |>
   require_numeric(no_na = TRUE) |>
   require_length_matches(~ nrow(newdata))
@@ -88,6 +91,7 @@ require_pred(predictions, newdata = df)
 ### Self-Documenting
 
 ``` r
+
 print(require_newdata)
 #> <restriction newdata>
 #>   1. must be a data.frame
@@ -104,11 +108,12 @@ as_contract_text(require_newdata)
 ## Installation
 
 ``` r
+
 # From CRAN
 install.packages("restrictR")
 
 # Development version from GitHub
-# install.packages("pak")
+install.packages("pak")
 pak::pak("gcol33/restrictR")
 ```
 
@@ -117,6 +122,7 @@ pak::pak("gcol33/restrictR")
 ### In Functions
 
 ``` r
+
 predict2 <- function(object, newdata, ...) {
   require_newdata(newdata)
   out <- predict(object, newdata = newdata)
@@ -128,6 +134,7 @@ predict2 <- function(object, newdata, ...) {
 ### Enum Validation
 
 ``` r
+
 require_method <- restrict("method") |>
   require_character(no_na = TRUE) |>
   require_length(1L) |>
@@ -142,6 +149,7 @@ compute_distance <- function(x, y, method = "euclidean") {
 ### Column-Level Checks
 
 ``` r
+
 require_survey <- restrict("survey") |>
   require_df() |>
   require_has_cols(c("age", "income", "status")) |>
@@ -154,6 +162,7 @@ require_survey <- restrict("survey") |>
 ### Roxygen Integration
 
 ``` r
+
 #' @param newdata `r as_contract_text(require_newdata)`
 ```
 
@@ -165,6 +174,7 @@ lets you write your own check while keeping the same error format via
 [`fail()`](https://gillescolling.com/restrictR/reference/fail.md):
 
 ``` r
+
 require_weights <- restrict("weights") |>
   require_numeric(no_na = TRUE) |>
   require_between(lower = 0, upper = 1) |>
@@ -181,14 +191,14 @@ require_weights <- restrict("weights") |>
 
 ## Built-In Steps
 
-| Category               | Steps                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-|------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Type checks**        | [`require_df()`](https://gillescolling.com/restrictR/reference/require_df.md), [`require_numeric()`](https://gillescolling.com/restrictR/reference/require_numeric.md), [`require_integer()`](https://gillescolling.com/restrictR/reference/require_integer.md), [`require_character()`](https://gillescolling.com/restrictR/reference/require_character.md), [`require_logical()`](https://gillescolling.com/restrictR/reference/require_logical.md)                                                                                                                                                                                                                                                                                                                                                                                                           |
-| **Null / Missingness** | [`require_not_null()`](https://gillescolling.com/restrictR/reference/require_not_null.md), [`require_no_na()`](https://gillescolling.com/restrictR/reference/require_no_na.md), [`require_finite()`](https://gillescolling.com/restrictR/reference/require_finite.md)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| **Structure**          | [`require_scalar()`](https://gillescolling.com/restrictR/reference/require_scalar.md), [`require_named()`](https://gillescolling.com/restrictR/reference/require_named.md), [`require_length()`](https://gillescolling.com/restrictR/reference/require_length.md), [`require_length_min()`](https://gillescolling.com/restrictR/reference/require_length_min.md), [`require_length_max()`](https://gillescolling.com/restrictR/reference/require_length_max.md), [`require_length_matches()`](https://gillescolling.com/restrictR/reference/require_length_matches.md), [`require_nrow_min()`](https://gillescolling.com/restrictR/reference/require_nrow_min.md), [`require_nrow_matches()`](https://gillescolling.com/restrictR/reference/require_nrow_matches.md), [`require_has_cols()`](https://gillescolling.com/restrictR/reference/require_has_cols.md) |
-| **Values**             | [`require_positive()`](https://gillescolling.com/restrictR/reference/require_positive.md), [`require_negative()`](https://gillescolling.com/restrictR/reference/require_negative.md), [`require_between()`](https://gillescolling.com/restrictR/reference/require_between.md), [`require_one_of()`](https://gillescolling.com/restrictR/reference/require_one_of.md), [`require_unique()`](https://gillescolling.com/restrictR/reference/require_unique.md)                                                                                                                                                                                                                                                                                                                                                                                                     |
-| **Columns**            | [`require_col_numeric()`](https://gillescolling.com/restrictR/reference/require_col_numeric.md), [`require_col_character()`](https://gillescolling.com/restrictR/reference/require_col_character.md), [`require_col_between()`](https://gillescolling.com/restrictR/reference/require_col_between.md), [`require_col_one_of()`](https://gillescolling.com/restrictR/reference/require_col_one_of.md)                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| **Extension**          | [`require_custom()`](https://gillescolling.com/restrictR/reference/require_custom.md)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| Category | Steps |
+|----|----|
+| **Type checks** | [`require_df()`](https://gillescolling.com/restrictR/reference/require_df.md), [`require_numeric()`](https://gillescolling.com/restrictR/reference/require_numeric.md), [`require_integer()`](https://gillescolling.com/restrictR/reference/require_integer.md), [`require_character()`](https://gillescolling.com/restrictR/reference/require_character.md), [`require_logical()`](https://gillescolling.com/restrictR/reference/require_logical.md) |
+| **Null / Missingness** | [`require_not_null()`](https://gillescolling.com/restrictR/reference/require_not_null.md), [`require_no_na()`](https://gillescolling.com/restrictR/reference/require_no_na.md), [`require_finite()`](https://gillescolling.com/restrictR/reference/require_finite.md) |
+| **Structure** | [`require_scalar()`](https://gillescolling.com/restrictR/reference/require_scalar.md), [`require_named()`](https://gillescolling.com/restrictR/reference/require_named.md), [`require_length()`](https://gillescolling.com/restrictR/reference/require_length.md), [`require_length_min()`](https://gillescolling.com/restrictR/reference/require_length_min.md), [`require_length_max()`](https://gillescolling.com/restrictR/reference/require_length_max.md), [`require_length_matches()`](https://gillescolling.com/restrictR/reference/require_length_matches.md), [`require_nrow_min()`](https://gillescolling.com/restrictR/reference/require_nrow_min.md), [`require_nrow_matches()`](https://gillescolling.com/restrictR/reference/require_nrow_matches.md), [`require_has_cols()`](https://gillescolling.com/restrictR/reference/require_has_cols.md) |
+| **Values** | [`require_positive()`](https://gillescolling.com/restrictR/reference/require_positive.md), [`require_negative()`](https://gillescolling.com/restrictR/reference/require_negative.md), [`require_between()`](https://gillescolling.com/restrictR/reference/require_between.md), [`require_one_of()`](https://gillescolling.com/restrictR/reference/require_one_of.md), [`require_unique()`](https://gillescolling.com/restrictR/reference/require_unique.md) |
+| **Columns** | [`require_col_numeric()`](https://gillescolling.com/restrictR/reference/require_col_numeric.md), [`require_col_character()`](https://gillescolling.com/restrictR/reference/require_col_character.md), [`require_col_between()`](https://gillescolling.com/restrictR/reference/require_col_between.md), [`require_col_one_of()`](https://gillescolling.com/restrictR/reference/require_col_one_of.md) |
+| **Extension** | [`require_custom()`](https://gillescolling.com/restrictR/reference/require_custom.md) |
 
 ## Documentation
 

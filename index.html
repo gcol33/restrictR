@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>restrictR: Composable Runtime Contracts for R • restrictR</title>
 <script src="lightswitch.js"></script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><link href="extra.css" rel="stylesheet">
 <meta property="og:title" content="restrictR: Composable Runtime Contracts for R">
@@ -168,7 +168,7 @@ operator. Define runtime contracts once and enforce them anywhere.
 <span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"restrictR"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Development version from GitHub</span></span>
-<span><span class="co"># install.packages("pak")</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"pak"</span><span class="op">)</span></span>
 <span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"gcol33/restrictR"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -244,42 +244,42 @@ operator. Define runtime contracts once and enforce them anywhere.
 <col width="58%">
 <col width="41%">
 </colgroup>
-<thead><tr class="header">
+<thead><tr>
 <th>Category</th>
 <th>Steps</th>
 </tr></thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td><strong>Type checks</strong></td>
 <td>
 <code><a href="reference/require_df.html">require_df()</a></code>, <code><a href="reference/require_numeric.html">require_numeric()</a></code>, <code><a href="reference/require_integer.html">require_integer()</a></code>, <code><a href="reference/require_character.html">require_character()</a></code>, <code><a href="reference/require_logical.html">require_logical()</a></code>
 </td>
 </tr>
-<tr class="even">
+<tr>
 <td><strong>Null / Missingness</strong></td>
 <td>
 <code><a href="reference/require_not_null.html">require_not_null()</a></code>, <code><a href="reference/require_no_na.html">require_no_na()</a></code>, <code><a href="reference/require_finite.html">require_finite()</a></code>
 </td>
 </tr>
-<tr class="odd">
+<tr>
 <td><strong>Structure</strong></td>
 <td>
 <code><a href="reference/require_scalar.html">require_scalar()</a></code>, <code><a href="reference/require_named.html">require_named()</a></code>, <code><a href="reference/require_length.html">require_length()</a></code>, <code><a href="reference/require_length_min.html">require_length_min()</a></code>, <code><a href="reference/require_length_max.html">require_length_max()</a></code>, <code><a href="reference/require_length_matches.html">require_length_matches()</a></code>, <code><a href="reference/require_nrow_min.html">require_nrow_min()</a></code>, <code><a href="reference/require_nrow_matches.html">require_nrow_matches()</a></code>, <code><a href="reference/require_has_cols.html">require_has_cols()</a></code>
 </td>
 </tr>
-<tr class="even">
+<tr>
 <td><strong>Values</strong></td>
 <td>
 <code><a href="reference/require_positive.html">require_positive()</a></code>, <code><a href="reference/require_negative.html">require_negative()</a></code>, <code><a href="reference/require_between.html">require_between()</a></code>, <code><a href="reference/require_one_of.html">require_one_of()</a></code>, <code><a href="reference/require_unique.html">require_unique()</a></code>
 </td>
 </tr>
-<tr class="odd">
+<tr>
 <td><strong>Columns</strong></td>
 <td>
 <code><a href="reference/require_col_numeric.html">require_col_numeric()</a></code>, <code><a href="reference/require_col_character.html">require_col_character()</a></code>, <code><a href="reference/require_col_between.html">require_col_between()</a></code>, <code><a href="reference/require_col_one_of.html">require_col_one_of()</a></code>
 </td>
 </tr>
-<tr class="even">
+<tr>
 <td><strong>Extension</strong></td>
 <td><code><a href="reference/require_custom.html">require_custom()</a></code></td>
 </tr>
