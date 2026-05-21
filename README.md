@@ -97,7 +97,7 @@ as_contract_text(require_newdata)
 install.packages("restrictR")
 
 # Development version from GitHub
-# install.packages("pak")
+install.packages("pak")
 pak::pak("gcol33/restrictR")
 ```
 
