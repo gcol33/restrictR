@@ -1,6 +1,6 @@
 # restrictR
 
-*you wrote that check already*
+*the same input check, written once*
 
 [![CRAN
 status](https://www.r-pkg.org/badges/version/restrictR)](https://CRAN.R-project.org/package=restrictR)
