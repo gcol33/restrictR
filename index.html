@@ -223,6 +223,25 @@ x: must not contain NA
 </table>
 </div>
 <div class="section level2">
+<h2 id="comparison-with-checkmate">Comparison with checkmate<a class="anchor" aria-label="anchor" href="#comparison-with-checkmate"></a>
+</h2>
+<p><a href="https://CRAN.R-project.org/package=checkmate" class="external-link">checkmate</a> is a fast, C-backed toolkit for argument checking. It offers <code>assert*</code>, <code>check*</code>, <code>test*</code>, and <code>expect*</code> families so that, inside a function, you write one call per argument: <code>assertNumeric(x, lower = 0, len = 1)</code> either passes or raises an error on the spot. Checks are expressed as direct function calls and run where they are written.</p>
+<p><code>restrictR</code> works one level up. Instead of calling checks inline, you build a named validator once as a <code>|&gt;</code> chain of <code>require_*()</code> steps and reuse that object across every function that takes the same argument. The two packages differ along a few axes:</p>
+<ul>
+<li>
+<strong>Reuse.</strong> A <code>restrictR</code> validator is a callable closure you define once and call at the top of many functions, so the rule for <code>newdata</code> lives in one place. checkmate checks are written inline at each call site.</li>
+<li>
+<strong>Composition.</strong> Validators compose with the base pipe and branch immutably: <code>base |&gt; require_length(1L)</code> and <code>base |&gt; require_between(lower = 0)</code> share a base without modifying it. checkmate composes by listing several <code>assert*</code> calls in sequence.</li>
+<li>
+<strong>Self-documentation.</strong> A validator prints its own contract, and <code><a href="reference/as_contract_text.html">as_contract_text()</a></code> renders it for a roxygen <code>@param</code>, so enforcement and documentation stay in sync.</li>
+<li>
+<strong>Dependent rules.</strong> Cross-argument constraints use one-sided formulas (<code>require_length_matches(~ nrow(newdata))</code>) with context passed explicitly at call time. checkmate expresses such relationships with ordinary R between the checks.</li>
+<li>
+<strong>Dependencies.</strong> checkmate uses compiled C code for speed. <code>restrictR</code> is pure base R with zero runtime dependencies.</li>
+</ul>
+<p>If you want fast, inline per-argument assertions, checkmate is a mature and well-tested choice. If you want to name a contract once, reuse it across functions, and have it document itself, that is what <code>restrictR</code> is built for. The two also coexist: a <code><a href="reference/require_custom.html">require_custom()</a></code> step can call a checkmate assertion inside it.</p>
+</div>
+<div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">

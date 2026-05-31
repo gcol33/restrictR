@@ -144,6 +144,46 @@ require_weights <- restrict("weights") |>
 | **Columns** | [`require_col_numeric()`](https://gillescolling.com/restrictR/reference/require_col_numeric.md), [`require_col_character()`](https://gillescolling.com/restrictR/reference/require_col_character.md), [`require_col_between()`](https://gillescolling.com/restrictR/reference/require_col_between.md), [`require_col_one_of()`](https://gillescolling.com/restrictR/reference/require_col_one_of.md) |
 | **Extension** | [`require_custom()`](https://gillescolling.com/restrictR/reference/require_custom.md) |
 
+## Comparison with checkmate
+
+[checkmate](https://CRAN.R-project.org/package=checkmate) is a fast,
+C-backed toolkit for argument checking. It offers `assert*`, `check*`,
+`test*`, and `expect*` families so that, inside a function, you write
+one call per argument: `assertNumeric(x, lower = 0, len = 1)` either
+passes or raises an error on the spot. Checks are expressed as direct
+function calls and run where they are written.
+
+`restrictR` works one level up. Instead of calling checks inline, you
+build a named validator once as a `|>` chain of `require_*()` steps and
+reuse that object across every function that takes the same argument.
+The two packages differ along a few axes:
+
+- **Reuse.** A `restrictR` validator is a callable closure you define
+  once and call at the top of many functions, so the rule for `newdata`
+  lives in one place. checkmate checks are written inline at each call
+  site.
+- **Composition.** Validators compose with the base pipe and branch
+  immutably: `base |> require_length(1L)` and
+  `base |> require_between(lower = 0)` share a base without modifying
+  it. checkmate composes by listing several `assert*` calls in sequence.
+- **Self-documentation.** A validator prints its own contract, and
+  [`as_contract_text()`](https://gillescolling.com/restrictR/reference/as_contract_text.md)
+  renders it for a roxygen `@param`, so enforcement and documentation
+  stay in sync.
+- **Dependent rules.** Cross-argument constraints use one-sided formulas
+  (`require_length_matches(~ nrow(newdata))`) with context passed
+  explicitly at call time. checkmate expresses such relationships with
+  ordinary R between the checks.
+- **Dependencies.** checkmate uses compiled C code for speed.
+  `restrictR` is pure base R with zero runtime dependencies.
+
+If you want fast, inline per-argument assertions, checkmate is a mature
+and well-tested choice. If you want to name a contract once, reuse it
+across functions, and have it document itself, that is what `restrictR`
+is built for. The two also coexist: a
+[`require_custom()`](https://gillescolling.com/restrictR/reference/require_custom.md)
+step can call a checkmate assertion inside it.
+
 ## Installation
 
 ``` r
