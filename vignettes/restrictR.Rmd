@@ -289,6 +289,19 @@ length(environment(v1)$steps)
 length(environment(v2)$steps)
 ```
 
+## Relation to checkmate
+
+The [checkmate](https://CRAN.R-project.org/package=checkmate) package covers
+similar ground with a different emphasis. Its `assert*`/`check*`/`test*` families
+provide fast, C-backed checks that you call inline, one per argument, where the
+check is needed. `restrictR` instead lets you name a contract once as a `|>` chain
+and reuse that callable validator across functions, compose and branch it
+immutably, and have it print and document itself via `as_contract_text()`. Use
+checkmate when you want quick inline assertions; use `restrictR` when the same
+contract recurs across functions and you want a single definition that also serves
+as documentation. The two interoperate: a checkmate assertion can live inside a
+`require_custom()` step.
+
 ```{r}
 sessionInfo()
 ```
