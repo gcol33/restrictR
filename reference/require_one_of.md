@@ -22,6 +22,12 @@ require_one_of(restriction, values)
 
 The modified `restriction` object.
 
+## Details
+
+`NA` elements are skipped; chain
+[`require_no_na()`](https://gillescolling.com/restrictR/reference/require_no_na.md)
+to reject them.
+
 ## See also
 
 Other value checks:

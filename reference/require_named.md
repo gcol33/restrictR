@@ -1,6 +1,8 @@
 # Require Named Value
 
-Validates that the value has names. Useful for named vectors and lists.
+Validates that the value is fully named: every element has a non-empty,
+non-`NA` name. A partially-named value (e.g. `c(a = 1, 2)`) fails and
+the positions of the unnamed elements are reported.
 
 ## Usage
 

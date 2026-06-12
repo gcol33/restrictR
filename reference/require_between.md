@@ -41,6 +41,13 @@ require_between(
 
 The modified `restriction` object.
 
+## Details
+
+Non-numeric input fails with a type error. `NA` elements are skipped;
+chain
+[`require_no_na()`](https://gillescolling.com/restrictR/reference/require_no_na.md)
+to reject them.
+
 ## See also
 
 Other value checks:

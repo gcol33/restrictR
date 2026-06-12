@@ -45,6 +45,11 @@ require_col_between(
 
 The modified `restriction` object.
 
+## Details
+
+A non-numeric column fails with a type error. `NA` elements are skipped;
+use `require_col_numeric(col, no_na = TRUE)` to reject them.
+
 ## See also
 
 Other column checks:

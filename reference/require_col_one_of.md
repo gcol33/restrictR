@@ -26,6 +26,12 @@ require_col_one_of(restriction, col, values)
 
 The modified `restriction` object.
 
+## Details
+
+`NA` elements are skipped; use
+`require_col_character(col, no_na = TRUE)` (or the matching column type
+check) to reject them.
+
 ## See also
 
 Other column checks:

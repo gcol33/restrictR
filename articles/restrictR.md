@@ -386,11 +386,12 @@ sessionInfo()
 #> [1] restrictR_0.1.2
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] digest_0.6.39     desc_1.4.3        R6_2.6.1          fastmap_1.2.0    
-#>  [5] xfun_0.57         glue_1.8.1        cachem_1.1.0      knitr_1.51       
-#>  [9] htmltools_0.5.9   rmarkdown_2.31    lifecycle_1.0.5   cli_3.6.6        
-#> [13] vctrs_0.7.3       svglite_2.2.2     sass_0.4.10       pkgdown_2.2.0    
-#> [17] textshaping_1.0.5 jquerylib_0.1.4   systemfonts_1.3.2 compiler_4.6.0   
-#> [21] tools_4.6.0       pillar_1.11.1     evaluate_1.0.5    bslib_0.11.0     
-#> [25] yaml_2.3.12       jsonlite_2.0.0    rlang_1.2.0       fs_2.1.0
+#>  [1] vctrs_0.7.3       svglite_2.2.2     cli_3.6.6         knitr_1.51       
+#>  [5] rlang_1.2.0       xfun_0.58         otel_0.2.0        textshaping_1.0.5
+#>  [9] jsonlite_2.0.0    glue_1.8.1        htmltools_0.5.9   sass_0.4.10      
+#> [13] rmarkdown_2.31    evaluate_1.0.5    jquerylib_0.1.4   fastmap_1.2.0    
+#> [17] yaml_2.3.12       lifecycle_1.0.5   compiler_4.6.0    fs_2.1.0         
+#> [21] systemfonts_1.3.2 digest_0.6.39     R6_2.6.1          pillar_1.11.1    
+#> [25] bslib_0.11.0      tools_4.6.0       pkgdown_2.2.0     cachem_1.1.0     
+#> [29] desc_1.4.3
 ```
