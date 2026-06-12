@@ -49,6 +49,11 @@ reference:
   - as_contract_block
   - require_custom
   - fail
+- title: Checking
+  desc: Run a validator without throwing
+  contents:
+  - is_valid
+  - validation_errors
 - title: Type Checks
   desc: Validate value types
   contents:
@@ -57,6 +62,7 @@ reference:
   - require_integer
   - require_character
   - require_logical
+  - require_class
 - title: Null & Missingness
   desc: Check for NULL, NA, and non-finite values
   contents:
