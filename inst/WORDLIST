@@ -6,6 +6,7 @@ DSL
 enum
 enums
 finiteness
+interoperate
 invariants
 nrow
 ORCID

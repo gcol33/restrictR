@@ -1,15 +1,16 @@
 Package: restrictR
-Title: Composable Runtime Contracts for R
+Title: Composable Runtime Contracts
 Version: 0.2.0
 Authors@R:
     person("Gilles", "Colling", email = "gilles.colling051@gmail.com",
            role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0000-0003-3070-6066"))
 Description: Build reusable validators from small building blocks using the
-    base pipe operator. Define runtime contracts once with 'restrict()' and
+    base pipe operator. Define runtime contracts once with restrict() and
     enforce them anywhere in code. Validators compose naturally, support
     dependent rules via formulas, and produce clear, path-aware error
-    messages. No DSL, no operator overloading, just idiomatic R.
+    messages. No domain-specific language, no operator overloading, just
+    idiomatic R.
 License: MIT + file LICENSE
 Language: en-US
 Encoding: UTF-8

@@ -33,7 +33,7 @@
   values where it adds no information.
 * Vignette: added "Data Frame with Mixed Constraints" section, surfaced
   immutability in the overview, updated custom step examples to use `fail()`.
-* README: tightened prose, removed AI-ish phrasing.
+* Documentation: tightened prose in the overview and examples.
 
 # restrictR 0.1.0
 

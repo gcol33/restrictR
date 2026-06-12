@@ -15,6 +15,11 @@ fail(path, message, found = NULL, at = NULL)
 
 \item{at}{optional integer positions to show on an \verb{At:} line.}
 }
+\value{
+No return value. Called for its side effect: it signals a classed
+\code{restrictR_failure} condition (an error) carrying \code{path}, \code{message}, and
+the optional \code{found} and \code{at} details.
+}
 \description{
 Produces a consistently formatted error message and stops execution.
 Intended for use inside custom validation steps created with
@@ -25,12 +30,8 @@ steps.
 Format: \code{path: message}, with optional \verb{Found:} and \verb{At:} lines.
 }
 \examples{
-\dontrun{
-fail("x", "must be positive", found = -3, at = 2L)
-# Error: x: must be positive
-#   Found: -3
-#   At: 2
-}
+# fail() signals an error; wrap in try() to show the formatted message
+try(fail("x", "must be positive", found = -3, at = 2L))
 
 }
 \seealso{
