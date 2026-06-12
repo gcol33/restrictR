@@ -44,6 +44,8 @@ Other core:
 \code{\link[=as_contract_block]{as_contract_block()}},
 \code{\link[=as_contract_text]{as_contract_text()}},
 \code{\link[=fail]{fail()}},
-\code{\link[=restrict]{restrict()}}
+\code{\link[=is_valid]{is_valid()}},
+\code{\link[=restrict]{restrict()}},
+\code{\link[=validation_errors]{validation_errors()}}
 }
 \concept{core}

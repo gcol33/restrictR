@@ -153,3 +153,20 @@ test_that("require_length_matches() rejects two-sided formulas", {
     "one-sided formula"
   )
 })
+
+test_that("formula steps resolve non-base functions (#7)", {
+  v <- restrict("x") |>
+    require_length_matches(~ as.integer(median(reference)))
+
+  expect_invisible(v(1:3, reference = c(3, 3, 3)))
+  expect_error(
+    v(1:4, reference = c(3, 3, 3)),
+    "length must match"
+  )
+})
+
+test_that("formula data names still come only from explicit context", {
+  v <- restrict("x") |> require_length_matches(~ length(reference))
+  reference <- 1:99  # must be ignored; not passed as context
+  expect_error(v(1:3), "depends on: reference")
+})

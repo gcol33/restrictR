@@ -118,3 +118,24 @@ test_that("require_logical(no_na = TRUE) rejects NAs", {
   expect_invisible(v(c(TRUE, FALSE)))
   expect_error(v(c(TRUE, NA)), "must not contain NA")
 })
+
+test_that("require_class() passes when the value inherits the class", {
+  expect_invisible((restrict("d") |> require_class("Date"))(Sys.Date()))
+  expect_invisible((restrict("f") |> require_class("factor"))(factor("a")))
+  expect_invisible((restrict("l") |> require_class("list"))(list(1, 2)))
+})
+
+test_that("require_class() fails with a type message for the wrong class", {
+  v <- restrict("d") |> require_class("Date")
+  expect_error(v(1), 'must be of class "Date", got numeric')
+  expect_error(v("2020-01-01"), 'must be of class "Date", got character')
+})
+
+test_that("require_class() honours inheritance unless exact = TRUE", {
+  x <- structure(1, class = c("special", "numeric"))
+  expect_invisible((restrict("x") |> require_class("numeric"))(x))
+  expect_error(
+    (restrict("x") |> require_class("numeric", exact = TRUE))(x),
+    'must be of class "numeric", got special'
+  )
+})

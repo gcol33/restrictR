@@ -1,3 +1,20 @@
+# restrictR 0.2.0
+
+* New step `require_class()`: assert any class (e.g. `factor`, `Date`,
+  `POSIXct`, fitted-model objects) through one verb, with `exact` for a
+  strict first-class match.
+* Validators gain `.on_fail = "all"`: run every step and report all
+  violations in one aggregated error instead of stopping at the first.
+* New non-throwing helpers `is_valid()` (logical predicate) and
+  `validation_errors()` (character vector of failure messages, empty when
+  the value passes).
+* Formula steps (`require_length_matches()`, `require_nrow_matches()`) now
+  resolve non-base functions such as `median()`, `sd()`, and package
+  exports. Data names are still taken only from explicit context.
+* `fail()` now signals a structured `restrictR_failure` condition carrying
+  `path`, `found`, and `at`, so failures can be collected and inspected
+  programmatically.
+
 # restrictR 0.1.2
 
 * New steps: `require_scalar()`, `require_not_null()`, `require_unique()`,

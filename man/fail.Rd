@@ -37,7 +37,9 @@ fail("x", "must be positive", found = -3, at = 2L)
 Other core:
 \code{\link[=as_contract_block]{as_contract_block()}},
 \code{\link[=as_contract_text]{as_contract_text()}},
+\code{\link[=is_valid]{is_valid()}},
 \code{\link[=require_custom]{require_custom()}},
-\code{\link[=restrict]{restrict()}}
+\code{\link[=restrict]{restrict()}},
+\code{\link[=validation_errors]{validation_errors()}}
 }
 \concept{core}

@@ -23,6 +23,7 @@ non-finite values.
 \seealso{
 Other type checks:
 \code{\link[=require_character]{require_character()}},
+\code{\link[=require_class]{require_class()}},
 \code{\link[=require_df]{require_df()}},
 \code{\link[=require_integer]{require_integer()}},
 \code{\link[=require_logical]{require_logical()}}

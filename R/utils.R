@@ -23,6 +23,23 @@
 #' @family core
 #' @export
 fail <- function(path, message, found = NULL, at = NULL) {
+  stop(restrictR_failure(path, message, found = found, at = at))
+}
+
+
+#' Build a Structured Validation-Failure Condition
+#'
+#' Creates the classed condition raised by [fail()]. Carries both the
+#' formatted message and the structured fields (`path`, `detail`, `found`,
+#' `at`) so callers can collect failures (`.on_fail = "all"`) or inspect them
+#' programmatically without parsing strings.
+#'
+#' @inheritParams fail
+#'
+#' @return A condition of class `c("restrictR_failure", "error", "condition")`.
+#'
+#' @noRd
+restrictR_failure <- function(path, message, found = NULL, at = NULL) {
   msg <- sprintf("%s: %s", path, message)
   if (!is.null(found)) {
     msg <- paste0(msg, "\n  Found: ", found)
@@ -36,7 +53,36 @@ fail <- function(path, message, found = NULL, at = NULL) {
                                  length(at) - 5L))
     }
   }
-  stop(msg, call. = FALSE)
+  structure(
+    class = c("restrictR_failure", "error", "condition"),
+    list(message = msg, call = NULL,
+         path = path, detail = message, found = found, at = at)
+  )
+}
+
+
+#' Combine Several Validation Failures
+#'
+#' Aggregates the individual `restrictR_failure` conditions collected in
+#' `.on_fail = "all"` mode into a single error whose message lists every
+#' `path: message`. The component conditions are retained in `$failures` for
+#' programmatic inspection.
+#'
+#' @param failures a list of `restrictR_failure` conditions.
+#'
+#' @return A condition of class `c("restrictR_failures", "error", "condition")`.
+#'
+#' @noRd
+restrictR_failures <- function(failures) {
+  n <- length(failures)
+  header <- sprintf("%d validation failure%s:", n, if (n == 1L) "" else "s")
+  body <- paste(vapply(failures, conditionMessage, character(1L)),
+                collapse = "\n")
+  structure(
+    class = c("restrictR_failures", "error", "condition"),
+    list(message = paste0(header, "\n", body), call = NULL,
+         failures = failures)
+  )
 }
 
 
@@ -59,7 +105,12 @@ fail <- function(path, message, found = NULL, at = NULL) {
 eval_formula <- function(formula, value, name, ctx) {
   expr <- formula[[2L]]
   env_data <- c(ctx, list(.value = value, .name = name))
-  env <- list2env(env_data, parent = baseenv())
+  # Parent is the formula's own environment so functions (median, sd, package
+  # exports) resolve from where the formula was written. Data names are not
+  # silently picked up from it: every variable in the formula is a declared
+  # dep, enforced present in `ctx` (the child env) before this runs, so the
+  # explicit binding always shadows the parent.
+  env <- list2env(env_data, parent = environment(formula) %||% baseenv())
   tryCatch(
     eval(expr, envir = env),
     error = function(e) {

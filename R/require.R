@@ -164,6 +164,46 @@ require_logical <- function(restriction, no_na = FALSE) {
 }
 
 
+#' Require a Specific Class
+#'
+#' Validates that the value belongs to a given class. One verb covers the
+#' types without a dedicated check, including `factor`, `Date`, `POSIXct`,
+#' `list`, and fitted-model objects such as `lm`.
+#'
+#' @param restriction a `restriction` object.
+#' @param class character(1) class name to require.
+#' @param exact logical; if `TRUE`, requires `class(value)[1]` to equal
+#'   `class` exactly. If `FALSE` (default), tests inheritance with
+#'   [inherits()], so a subclass passes.
+#'
+#' @return The modified `restriction` object.
+#'
+#' @examples
+#' restrict("d") |> require_class("Date")
+#' restrict("f") |> require_class("factor")
+#' restrict("model") |> require_class("lm")
+#'
+#' @family type checks
+#' @export
+require_class <- function(restriction, class, exact = FALSE) {
+  lbl <- sprintf('must be of class "%s"', class)
+
+  add_step(restriction, list(
+    label = lbl,
+    deps = character(0L),
+    fields = list(class = class, exact = exact),
+    fn = function(value, name, ctx) {
+      observed <- base::class(value)
+      ok <- if (exact) identical(observed[1L], class) else inherits(value, class)
+      if (!ok) {
+        fail(name, sprintf('must be of class "%s", got %s',
+                           class, observed[1L]))
+      }
+    }
+  ))
+}
+
+
 # ---- Null checks ----
 
 #' Require Non-NULL Value

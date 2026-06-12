@@ -30,6 +30,15 @@ require_pred(out, .ctx = list(newdata = df))
 Named arguments in \code{...} take precedence over \code{.ctx} entries with the
 same name. If a step declares dependencies (e.g. \code{require_length_matches(~ nrow(newdata))}), the validator checks that all required context is present
 before running any steps and errors early if not.
+
+By default a validator is fail-fast: the first failing step stops with its
+error. Pass \code{.on_fail = "all"} to run every step and report all violations
+in one aggregated error:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{require_pred(out, .on_fail = "all")
+}\if{html}{\out{</div>}}
+
+For a non-throwing result, use \code{\link[=is_valid]{is_valid()}} or \code{\link[=validation_errors]{validation_errors()}}.
 }
 
 \examples{
@@ -53,6 +62,8 @@ Other core:
 \code{\link[=as_contract_block]{as_contract_block()}},
 \code{\link[=as_contract_text]{as_contract_text()}},
 \code{\link[=fail]{fail()}},
-\code{\link[=require_custom]{require_custom()}}
+\code{\link[=is_valid]{is_valid()}},
+\code{\link[=require_custom]{require_custom()}},
+\code{\link[=validation_errors]{validation_errors()}}
 }
 \concept{core}

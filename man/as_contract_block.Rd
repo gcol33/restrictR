@@ -25,7 +25,9 @@ as_contract_block(v)
 Other core:
 \code{\link[=as_contract_text]{as_contract_text()}},
 \code{\link[=fail]{fail()}},
+\code{\link[=is_valid]{is_valid()}},
 \code{\link[=require_custom]{require_custom()}},
-\code{\link[=restrict]{restrict()}}
+\code{\link[=restrict]{restrict()}},
+\code{\link[=validation_errors]{validation_errors()}}
 }
 \concept{core}

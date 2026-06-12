@@ -23,6 +23,16 @@
 #' nrow(newdata))`), the validator checks that all required context is present
 #' before running any steps and errors early if not.
 #'
+#' By default a validator is fail-fast: the first failing step stops with its
+#' error. Pass `.on_fail = "all"` to run every step and report all violations
+#' in one aggregated error:
+#'
+#' ```
+#' require_pred(out, .on_fail = "all")
+#' ```
+#'
+#' For a non-throwing result, use [is_valid()] or [validation_errors()].
+#'
 #' @examples
 #' # Define a validator
 #' require_positive <- restrict("x") |>
@@ -67,7 +77,9 @@ make_validator <- function(name, steps) {
   # Precompute union of all deps for early context checking
   all_deps <- unique(unlist(lapply(steps, function(s) s$deps)))
 
-  validator <- function(value, ..., .ctx = NULL) {
+  validator <- function(value, ..., .ctx = NULL,
+                        .on_fail = c("first", "all")) {
+    on_fail <- match.arg(.on_fail)
     ctx <- c(list(...), .ctx %||% list())
     # Deduplicate: ... wins over .ctx
     ctx <- ctx[!duplicated(names(ctx))]
@@ -87,8 +99,24 @@ make_validator <- function(name, steps) {
 
     s <- steps
     nm <- name
-    for (i in seq_along(s)) {
-      s[[i]]$fn(value, nm, ctx)
+    if (on_fail == "first") {
+      for (i in seq_along(s)) {
+        s[[i]]$fn(value, nm, ctx)
+      }
+    } else {
+      failures <- list()
+      for (i in seq_along(s)) {
+        res <- tryCatch(
+          s[[i]]$fn(value, nm, ctx),
+          restrictR_failure = function(c) c
+        )
+        if (inherits(res, "restrictR_failure")) {
+          failures[[length(failures) + 1L]] <- res
+        }
+      }
+      if (length(failures) > 0L) {
+        stop(restrictR_failures(failures))
+      }
     }
     invisible(value)
   }
