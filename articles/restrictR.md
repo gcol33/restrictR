@@ -18,7 +18,9 @@ shared base without side effects.
 | [Reusable schemas](#reusable-schemas) | Define and reuse data.frame contracts |
 | [Dependent validation](#dependent-validation) | Constraints that reference other arguments |
 | [Enum arguments](#enum-arguments) | Restrict string arguments to a fixed set |
+| [Arbitrary classes](#arbitrary-classes) | Validate factors, dates, and model objects |
 | [Data frame with mixed constraints](#data-frame-with-mixed-constraints) | Columns + enums + ranges in one contract |
+| [Checking without stopping](#checking-without-stopping) | Collect all failures; test without throwing |
 | [Custom steps](#custom-steps) | Domain-specific invariants |
 | [Self-documentation](#self-documentation) | Print, [`as_contract_text()`](https://gillescolling.com/restrictR/reference/as_contract_text.md), [`as_contract_block()`](https://gillescolling.com/restrictR/reference/as_contract_block.md) |
 | [Using contracts in packages](#using-contracts-in-packages) | The recommended pattern for R packages |
@@ -149,6 +151,28 @@ require_method("chebyshev")
 #>   Found: "chebyshev"
 ```
 
+## Arbitrary Classes
+
+[`require_class()`](https://gillescolling.com/restrictR/reference/require_class.md)
+covers types without a dedicated check, such as factors, dates, and
+fitted-model objects. By default it tests inheritance, so a subclass
+passes; set `exact = TRUE` to require the first class exactly.
+
+``` r
+
+require_event <- restrict("event") |>
+  require_class("Date")
+
+require_event(as.Date("2026-01-01"))
+```
+
+``` r
+
+require_event("2026-01-01")
+#> Error:
+#> ! event: must be of class "Date", got character
+```
+
 ## Data Frame with Mixed Constraints
 
 Contracts work well for functions that accept a data frame with typed
@@ -187,6 +211,48 @@ require_survey(bad_survey)
 #> ! survey$age: must be >= 0 and <= 150
 #>   Found: -5
 #>   At: 2, 3
+```
+
+## Checking Without Stopping
+
+By default a validator stops at the first failing step. Pass
+`.on_fail = "all"` to run every step and collect all violations in one
+report:
+
+``` r
+
+messy_survey <- data.frame(
+  age = c(25, -5, 200),
+  income = c(35000, NA, 45000),
+  status = c("active", "banned", "active")
+)
+require_survey(messy_survey, .on_fail = "all")
+#> Error:
+#> ! 3 validation failures:
+#> survey$age: must be >= 0 and <= 150
+#>   Found: -5
+#>   At: 2, 3
+#> survey$income: must not contain NA
+#>   At: 2
+#> survey$status: must be one of ["active", "inactive", "pending"]
+#>   Found: "banned"
+#>   At: 2
+```
+
+To branch on validity in code,
+[`is_valid()`](https://gillescolling.com/restrictR/reference/is_valid.md)
+returns a logical and
+[`validation_errors()`](https://gillescolling.com/restrictR/reference/validation_errors.md)
+returns the messages as a character vector, empty when the value passes:
+
+``` r
+
+is_valid(require_survey, good_survey)
+#> [1] TRUE
+validation_errors(require_survey, messy_survey)
+#> [1] "survey$age: must be >= 0 and <= 150\n  Found: -5\n  At: 2, 3"                                       
+#> [2] "survey$income: must not contain NA\n  At: 2"                                                        
+#> [3] "survey$status: must be one of [\"active\", \"inactive\", \"pending\"]\n  Found: \"banned\"\n  At: 2"
 ```
 
 ## Custom Steps
@@ -383,7 +449,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] restrictR_0.1.2
+#> [1] restrictR_0.2.0
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] vctrs_0.7.3       svglite_2.2.2     cli_3.6.6         knitr_1.51       

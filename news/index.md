@@ -1,5 +1,31 @@
 # Changelog
 
+## restrictR 0.2.0
+
+- New step
+  [`require_class()`](https://gillescolling.com/restrictR/reference/require_class.md):
+  assert any class (e.g. `factor`, `Date`, `POSIXct`, fitted-model
+  objects) through one verb, with `exact` for a strict first-class
+  match.
+- Validators gain `.on_fail = "all"`: run every step and report all
+  violations in one aggregated error instead of stopping at the first.
+- New non-throwing helpers
+  [`is_valid()`](https://gillescolling.com/restrictR/reference/is_valid.md)
+  (logical predicate) and
+  [`validation_errors()`](https://gillescolling.com/restrictR/reference/validation_errors.md)
+  (character vector of failure messages, empty when the value passes).
+- Formula steps
+  ([`require_length_matches()`](https://gillescolling.com/restrictR/reference/require_length_matches.md),
+  [`require_nrow_matches()`](https://gillescolling.com/restrictR/reference/require_nrow_matches.md))
+  now resolve non-base functions such as
+  [`median()`](https://rdrr.io/r/stats/median.html),
+  [`sd()`](https://rdrr.io/r/stats/sd.html), and package exports. Data
+  names are still taken only from explicit context.
+- [`fail()`](https://gillescolling.com/restrictR/reference/fail.md) now
+  signals a structured `restrictR_failure` condition carrying `path`,
+  `found`, and `at`, so failures can be collected and inspected
+  programmatically.
+
 ## restrictR 0.1.2
 
 - New steps:
@@ -30,7 +56,7 @@
 - Vignette: added “Data Frame with Mixed Constraints” section, surfaced
   immutability in the overview, updated custom step examples to use
   [`fail()`](https://gillescolling.com/restrictR/reference/fail.md).
-- README: tightened prose, removed AI-ish phrasing.
+- Documentation: tightened prose in the overview and examples.
 
 ## restrictR 0.1.0
 

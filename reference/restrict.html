@@ -24,7 +24,7 @@ with a value to validate."></head><body><p>
 
     <a class="navbar-brand me-2" href="../index.html">restrictR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -96,6 +96,11 @@ arguments in <code>...</code> or as a named list in <code>.ctx</code>:</p>
 <p>Named arguments in <code>...</code> take precedence over <code>.ctx</code> entries with the
 same name. If a step declares dependencies (e.g. <code>require_length_matches(~ nrow(newdata))</code>), the validator checks that all required context is present
 before running any steps and errors early if not.</p>
+<p>By default a validator is fail-fast: the first failing step stops with its
+error. Pass <code>.on_fail = "all"</code> to run every step and report all violations
+in one aggregated error:</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">require_pred</span>(out, <span class="at">.on_fail =</span> <span class="st">"all"</span>)</span></code></pre><p></p></div>
+<p>For a non-throwing result, use <code><a href="is_valid.html">is_valid()</a></code> or <code><a href="validation_errors.html">validation_errors()</a></code>.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -103,7 +108,9 @@ before running any steps and errors early if not.</p>
 <code><a href="as_contract_block.html">as_contract_block()</a></code>,
 <code><a href="as_contract_text.html">as_contract_text()</a></code>,
 <code><a href="fail.html">fail()</a></code>,
-<code><a href="require_custom.html">require_custom()</a></code></p></div>
+<code><a href="is_valid.html">is_valid()</a></code>,
+<code><a href="require_custom.html">require_custom()</a></code>,
+<code><a href="validation_errors.html">validation_errors()</a></code></p></div>
     </div>
 
     <div class="section level2">

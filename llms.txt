@@ -1,5 +1,7 @@
 # restrictR
 
+> Small exact engines for scientific computing in R.
+
 *the same input check, written once*
 
 [![CRAN
@@ -245,6 +247,15 @@ Create and inspect validators
 - [`fail()`](https://gillescolling.com/restrictR/reference/fail.md) :
   Format a Validation Error
 
+## Checking
+
+Run a validator without throwing
+
+- [`is_valid()`](https://gillescolling.com/restrictR/reference/is_valid.md)
+  : Test Whether a Value Satisfies a Validator
+- [`validation_errors()`](https://gillescolling.com/restrictR/reference/validation_errors.md)
+  : Collect Validation Errors Without Throwing
+
 ## Type Checks
 
 Validate value types
@@ -259,6 +270,8 @@ Validate value types
   : Require Character Type
 - [`require_logical()`](https://gillescolling.com/restrictR/reference/require_logical.md)
   : Require Logical Type
+- [`require_class()`](https://gillescolling.com/restrictR/reference/require_class.md)
+  : Require a Specific Class
 
 ## Null & Missingness
 

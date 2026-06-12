@@ -34,13 +34,26 @@ same name. If a step declares dependencies (e.g.
 all required context is present before running any steps and errors
 early if not.
 
+By default a validator is fail-fast: the first failing step stops with
+its error. Pass `.on_fail = "all"` to run every step and report all
+violations in one aggregated error:
+
+    require_pred(out, .on_fail = "all")
+
+For a non-throwing result, use
+[`is_valid()`](https://gillescolling.com/restrictR/reference/is_valid.md)
+or
+[`validation_errors()`](https://gillescolling.com/restrictR/reference/validation_errors.md).
+
 ## See also
 
 Other core:
 [`as_contract_block()`](https://gillescolling.com/restrictR/reference/as_contract_block.md),
 [`as_contract_text()`](https://gillescolling.com/restrictR/reference/as_contract_text.md),
 [`fail()`](https://gillescolling.com/restrictR/reference/fail.md),
-[`require_custom()`](https://gillescolling.com/restrictR/reference/require_custom.md)
+[`is_valid()`](https://gillescolling.com/restrictR/reference/is_valid.md),
+[`require_custom()`](https://gillescolling.com/restrictR/reference/require_custom.md),
+[`validation_errors()`](https://gillescolling.com/restrictR/reference/validation_errors.md)
 
 ## Examples
 

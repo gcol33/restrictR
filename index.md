@@ -1,5 +1,7 @@
 # restrictR
 
+> Small exact engines for scientific computing in R.
+
 *the same input check, written once*
 
 [![CRAN

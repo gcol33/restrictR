@@ -25,8 +25,10 @@ A character(1) string describing the validation contract.
 Other core:
 [`as_contract_block()`](https://gillescolling.com/restrictR/reference/as_contract_block.md),
 [`fail()`](https://gillescolling.com/restrictR/reference/fail.md),
+[`is_valid()`](https://gillescolling.com/restrictR/reference/is_valid.md),
 [`require_custom()`](https://gillescolling.com/restrictR/reference/require_custom.md),
-[`restrict()`](https://gillescolling.com/restrictR/reference/restrict.md)
+[`restrict()`](https://gillescolling.com/restrictR/reference/restrict.md),
+[`validation_errors()`](https://gillescolling.com/restrictR/reference/validation_errors.md)
 
 ## Examples
 

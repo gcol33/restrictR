@@ -25,6 +25,7 @@ The modified `restriction` object.
 ## See also
 
 Other type checks:
+[`require_class()`](https://gillescolling.com/restrictR/reference/require_class.md),
 [`require_df()`](https://gillescolling.com/restrictR/reference/require_df.md),
 [`require_integer()`](https://gillescolling.com/restrictR/reference/require_integer.md),
 [`require_logical()`](https://gillescolling.com/restrictR/reference/require_logical.md),

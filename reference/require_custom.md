@@ -42,7 +42,9 @@ Other core:
 [`as_contract_block()`](https://gillescolling.com/restrictR/reference/as_contract_block.md),
 [`as_contract_text()`](https://gillescolling.com/restrictR/reference/as_contract_text.md),
 [`fail()`](https://gillescolling.com/restrictR/reference/fail.md),
-[`restrict()`](https://gillescolling.com/restrictR/reference/restrict.md)
+[`is_valid()`](https://gillescolling.com/restrictR/reference/is_valid.md),
+[`restrict()`](https://gillescolling.com/restrictR/reference/restrict.md),
+[`validation_errors()`](https://gillescolling.com/restrictR/reference/validation_errors.md)
 
 ## Examples
 

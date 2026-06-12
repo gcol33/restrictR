@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">restrictR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,6 +57,15 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.0" id="restrictr-020">restrictR 0.2.0<a class="anchor" aria-label="anchor" href="#restrictr-020"></a></h2>
+<ul><li>New step <code><a href="../reference/require_class.html">require_class()</a></code>: assert any class (e.g. <code>factor</code>, <code>Date</code>, <code>POSIXct</code>, fitted-model objects) through one verb, with <code>exact</code> for a strict first-class match.</li>
+<li>Validators gain <code>.on_fail = "all"</code>: run every step and report all violations in one aggregated error instead of stopping at the first.</li>
+<li>New non-throwing helpers <code><a href="../reference/is_valid.html">is_valid()</a></code> (logical predicate) and <code><a href="../reference/validation_errors.html">validation_errors()</a></code> (character vector of failure messages, empty when the value passes).</li>
+<li>Formula steps (<code><a href="../reference/require_length_matches.html">require_length_matches()</a></code>, <code><a href="../reference/require_nrow_matches.html">require_nrow_matches()</a></code>) now resolve non-base functions such as <code><a href="https://rdrr.io/r/stats/median.html" class="external-link">median()</a></code>, <code><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd()</a></code>, and package exports. Data names are still taken only from explicit context.</li>
+<li>
+<code><a href="../reference/fail.html">fail()</a></code> now signals a structured <code>restrictR_failure</code> condition carrying <code>path</code>, <code>found</code>, and <code>at</code>, so failures can be collected and inspected programmatically.</li>
+</ul></div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.2" id="restrictr-012">restrictR 0.1.2<a class="anchor" aria-label="anchor" href="#restrictr-012"></a></h2>
 <ul><li>New steps: <code><a href="../reference/require_scalar.html">require_scalar()</a></code>, <code><a href="../reference/require_not_null.html">require_not_null()</a></code>, <code><a href="../reference/require_unique.html">require_unique()</a></code>, <code><a href="../reference/require_named.html">require_named()</a></code>.</li>
 <li>New steps: <code><a href="../reference/require_positive.html">require_positive()</a></code> and <code><a href="../reference/require_negative.html">require_negative()</a></code> with <code>strict</code> argument (non-strict by default).</li>
@@ -71,7 +80,7 @@
 <li>
 <code><a href="../reference/require_between.html">require_between()</a></code> and <code><a href="../reference/require_one_of.html">require_one_of()</a></code> omit the <code>At:</code> line for scalar values where it adds no information.</li>
 <li>Vignette: added “Data Frame with Mixed Constraints” section, surfaced immutability in the overview, updated custom step examples to use <code><a href="../reference/fail.html">fail()</a></code>.</li>
-<li>README: tightened prose, removed AI-ish phrasing.</li>
+<li>Documentation: tightened prose in the overview and examples.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0" id="restrictr-010">restrictR 0.1.0<a class="anchor" aria-label="anchor" href="#restrictr-010"></a></h2><p class="text-muted">CRAN release: 2026-03-09</p>

@@ -12,8 +12,10 @@
 <url><loc>https://gillescolling.com/restrictR/reference/as_contract_text.html</loc></url>
 <url><loc>https://gillescolling.com/restrictR/reference/fail.html</loc></url>
 <url><loc>https://gillescolling.com/restrictR/reference/index.html</loc></url>
+<url><loc>https://gillescolling.com/restrictR/reference/is_valid.html</loc></url>
 <url><loc>https://gillescolling.com/restrictR/reference/require_between.html</loc></url>
 <url><loc>https://gillescolling.com/restrictR/reference/require_character.html</loc></url>
+<url><loc>https://gillescolling.com/restrictR/reference/require_class.html</loc></url>
 <url><loc>https://gillescolling.com/restrictR/reference/require_col_between.html</loc></url>
 <url><loc>https://gillescolling.com/restrictR/reference/require_col_character.html</loc></url>
 <url><loc>https://gillescolling.com/restrictR/reference/require_col_numeric.html</loc></url>
@@ -41,5 +43,6 @@
 <url><loc>https://gillescolling.com/restrictR/reference/require_unique.html</loc></url>
 <url><loc>https://gillescolling.com/restrictR/reference/restrict.html</loc></url>
 <url><loc>https://gillescolling.com/restrictR/reference/restrictR-package.html</loc></url>
+<url><loc>https://gillescolling.com/restrictR/reference/validation_errors.html</loc></url>
 </urlset>
 

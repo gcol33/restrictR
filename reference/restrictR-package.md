@@ -1,10 +1,10 @@
-# restrictR: Composable Runtime Contracts for R
+# restrictR: Composable Runtime Contracts
 
 Build reusable validators from small building blocks using the base pipe
-operator. Define runtime contracts once with 'restrict()' and enforce
-them anywhere in code. Validators compose naturally, support dependent
-rules via formulas, and produce clear, path-aware error messages. No
-DSL, no operator overloading, just idiomatic R.
+operator. Define runtime contracts once with restrict() and enforce them
+anywhere in code. Validators compose naturally, support dependent rules
+via formulas, and produce clear, path-aware error messages. No
+domain-specific language, no operator overloading, just idiomatic R.
 
 ## See also
 

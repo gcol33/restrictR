@@ -33,6 +33,7 @@ The modified `restriction` object.
 
 Other type checks:
 [`require_character()`](https://gillescolling.com/restrictR/reference/require_character.md),
+[`require_class()`](https://gillescolling.com/restrictR/reference/require_class.md),
 [`require_df()`](https://gillescolling.com/restrictR/reference/require_df.md),
 [`require_logical()`](https://gillescolling.com/restrictR/reference/require_logical.md),
 [`require_numeric()`](https://gillescolling.com/restrictR/reference/require_numeric.md)
