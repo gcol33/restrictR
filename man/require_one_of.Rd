@@ -17,11 +17,14 @@ The modified \code{restriction} object.
 \description{
 Validates that all elements of the value are among the allowed values.
 }
+\details{
+\code{NA} elements are skipped; chain \code{\link[=require_no_na]{require_no_na()}} to reject them.
+}
 \seealso{
-Other value checks: 
-\code{\link{require_between}()},
-\code{\link{require_negative}()},
-\code{\link{require_positive}()},
-\code{\link{require_unique}()}
+Other value checks:
+\code{\link[=require_between]{require_between()}},
+\code{\link[=require_negative]{require_negative()}},
+\code{\link[=require_positive]{require_positive()}},
+\code{\link[=require_unique]{require_unique()}}
 }
 \concept{value checks}

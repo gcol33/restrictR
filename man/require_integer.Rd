@@ -23,10 +23,10 @@ Validates that the value contains whole numbers. By default accepts both
 (\code{x == floor(x)}). Set \code{strict = TRUE} to require the R \code{integer} type.
 }
 \seealso{
-Other type checks: 
-\code{\link{require_character}()},
-\code{\link{require_df}()},
-\code{\link{require_logical}()},
-\code{\link{require_numeric}()}
+Other type checks:
+\code{\link[=require_character]{require_character()}},
+\code{\link[=require_df]{require_df()}},
+\code{\link[=require_logical]{require_logical()}},
+\code{\link[=require_numeric]{require_numeric()}}
 }
 \concept{type checks}

@@ -40,10 +40,10 @@ require_unique_id <- restrict("id") |>
 
 }
 \seealso{
-Other core: 
-\code{\link{as_contract_block}()},
-\code{\link{as_contract_text}()},
-\code{\link{fail}()},
-\code{\link{restrict}()}
+Other core:
+\code{\link[=as_contract_block]{as_contract_block()}},
+\code{\link[=as_contract_text]{as_contract_text()}},
+\code{\link[=fail]{fail()}},
+\code{\link[=restrict]{restrict()}}
 }
 \concept{core}

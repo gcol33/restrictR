@@ -47,9 +47,7 @@ require_numeric <- function(restriction, no_na = FALSE, finite = FALSE) {
     deps = character(0L),
     fields = list(no_na = no_na, finite = finite),
     fn = function(value, name, ctx) {
-      if (!is.numeric(value)) {
-        fail(name, sprintf("must be numeric, got %s", class(value)[1L]))
-      }
+      check_numeric(value, name)
       check_na_finite(value, name, no_na, finite)
     }
   ))
@@ -275,7 +273,9 @@ require_scalar <- function(restriction) {
 
 #' Require Named Value
 #'
-#' Validates that the value has names. Useful for named vectors and lists.
+#' Validates that the value is fully named: every element has a non-empty,
+#' non-`NA` name. A partially-named value (e.g. `c(a = 1, 2)`) fails and the
+#' positions of the unnamed elements are reported.
 #'
 #' @param restriction a `restriction` object.
 #'
@@ -289,8 +289,13 @@ require_named <- function(restriction) {
     deps = character(0L),
     fields = NULL,
     fn = function(value, name, ctx) {
-      if (is.null(names(value))) {
+      nm <- names(value)
+      if (is.null(nm)) {
         fail(name, "must be named")
+      }
+      unnamed <- which(is.na(nm) | nm == "")
+      if (length(unnamed) > 0L) {
+        fail(name, "must be named (all elements)", at = unnamed)
       }
     }
   ))
@@ -542,14 +547,9 @@ require_col_numeric <- function(restriction, col, no_na = FALSE,
     fields = list(col = col, no_na = no_na, finite = finite),
     fn = function(value, name, ctx) {
       path <- col_path(name, col)
-      x <- value[[col]]
+      x <- get_col(value, col, name)
 
-      if (is.null(x)) {
-        fail(name, sprintf('column "%s" does not exist', col))
-      }
-      if (!is.numeric(x)) {
-        fail(path, sprintf("must be numeric, got %s", class(x)[1L]))
-      }
+      check_numeric(x, path)
       check_na_finite(x, path, no_na, finite)
     }
   ))
@@ -579,11 +579,8 @@ require_col_character <- function(restriction, col, no_na = FALSE) {
     fields = list(col = col, no_na = no_na),
     fn = function(value, name, ctx) {
       path <- col_path(name, col)
-      x <- value[[col]]
+      x <- get_col(value, col, name)
 
-      if (is.null(x)) {
-        fail(name, sprintf('column "%s" does not exist', col))
-      }
       if (!is.character(x)) {
         fail(path, sprintf("must be character, got %s", class(x)[1L]))
       }
@@ -604,6 +601,9 @@ require_col_character <- function(restriction, col, no_na = FALSE) {
 #' @param exclusive_lower logical; if `TRUE`, lower bound is exclusive.
 #' @param exclusive_upper logical; if `TRUE`, upper bound is exclusive.
 #'
+#' @details A non-numeric column fails with a type error. `NA` elements are
+#'   skipped; use `require_col_numeric(col, no_na = TRUE)` to reject them.
+#'
 #' @return The modified `restriction` object.
 #'
 #' @family column checks
@@ -623,16 +623,13 @@ require_col_between <- function(restriction, col, lower = -Inf, upper = Inf,
                   exclusive_upper = exclusive_upper),
     fn = function(value, name, ctx) {
       path <- col_path(name, col)
-      x <- value[[col]]
+      x <- get_col(value, col, name)
 
-      if (is.null(x)) {
-        fail(name, sprintf('column "%s" does not exist', col))
-      }
+      check_numeric(x, path)
 
       too_low <- if (exclusive_lower) x <= lower else x < lower
       too_high <- if (exclusive_upper) x >= upper else x > upper
       bad <- which(too_low | too_high)
-      bad <- bad[!is.na(bad)]
 
       if (length(bad) > 0L) {
         fail(path, sprintf(
@@ -655,6 +652,9 @@ require_col_between <- function(restriction, col, lower = -Inf, upper = Inf,
 #' @param col character(1) column name.
 #' @param values vector of allowed values.
 #'
+#' @details `NA` elements are skipped; use `require_col_character(col, no_na =
+#'   TRUE)` (or the matching column type check) to reject them.
+#'
 #' @return The modified `restriction` object.
 #'
 #' @family column checks
@@ -667,13 +667,9 @@ require_col_one_of <- function(restriction, col, values) {
     fields = list(col = col, values = values),
     fn = function(value, name, ctx) {
       path <- col_path(name, col)
-      x <- value[[col]]
+      x <- get_col(value, col, name)
 
-      if (is.null(x)) {
-        fail(name, sprintf('column "%s" does not exist', col))
-      }
-
-      bad <- which(!x %in% values)
+      bad <- which(!(x %in% values) & !is.na(x))
       if (length(bad) > 0L) {
         fail(path, sprintf(
           'must be one of [%s]',
@@ -728,6 +724,9 @@ require_unique <- function(restriction) {
 #' @param exclusive_lower logical; if `TRUE`, lower bound is exclusive.
 #' @param exclusive_upper logical; if `TRUE`, upper bound is exclusive.
 #'
+#' @details Non-numeric input fails with a type error. `NA` elements are
+#'   skipped; chain [require_no_na()] to reject them.
+#'
 #' @return The modified `restriction` object.
 #'
 #' @family value checks
@@ -745,10 +744,11 @@ require_between <- function(restriction, lower = -Inf, upper = Inf,
                   exclusive_lower = exclusive_lower,
                   exclusive_upper = exclusive_upper),
     fn = function(value, name, ctx) {
+      check_numeric(value, name)
+
       too_low <- if (exclusive_lower) value <= lower else value < lower
       too_high <- if (exclusive_upper) value >= upper else value > upper
       bad <- which(too_low | too_high)
-      bad <- bad[!is.na(bad)]
 
       if (length(bad) > 0L) {
         fail(name, sprintf("must be in %s%s, %s%s", lb, lower, upper, ub),
@@ -769,6 +769,9 @@ require_between <- function(restriction, lower = -Inf, upper = Inf,
 #' @param strict logical; if `TRUE`, requires `> 0`.
 #'   If `FALSE` (default), requires `>= 0`.
 #'
+#' @details Non-numeric input fails with a type error. `NA` elements are
+#'   skipped; chain [require_no_na()] to reject them.
+#'
 #' @return The modified `restriction` object.
 #'
 #' @family value checks
@@ -781,8 +784,8 @@ require_positive <- function(restriction, strict = FALSE) {
       deps = character(0L),
       fields = list(strict = strict),
       fn = function(value, name, ctx) {
+        check_numeric(value, name)
         bad <- which(value <= 0)
-        bad <- bad[!is.na(bad)]
         if (length(bad) > 0L) {
           fail(name, lbl, found = value[bad[1L]],
                at = if (length(value) > 1L) bad)
@@ -796,8 +799,8 @@ require_positive <- function(restriction, strict = FALSE) {
       deps = character(0L),
       fields = list(strict = strict),
       fn = function(value, name, ctx) {
+        check_numeric(value, name)
         bad <- which(value < 0)
-        bad <- bad[!is.na(bad)]
         if (length(bad) > 0L) {
           fail(name, lbl, found = value[bad[1L]],
                at = if (length(value) > 1L) bad)
@@ -817,6 +820,9 @@ require_positive <- function(restriction, strict = FALSE) {
 #' @param strict logical; if `TRUE`, requires `< 0`.
 #'   If `FALSE` (default), requires `<= 0`.
 #'
+#' @details Non-numeric input fails with a type error. `NA` elements are
+#'   skipped; chain [require_no_na()] to reject them.
+#'
 #' @return The modified `restriction` object.
 #'
 #' @family value checks
@@ -829,8 +835,8 @@ require_negative <- function(restriction, strict = FALSE) {
       deps = character(0L),
       fields = list(strict = strict),
       fn = function(value, name, ctx) {
+        check_numeric(value, name)
         bad <- which(value >= 0)
-        bad <- bad[!is.na(bad)]
         if (length(bad) > 0L) {
           fail(name, lbl, found = value[bad[1L]],
                at = if (length(value) > 1L) bad)
@@ -844,8 +850,8 @@ require_negative <- function(restriction, strict = FALSE) {
       deps = character(0L),
       fields = list(strict = strict),
       fn = function(value, name, ctx) {
+        check_numeric(value, name)
         bad <- which(value > 0)
-        bad <- bad[!is.na(bad)]
         if (length(bad) > 0L) {
           fail(name, lbl, found = value[bad[1L]],
                at = if (length(value) > 1L) bad)
@@ -863,6 +869,8 @@ require_negative <- function(restriction, strict = FALSE) {
 #' @param restriction a `restriction` object.
 #' @param values vector of allowed values.
 #'
+#' @details `NA` elements are skipped; chain [require_no_na()] to reject them.
+#'
 #' @return The modified `restriction` object.
 #'
 #' @family value checks
@@ -874,7 +882,7 @@ require_one_of <- function(restriction, values) {
     deps = character(0L),
     fields = list(values = values),
     fn = function(value, name, ctx) {
-      bad <- which(!value %in% values)
+      bad <- which(!(value %in% values) & !is.na(value))
       if (length(bad) > 0L) {
         fail(name, sprintf(
           'must be one of [%s]',

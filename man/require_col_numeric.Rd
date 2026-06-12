@@ -23,9 +23,9 @@ Validates that a specific column in a data.frame is numeric. Produces
 path-aware error messages (e.g. \verb{newdata$x2: must be numeric}).
 }
 \seealso{
-Other column checks: 
-\code{\link{require_col_between}()},
-\code{\link{require_col_character}()},
-\code{\link{require_col_one_of}()}
+Other column checks:
+\code{\link[=require_col_between]{require_col_between()}},
+\code{\link[=require_col_character]{require_col_character()}},
+\code{\link[=require_col_one_of]{require_col_one_of()}}
 }
 \concept{column checks}

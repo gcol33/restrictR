@@ -97,6 +97,49 @@ col_path <- function(name, col) {
 }
 
 
+#' Extract a Data Frame Column with Path-Aware Guards
+#'
+#' Shared helper for all column-level checks. Confirms the value is a
+#' data.frame and the column exists before returning the column, so callers
+#' never index a non-data.frame and produce an opaque base-R error.
+#'
+#' @param value the value being validated.
+#' @param col the column name.
+#' @param name the validator name (used for error paths).
+#'
+#' @return the extracted column.
+#'
+#' @noRd
+get_col <- function(value, col, name) {
+  if (!is.data.frame(value)) {
+    fail(name, sprintf('must be a data.frame to check column "%s", got %s',
+                       col, class(value)[1L]))
+  }
+  x <- value[[col]]
+  if (is.null(x)) {
+    fail(name, sprintf('column "%s" does not exist', col))
+  }
+  x
+}
+
+
+#' Require Numeric Type
+#'
+#' Shared guard used by every check that compares with `<`/`>`/etc. Fails with
+#' a clear type error before any comparison, so a non-numeric input never falls
+#' through to R's coercion rules.
+#'
+#' @param x the value to check.
+#' @param path the full path for error messages.
+#'
+#' @noRd
+check_numeric <- function(x, path) {
+  if (!is.numeric(x)) {
+    fail(path, sprintf("must be numeric, got %s", class(x)[1L]))
+  }
+}
+
+
 #' Check for NA Values
 #'
 #' Shared helper for NA checking across type and column validators.

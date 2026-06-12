@@ -16,8 +16,8 @@ The modified \code{restriction} object.
 Validates that the value contains no \code{NA} values. Works on any atomic type.
 }
 \seealso{
-Other missingness checks: 
-\code{\link{require_finite}()},
-\code{\link{require_not_null}()}
+Other missingness checks:
+\code{\link[=require_finite]{require_finite()}},
+\code{\link[=require_not_null]{require_not_null()}}
 }
 \concept{missingness checks}

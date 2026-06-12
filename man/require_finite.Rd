@@ -17,8 +17,8 @@ Validates that a numeric value contains no \code{Inf}, \code{-Inf}, or \code{NaN
 Does not check for \code{NA} (use \code{\link[=require_no_na]{require_no_na()}} for that).
 }
 \seealso{
-Other missingness checks: 
-\code{\link{require_no_na}()},
-\code{\link{require_not_null}()}
+Other missingness checks:
+\code{\link[=require_no_na]{require_no_na()}},
+\code{\link[=require_not_null]{require_not_null()}}
 }
 \concept{missingness checks}

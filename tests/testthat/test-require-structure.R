@@ -27,6 +27,14 @@ test_that("require_named() rejects unnamed values", {
   expect_error(v(list(1, 2)), "must be named")
 })
 
+test_that("require_named() rejects partially-named values", {
+  v <- restrict("x") |> require_named()
+  expect_error(v(c(a = 1, 2)), "must be named \\(all elements\\)")
+  expect_error(v(c(a = 1, 2)), "At: 2")
+  expect_error(v(c(a = 1, b = 2, 3)), "At: 3")
+  expect_error(v(list(x = 1, 2)), "must be named \\(all elements\\)")
+})
+
 test_that("require_length() checks exact length", {
   v <- restrict("x") |> require_length(3L)
   expect_invisible(v(1:3))

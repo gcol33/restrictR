@@ -49,10 +49,10 @@ require_score <- restrict("score") |>
 
 }
 \seealso{
-Other core: 
-\code{\link{as_contract_block}()},
-\code{\link{as_contract_text}()},
-\code{\link{fail}()},
-\code{\link{require_custom}()}
+Other core:
+\code{\link[=as_contract_block]{as_contract_block()}},
+\code{\link[=as_contract_text]{as_contract_text()}},
+\code{\link[=fail]{fail()}},
+\code{\link[=require_custom]{require_custom()}}
 }
 \concept{core}

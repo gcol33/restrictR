@@ -22,10 +22,10 @@ as_contract_block(v)
 
 }
 \seealso{
-Other core: 
-\code{\link{as_contract_text}()},
-\code{\link{fail}()},
-\code{\link{require_custom}()},
-\code{\link{restrict}()}
+Other core:
+\code{\link[=as_contract_text]{as_contract_text()}},
+\code{\link[=fail]{fail()}},
+\code{\link[=require_custom]{require_custom()}},
+\code{\link[=restrict]{restrict()}}
 }
 \concept{core}

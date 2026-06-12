@@ -17,8 +17,8 @@ Validates that the value is not \code{NULL}. Place this step first in the
 pipeline when \code{NULL} is a possible input.
 }
 \seealso{
-Other missingness checks: 
-\code{\link{require_finite}()},
-\code{\link{require_no_na}()}
+Other missingness checks:
+\code{\link[=require_finite]{require_finite()}},
+\code{\link[=require_no_na]{require_no_na()}}
 }
 \concept{missingness checks}

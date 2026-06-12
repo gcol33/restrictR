@@ -29,11 +29,15 @@ The modified \code{restriction} object.
 \description{
 Validates that all elements of a numeric value fall within a specified range.
 }
+\details{
+Non-numeric input fails with a type error. \code{NA} elements are
+skipped; chain \code{\link[=require_no_na]{require_no_na()}} to reject them.
+}
 \seealso{
-Other value checks: 
-\code{\link{require_negative}()},
-\code{\link{require_one_of}()},
-\code{\link{require_positive}()},
-\code{\link{require_unique}()}
+Other value checks:
+\code{\link[=require_negative]{require_negative()}},
+\code{\link[=require_one_of]{require_one_of()}},
+\code{\link[=require_positive]{require_positive()}},
+\code{\link[=require_unique]{require_unique()}}
 }
 \concept{value checks}

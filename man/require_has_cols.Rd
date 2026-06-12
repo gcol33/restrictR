@@ -18,14 +18,14 @@ The modified \code{restriction} object.
 Validates that a data.frame contains all specified columns.
 }
 \seealso{
-Other structure checks: 
-\code{\link{require_length}()},
-\code{\link{require_length_matches}()},
-\code{\link{require_length_max}()},
-\code{\link{require_length_min}()},
-\code{\link{require_named}()},
-\code{\link{require_nrow_matches}()},
-\code{\link{require_nrow_min}()},
-\code{\link{require_scalar}()}
+Other structure checks:
+\code{\link[=require_length]{require_length()}},
+\code{\link[=require_length_matches]{require_length_matches()}},
+\code{\link[=require_length_max]{require_length_max()}},
+\code{\link[=require_length_min]{require_length_min()}},
+\code{\link[=require_named]{require_named()}},
+\code{\link[=require_nrow_matches]{require_nrow_matches()}},
+\code{\link[=require_nrow_min]{require_nrow_min()}},
+\code{\link[=require_scalar]{require_scalar()}}
 }
 \concept{structure checks}

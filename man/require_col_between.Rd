@@ -32,10 +32,14 @@ The modified \code{restriction} object.
 \description{
 Validates that all values in a column fall within a specified range.
 }
+\details{
+A non-numeric column fails with a type error. \code{NA} elements are
+skipped; use \code{require_col_numeric(col, no_na = TRUE)} to reject them.
+}
 \seealso{
-Other column checks: 
-\code{\link{require_col_character}()},
-\code{\link{require_col_numeric}()},
-\code{\link{require_col_one_of}()}
+Other column checks:
+\code{\link[=require_col_character]{require_col_character()}},
+\code{\link[=require_col_numeric]{require_col_numeric()}},
+\code{\link[=require_col_one_of]{require_col_one_of()}}
 }
 \concept{column checks}

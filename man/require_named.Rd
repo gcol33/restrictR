@@ -13,17 +13,19 @@ require_named(restriction)
 The modified \code{restriction} object.
 }
 \description{
-Validates that the value has names. Useful for named vectors and lists.
+Validates that the value is fully named: every element has a non-empty,
+non-\code{NA} name. A partially-named value (e.g. \code{c(a = 1, 2)}) fails and the
+positions of the unnamed elements are reported.
 }
 \seealso{
-Other structure checks: 
-\code{\link{require_has_cols}()},
-\code{\link{require_length}()},
-\code{\link{require_length_matches}()},
-\code{\link{require_length_max}()},
-\code{\link{require_length_min}()},
-\code{\link{require_nrow_matches}()},
-\code{\link{require_nrow_min}()},
-\code{\link{require_scalar}()}
+Other structure checks:
+\code{\link[=require_has_cols]{require_has_cols()}},
+\code{\link[=require_length]{require_length()}},
+\code{\link[=require_length_matches]{require_length_matches()}},
+\code{\link[=require_length_max]{require_length_max()}},
+\code{\link[=require_length_min]{require_length_min()}},
+\code{\link[=require_nrow_matches]{require_nrow_matches()}},
+\code{\link[=require_nrow_min]{require_nrow_min()}},
+\code{\link[=require_scalar]{require_scalar()}}
 }
 \concept{structure checks}

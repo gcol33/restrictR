@@ -19,10 +19,13 @@ The modified \code{restriction} object.
 \description{
 Validates that all values in a column are among the allowed values.
 }
+\details{
+\code{NA} elements are skipped; use \code{require_col_character(col, no_na = TRUE)} (or the matching column type check) to reject them.
+}
 \seealso{
-Other column checks: 
-\code{\link{require_col_between}()},
-\code{\link{require_col_character}()},
-\code{\link{require_col_numeric}()}
+Other column checks:
+\code{\link[=require_col_between]{require_col_between()}},
+\code{\link[=require_col_character]{require_col_character()}},
+\code{\link[=require_col_numeric]{require_col_numeric()}}
 }
 \concept{column checks}

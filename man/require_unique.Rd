@@ -17,10 +17,10 @@ Validates that the value contains no duplicates. Reports the positions
 of duplicated elements.
 }
 \seealso{
-Other value checks: 
-\code{\link{require_between}()},
-\code{\link{require_negative}()},
-\code{\link{require_one_of}()},
-\code{\link{require_positive}()}
+Other value checks:
+\code{\link[=require_between]{require_between()}},
+\code{\link[=require_negative]{require_negative()}},
+\code{\link[=require_one_of]{require_one_of()}},
+\code{\link[=require_positive]{require_positive()}}
 }
 \concept{value checks}

@@ -21,9 +21,9 @@ Validates that a specific column in a data.frame is character. Produces
 path-aware error messages.
 }
 \seealso{
-Other column checks: 
-\code{\link{require_col_between}()},
-\code{\link{require_col_numeric}()},
-\code{\link{require_col_one_of}()}
+Other column checks:
+\code{\link[=require_col_between]{require_col_between()}},
+\code{\link[=require_col_numeric]{require_col_numeric()}},
+\code{\link[=require_col_one_of]{require_col_one_of()}}
 }
 \concept{column checks}

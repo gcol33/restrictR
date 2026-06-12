@@ -17,14 +17,14 @@ Validates that the value has length 1. Rejects \code{NULL}, zero-length vectors,
 and vectors with more than one element.
 }
 \seealso{
-Other structure checks: 
-\code{\link{require_has_cols}()},
-\code{\link{require_length}()},
-\code{\link{require_length_matches}()},
-\code{\link{require_length_max}()},
-\code{\link{require_length_min}()},
-\code{\link{require_named}()},
-\code{\link{require_nrow_matches}()},
-\code{\link{require_nrow_min}()}
+Other structure checks:
+\code{\link[=require_has_cols]{require_has_cols()}},
+\code{\link[=require_length]{require_length()}},
+\code{\link[=require_length_matches]{require_length_matches()}},
+\code{\link[=require_length_max]{require_length_max()}},
+\code{\link[=require_length_min]{require_length_min()}},
+\code{\link[=require_named]{require_named()}},
+\code{\link[=require_nrow_matches]{require_nrow_matches()}},
+\code{\link[=require_nrow_min]{require_nrow_min()}}
 }
 \concept{structure checks}

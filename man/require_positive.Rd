@@ -19,11 +19,15 @@ The modified \code{restriction} object.
 Validates that all elements are positive. By default uses \verb{>= 0}
 (non-negative); set \code{strict = TRUE} for \verb{> 0}.
 }
+\details{
+Non-numeric input fails with a type error. \code{NA} elements are
+skipped; chain \code{\link[=require_no_na]{require_no_na()}} to reject them.
+}
 \seealso{
-Other value checks: 
-\code{\link{require_between}()},
-\code{\link{require_negative}()},
-\code{\link{require_one_of}()},
-\code{\link{require_unique}()}
+Other value checks:
+\code{\link[=require_between]{require_between()}},
+\code{\link[=require_negative]{require_negative()}},
+\code{\link[=require_one_of]{require_one_of()}},
+\code{\link[=require_unique]{require_unique()}}
 }
 \concept{value checks}

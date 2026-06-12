@@ -232,3 +232,67 @@ test_that("dependent validation end-to-end", {
   expect_invisible(require_pred(1:5, newdata = newdata))
   expect_error(require_pred(1:3, newdata = newdata), "Found: length 3")
 })
+
+# ---- Regression: value checks reject non-numeric input (#2) ----
+
+test_that("require_between() rejects non-numeric input with a type error", {
+  v <- restrict("x") |> require_between(lower = 0, upper = 10)
+  expect_error(v("abc"), "must be numeric, got character")
+  expect_error(v(factor("a")), "must be numeric, got factor")
+})
+
+test_that("require_positive() rejects non-numeric input (no silent pass)", {
+  v_strict <- restrict("x") |> require_positive(strict = TRUE)
+  expect_error(v_strict("a"), "must be numeric, got character")
+
+  v <- restrict("x") |> require_positive()
+  expect_error(v(factor("a")), "must be numeric, got factor")
+})
+
+test_that("require_negative() rejects non-numeric input", {
+  v <- restrict("x") |> require_negative()
+  expect_error(v("a"), "must be numeric, got character")
+})
+
+test_that("require_col_between() rejects a non-numeric column", {
+  v <- restrict("df") |> require_df() |> require_col_between("g", lower = 0)
+  expect_error(v(data.frame(g = c("a", "b"))),
+               "df\\$g: must be numeric, got character")
+})
+
+# ---- Regression: consistent NA handling across value checks (#4) ----
+
+test_that("value checks skip NA (require_no_na owns NA rejection)", {
+  expect_invisible((restrict("x") |> require_between(0, 10))(c(5, NA)))
+  expect_invisible((restrict("x") |> require_positive())(c(1, NA)))
+  expect_invisible((restrict("x") |> require_negative())(c(-1, NA)))
+  expect_invisible((restrict("x") |> require_one_of(c("a", "b")))(c("a", NA)))
+})
+
+test_that("require_col_one_of() skips NA in a column", {
+  v <- restrict("df") |>
+    require_df() |>
+    require_col_one_of("status", c("active", "inactive"))
+  expect_invisible(v(data.frame(status = c("active", NA))))
+})
+
+# ---- Regression: column checks guard non-data.frame input (#3) ----
+
+test_that("column checks give a path-aware error on non-data.frame input", {
+  expect_error(
+    (restrict("m") |> require_col_numeric("x2"))(matrix(1:4, 2)),
+    'm: must be a data.frame to check column "x2", got matrix'
+  )
+  expect_error(
+    (restrict("m") |> require_col_character("x2"))(1:4),
+    'm: must be a data.frame to check column "x2"'
+  )
+  expect_error(
+    (restrict("m") |> require_col_between("x2"))(matrix(1:4, 2)),
+    'm: must be a data.frame to check column "x2"'
+  )
+  expect_error(
+    (restrict("m") |> require_col_one_of("x2", c("a")))(1:4),
+    'm: must be a data.frame to check column "x2"'
+  )
+})

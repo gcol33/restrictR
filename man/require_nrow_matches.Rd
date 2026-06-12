@@ -20,14 +20,14 @@ The formula is evaluated using only explicitly passed context arguments,
 plus \code{.value} (the validated value) and \code{.name} (the restriction name).
 }
 \seealso{
-Other structure checks: 
-\code{\link{require_has_cols}()},
-\code{\link{require_length}()},
-\code{\link{require_length_matches}()},
-\code{\link{require_length_max}()},
-\code{\link{require_length_min}()},
-\code{\link{require_named}()},
-\code{\link{require_nrow_min}()},
-\code{\link{require_scalar}()}
+Other structure checks:
+\code{\link[=require_has_cols]{require_has_cols()}},
+\code{\link[=require_length]{require_length()}},
+\code{\link[=require_length_matches]{require_length_matches()}},
+\code{\link[=require_length_max]{require_length_max()}},
+\code{\link[=require_length_min]{require_length_min()}},
+\code{\link[=require_named]{require_named()}},
+\code{\link[=require_nrow_min]{require_nrow_min()}},
+\code{\link[=require_scalar]{require_scalar()}}
 }
 \concept{structure checks}

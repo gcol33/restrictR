@@ -21,10 +21,10 @@ Validates that the value is numeric. Optionally checks for NA and
 non-finite values.
 }
 \seealso{
-Other type checks: 
-\code{\link{require_character}()},
-\code{\link{require_df}()},
-\code{\link{require_integer}()},
-\code{\link{require_logical}()}
+Other type checks:
+\code{\link[=require_character]{require_character()}},
+\code{\link[=require_df]{require_df()}},
+\code{\link[=require_integer]{require_integer()}},
+\code{\link[=require_logical]{require_logical()}}
 }
 \concept{type checks}
