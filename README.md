@@ -1,7 +1,5 @@
 # restrictR
 
-> Small exact engines for scientific computing in R.
-
 *the same input check, written once*
 
 [![CRAN status](https://www.r-pkg.org/badges/version/restrictR)](https://CRAN.R-project.org/package=restrictR)
