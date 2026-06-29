@@ -3,20 +3,20 @@
 growing the package's built-in API surface. The step function receives
 (value, name, ctx) and should call fail() on validation failure."><meta property="og:description" content="Allows advanced users to define their own validation step without
 growing the package's built-in API surface. The step function receives
-(value, name, ctx) and should call fail() on validation failure."></head><body><p>
-
-
-
-
-
-
-
-
-  pkgdown/mathjax-config.html
-
-  
-
-  </p>
+(value, name, ctx) and should call fail() on validation failure."><script>
+(function () {
+  var D = String.fromCharCode(36);
+  window.MathJax = {
+    tex: {
+      inlineMath: [[D, D], ["\\(", "\\)"]],
+      displayMath: [[D + D, D + D], ["\\[", "\\]"]]
+    },
+    chtml: { linebreaks: { automatic: true, width: "90% container" } },
+    svg: { linebreaks: { automatic: true, width: "90% container" } },
+    options: { renderActions: { addMenu: [] } }
+  };
+})();
+</script></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -143,6 +143,5 @@ calls <code><a href="fail.html">fail()</a></code> on validation failure.</p></dd
 
 
 
-  
-</body></html>
+  </body></html>
 

@@ -428,7 +428,7 @@ step.
 ``` r
 
 sessionInfo()
-#> R version 4.6.0 (2026-04-24)
+#> R version 4.6.1 (2026-06-24)
 #> Platform: x86_64-pc-linux-gnu
 #> Running under: Ubuntu 24.04.4 LTS
 #> 
@@ -453,11 +453,11 @@ sessionInfo()
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] vctrs_0.7.3       svglite_2.2.2     cli_3.6.6         knitr_1.51       
-#>  [5] rlang_1.2.0       xfun_0.58         otel_0.2.0        textshaping_1.0.5
+#>  [5] rlang_1.2.0       xfun_0.59         otel_0.2.0        textshaping_1.0.5
 #>  [9] jsonlite_2.0.0    glue_1.8.1        htmltools_0.5.9   sass_0.4.10      
 #> [13] rmarkdown_2.31    evaluate_1.0.5    jquerylib_0.1.4   fastmap_1.2.0    
-#> [17] yaml_2.3.12       lifecycle_1.0.5   compiler_4.6.0    fs_2.1.0         
+#> [17] yaml_2.3.12       lifecycle_1.0.5   compiler_4.6.1    fs_2.1.0         
 #> [21] systemfonts_1.3.2 digest_0.6.39     R6_2.6.1          pillar_1.11.1    
-#> [25] bslib_0.11.0      tools_4.6.0       pkgdown_2.2.0     cachem_1.1.0     
+#> [25] bslib_0.11.0      tools_4.6.1       pkgdown_2.2.0     cachem_1.1.0     
 #> [29] desc_1.4.3
 ```

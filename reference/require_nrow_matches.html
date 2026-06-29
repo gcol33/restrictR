@@ -3,20 +3,20 @@
 The formula is evaluated using only explicitly passed context arguments,
 plus .value (the validated value) and .name (the restriction name)."><meta property="og:description" content="Validates that nrow(value) equals the result of evaluating a formula.
 The formula is evaluated using only explicitly passed context arguments,
-plus .value (the validated value) and .name (the restriction name)."></head><body><p>
-
-
-
-
-
-
-
-
-  pkgdown/mathjax-config.html
-
-  
-
-  </p>
+plus .value (the validated value) and .name (the restriction name)."><script>
+(function () {
+  var D = String.fromCharCode(36);
+  window.MathJax = {
+    tex: {
+      inlineMath: [[D, D], ["\\(", "\\)"]],
+      displayMath: [[D + D, D + D], ["\\[", "\\]"]]
+    },
+    chtml: { linebreaks: { automatic: true, width: "90% container" } },
+    svg: { linebreaks: { automatic: true, width: "90% container" } },
+    options: { renderActions: { addMenu: [] } }
+  };
+})();
+</script></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -119,6 +119,5 @@ plus <code>.value</code> (the validated value) and <code>.name</code> (the restr
 
 
 
-  
-</body></html>
+  </body></html>
 
