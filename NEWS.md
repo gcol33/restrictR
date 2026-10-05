@@ -1,4 +1,4 @@
-# restrictR (development version)
+# restrictR 0.3.0
 
 * New character steps `require_pattern()`, `require_nchar()` and
   `require_nonempty()`.
