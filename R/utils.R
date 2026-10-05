@@ -36,10 +36,17 @@ fail <- function(path, message, found = NULL, at = NULL) {
 #'
 #' @inheritParams fail
 #'
-#' @return A condition of class `c("restrictR_failure", "error", "condition")`.
+#' @param precondition logical; if `TRUE` the condition also inherits from
+#'   `restrictR_precondition`: a type or structure guard that other steps on the
+#'   same path rely on. In `.on_fail = "all"` mode only the first precondition
+#'   failure per path is reported.
+#'
+#' @return A condition of class `c("restrictR_failure", "error", "condition")`,
+#'   prefixed with `"restrictR_precondition"` for precondition failures.
 #'
 #' @noRd
-restrictR_failure <- function(path, message, found = NULL, at = NULL) {
+restrictR_failure <- function(path, message, found = NULL, at = NULL,
+                              precondition = FALSE) {
   msg <- sprintf("%s: %s", path, message)
   if (!is.null(found)) {
     msg <- paste0(msg, "\n  Found: ", found)
@@ -54,10 +61,25 @@ restrictR_failure <- function(path, message, found = NULL, at = NULL) {
     }
   }
   structure(
-    class = c("restrictR_failure", "error", "condition"),
+    class = c(if (precondition) "restrictR_precondition",
+              "restrictR_failure", "error", "condition"),
     list(message = msg, call = NULL,
          path = path, detail = message, found = found, at = at)
   )
+}
+
+
+#' Signal a Precondition Failure
+#'
+#' Like [fail()], for type and structure guards that value-level steps depend
+#' on. Used by the shared guards and the built-in type steps.
+#'
+#' @inheritParams fail
+#'
+#' @noRd
+fail_precondition <- function(path, message, found = NULL, at = NULL) {
+  stop(restrictR_failure(path, message, found = found, at = at,
+                         precondition = TRUE))
 }
 
 
@@ -162,15 +184,53 @@ col_path <- function(name, col) {
 #'
 #' @noRd
 get_col <- function(value, col, name) {
-  if (!is.data.frame(value)) {
-    fail(name, sprintf('must be a data.frame to check column "%s", got %s',
-                       col, class(value)[1L]))
-  }
+  check_df(value, name, sprintf('column "%s"', col))
   x <- value[[col]]
   if (is.null(x)) {
-    fail(name, sprintf('column "%s" does not exist', col))
+    fail_precondition(name, sprintf('column "%s" does not exist', col))
   }
   x
+}
+
+
+#' Require a Data Frame
+#'
+#' Shared guard for every check that indexes rows or columns. Fails with a
+#' path-aware precondition error so a non-data.frame input never reaches
+#' `nrow()` or `[[`.
+#'
+#' @param value the value being validated.
+#' @param name the validator name (used for error paths).
+#' @param what what is being checked, e.g. `"row count"` or `'column "x"'`.
+#'
+#' @noRd
+check_df <- function(value, name, what) {
+  if (!is.data.frame(value)) {
+    fail_precondition(name, sprintf("must be a data.frame to check %s, got %s",
+                                    what, class(value)[1L]))
+  }
+}
+
+
+#' Evaluate a Formula to a Single Count
+#'
+#' Evaluates `formula` via `eval_formula()` and requires a single non-NA
+#' number, so the comparison in the calling step is always well-defined.
+#'
+#' @inheritParams eval_formula
+#' @param expr_text deparsed formula body, for the error message.
+#'
+#' @return the evaluated number.
+#'
+#' @noRd
+eval_count <- function(formula, value, name, ctx, expr_text) {
+  expected <- eval_formula(formula, value, name, ctx)
+  if (!is.numeric(expected) || length(expected) != 1L || is.na(expected)) {
+    fail(name, sprintf("`%s` must evaluate to a single non-NA number", expr_text),
+         found = if (is.null(expected)) "NULL" else
+           sprintf("%s of length %d", class(expected)[1L], length(expected)))
+  }
+  expected
 }
 
 
@@ -186,7 +246,7 @@ get_col <- function(value, col, name) {
 #' @noRd
 check_numeric <- function(x, path) {
   if (!is.numeric(x)) {
-    fail(path, sprintf("must be numeric, got %s", class(x)[1L]))
+    fail_precondition(path, sprintf("must be numeric, got %s", class(x)[1L]))
   }
 }
 

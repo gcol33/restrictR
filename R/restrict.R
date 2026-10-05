@@ -31,6 +31,11 @@
 #' require_pred(out, .on_fail = "all")
 #' ```
 #'
+#' In `"all"` mode a type or structure guard (wrong type, not a data.frame,
+#' missing column) is reported once per path: later steps that fail the same
+#' guard on the same path are not repeated. Independent value failures are all
+#' reported.
+#'
 #' For a non-throwing result, use [is_valid()] or [validation_errors()].
 #'
 #' @examples
@@ -105,12 +110,17 @@ make_validator <- function(name, steps) {
       }
     } else {
       failures <- list()
+      precondition_paths <- character(0L)
       for (i in seq_along(s)) {
         res <- tryCatch(
           s[[i]]$fn(value, nm, ctx),
           restrictR_failure = function(c) c
         )
         if (inherits(res, "restrictR_failure")) {
+          if (inherits(res, "restrictR_precondition")) {
+            if (res$path %in% precondition_paths) next
+            precondition_paths <- c(precondition_paths, res$path)
+          }
           failures[[length(failures) + 1L]] <- res
         }
       }

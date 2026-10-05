@@ -38,6 +38,11 @@ in one aggregated error:
 \if{html}{\out{<div class="sourceCode">}}\preformatted{require_pred(out, .on_fail = "all")
 }\if{html}{\out{</div>}}
 
+In \code{"all"} mode a type or structure guard (wrong type, not a data.frame,
+missing column) is reported once per path: later steps that fail the same
+guard on the same path are not repeated. Independent value failures are all
+reported.
+
 For a non-throwing result, use \code{\link[=is_valid]{is_valid()}} or \code{\link[=validation_errors]{validation_errors()}}.
 }
 

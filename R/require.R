@@ -78,7 +78,8 @@ require_integer <- function(restriction, no_na = FALSE, strict = FALSE) {
       fields = list(no_na = no_na, strict = strict),
       fn = function(value, name, ctx) {
         if (!is.integer(value)) {
-          fail(name, sprintf("must be integer type, got %s", class(value)[1L]))
+          fail_precondition(name, sprintf("must be integer type, got %s",
+                                          class(value)[1L]))
         }
         if (no_na) check_no_na(value, name)
       }
@@ -91,8 +92,8 @@ require_integer <- function(restriction, no_na = FALSE, strict = FALSE) {
       fields = list(no_na = no_na, strict = strict),
       fn = function(value, name, ctx) {
         if (!is.numeric(value) && !is.integer(value)) {
-          fail(name, sprintf("must be numeric or integer, got %s",
-                             class(value)[1L]))
+          fail_precondition(name, sprintf("must be numeric or integer, got %s",
+                                          class(value)[1L]))
         }
         non_na <- which(!is.na(value))
         bad <- non_na[value[non_na] != floor(value[non_na])]
@@ -128,7 +129,8 @@ require_character <- function(restriction, no_na = FALSE) {
     fields = list(no_na = no_na),
     fn = function(value, name, ctx) {
       if (!is.character(value)) {
-        fail(name, sprintf("must be character, got %s", class(value)[1L]))
+        fail_precondition(name, sprintf("must be character, got %s",
+                                        class(value)[1L]))
       }
       if (no_na) check_no_na(value, name)
     }
@@ -156,7 +158,8 @@ require_logical <- function(restriction, no_na = FALSE) {
     fields = list(no_na = no_na),
     fn = function(value, name, ctx) {
       if (!is.logical(value)) {
-        fail(name, sprintf("must be logical, got %s", class(value)[1L]))
+        fail_precondition(name, sprintf("must be logical, got %s",
+                                        class(value)[1L]))
       }
       if (no_na) check_no_na(value, name)
     }
@@ -446,7 +449,7 @@ require_length_matches <- function(restriction, formula) {
     deps = deps,
     fields = list(formula = formula),
     fn = function(value, name, ctx) {
-      expected <- eval_formula(formula, value, name, ctx)
+      expected <- eval_count(formula, value, name, ctx, expr_text)
       actual <- length(value)
       if (actual != expected) {
         fail(name, sprintf("length must match %s (%d)", expr_text, expected),
@@ -475,6 +478,7 @@ require_nrow_min <- function(restriction, n) {
     deps = character(0L),
     fields = list(n = n),
     fn = function(value, name, ctx) {
+      check_df(value, name, "row count")
       if (nrow(value) < n) {
         fail(name, sprintf("must have at least %d row%s",
                            n, if (n == 1L) "" else "s"),
@@ -512,7 +516,8 @@ require_nrow_matches <- function(restriction, formula) {
     deps = deps,
     fields = list(formula = formula),
     fn = function(value, name, ctx) {
-      expected <- eval_formula(formula, value, name, ctx)
+      check_df(value, name, "row count")
+      expected <- eval_count(formula, value, name, ctx, expr_text)
       actual <- nrow(value)
       if (actual != expected) {
         fail(name, sprintf("nrow must match %s (%d)", expr_text, expected),

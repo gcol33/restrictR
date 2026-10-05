@@ -170,3 +170,29 @@ test_that("formula data names still come only from explicit context", {
   reference <- 1:99  # must be ignored; not passed as context
   expect_error(v(1:3), "depends on: reference")
 })
+
+test_that("row-count steps reject non-data.frame input through fail()", {
+  nmin <- restrict("df") |> require_nrow_min(2)
+  nmatch <- restrict("df") |> require_nrow_matches(~ nrow(ref))
+  ref <- data.frame(a = 1:2)
+  for (bad in list(1:3, list(1, 2), NULL)) {
+    expect_error(nmin(bad), "df: must be a data.frame to check row count",
+                 class = "restrictR_failure")
+    expect_error(nmatch(bad, ref = ref),
+                 "df: must be a data.frame to check row count",
+                 class = "restrictR_failure")
+  }
+  expect_error(nmin(1:3), "got integer")
+})
+
+test_that("length/nrow formulas must evaluate to a single non-NA number", {
+  df <- data.frame(a = 1:2)
+  nrow_v <- restrict("df") |> require_nrow_matches(~ ref)
+  len_v <- restrict("x") |> require_length_matches(~ ref)
+  expect_error(nrow_v(df, ref = c(2, 2)), "must evaluate to a single non-NA number",
+               class = "restrictR_failure")
+  expect_error(nrow_v(df, ref = NA_real_), "single non-NA number")
+  expect_error(len_v(1:2, ref = c(2, 2)), "single non-NA number")
+  expect_error(len_v(1:2, ref = NULL), "single non-NA number")
+  expect_silent(len_v(1:2, ref = 2))
+})

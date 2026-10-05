@@ -80,3 +80,23 @@ test_that("non-throwing helpers reject non-restriction input", {
   expect_error(validation_errors(function(x) x, 1),
                "must be a restriction object")
 })
+
+test_that(".on_fail = 'all' reports a type failure once per path (#11)", {
+  w <- restrict("x") |> require_numeric() |> require_between(0, 1)
+  expect_equal(validation_errors(w, "a"), "x: must be numeric, got character")
+})
+
+test_that(".on_fail = 'all' dedupes column type failures per column path", {
+  v <- restrict("df") |>
+    require_df() |>
+    require_col_numeric("x") |>
+    require_col_between("x", 0, 1)
+  errs <- validation_errors(v, data.frame(x = "a"))
+  expect_length(errs, 1L)
+  expect_match(errs, "df[$]x: must be numeric")
+})
+
+test_that(".on_fail = 'all' still reports independent value failures", {
+  v <- restrict("x") |> require_numeric(no_na = TRUE) |> require_between(0, 1)
+  expect_length(validation_errors(v, c(NA, 5)), 2L)
+})
