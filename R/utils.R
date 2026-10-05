@@ -544,6 +544,9 @@ absolute_path <- function(p) {
   rel <- !grepl("^(/|~|[A-Za-z]:)", out)
   out[rel] <- file.path(normalizePath(getwd(), winslash = "/"),
                         sub("^\\./", "", out[rel]))
+  drive <- grepl("^[a-z]:", out)
+  out[drive] <- paste0(toupper(substr(out[drive], 1L, 1L)),
+                       substring(out[drive], 2L))
   out
 }
 

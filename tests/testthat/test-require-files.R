@@ -24,8 +24,9 @@ test_that("require_file_exists() reports the first offender and positions", {
 test_that("Found: shows the normalized path of a relative path", {
   v <- restrict("path") |> require_file_exists()
   err <- validation_errors(v, "no_such_file.csv")
-  expect_match(err, paste0(normalizePath(getwd(), winslash = "/"),
-                           "/no_such_file.csv"), fixed = TRUE)
+  expected <- file.path(normalizePath(getwd(), winslash = "/"),
+                        "no_such_file.csv")
+  expect_true(grepl(tolower(expected), tolower(err), fixed = TRUE))
 })
 
 test_that("require_file_exists(extension =) checks case-insensitively", {
