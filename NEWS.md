@@ -1,3 +1,26 @@
+# restrictR (development version)
+
+* New `require_col(col, validator)` lifts any validator onto a data.frame
+  column with path-aware errors (`newdata$age: ...`). It replaces
+  `require_col_numeric()`, `require_col_character()`, `require_col_between()`
+  and `require_col_one_of()`, which are removed: write
+  `require_col("x", restrict("x") |> require_numeric())` instead.
+* New `require_each()` and `require_fields()` validate every element, or
+  named fields, of a list (`layers[[2]]`, `opts$alpha`).
+* New `allow_null()` marks an optional argument: `NULL` passes, otherwise all
+  steps apply.
+* New `require_valid()` includes another validator's steps and
+  `require_any()` accepts a value that satisfies at least one alternative.
+* `require_between()` now accepts `Date`, `POSIXct`, `difftime` and ordered
+  factor values and bounds.
+* `require_nrow_min()` and `require_nrow_matches()` fail with a path-aware
+  error on non-data.frame input, and `require_length_matches()` /
+  `require_nrow_matches()` reject formulas that do not evaluate to a single
+  non-NA number.
+* With `.on_fail = "all"`, a type or structure failure on a path is reported
+  once instead of once per step. The aggregated message lists at most 20
+  failures; the full list stays in `$failures`.
+
 # restrictR 0.2.0
 
 * New step `require_class()`: assert any class (e.g. `factor`, `Date`,

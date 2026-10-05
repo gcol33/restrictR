@@ -42,11 +42,14 @@ pipe chain, call it at the top of any method, and the rule lives in one place wi
 error format. Change the rule, change it once.
 
 ```r
+require_feature <- restrict("feature") |>
+  require_numeric(no_na = TRUE, finite = TRUE)
+
 require_newdata <- restrict("newdata") |>
   require_df() |>
   require_has_cols(c("x1", "x2")) |>
-  require_col_numeric("x1", no_na = TRUE, finite = TRUE) |>
-  require_col_numeric("x2", no_na = TRUE, finite = TRUE) |>
+  require_col("x1", require_feature) |>
+  require_col("x2", require_feature) |>
   require_nrow_min(1L)
 
 predict2 <- function(object, newdata, ...) {
@@ -126,8 +129,8 @@ require_weights <- restrict("weights") |>
 | **Type checks** | `require_df()`, `require_numeric()`, `require_integer()`, `require_character()`, `require_logical()` |
 | **Null / missingness** | `require_not_null()`, `require_no_na()`, `require_finite()` |
 | **Structure** | `require_scalar()`, `require_named()`, `require_length()`, `require_length_min()`, `require_length_max()`, `require_length_matches()`, `require_nrow_min()`, `require_nrow_matches()`, `require_has_cols()` |
-| **Values** | `require_positive()`, `require_negative()`, `require_between()`, `require_one_of()`, `require_unique()` |
-| **Columns** | `require_col_numeric()`, `require_col_character()`, `require_col_between()`, `require_col_one_of()` |
+| **Values** | `require_positive()`, `require_negative()`, `require_between()` (numbers, dates, times, durations, ordered factors), `require_one_of()`, `require_unique()` |
+| **Composition** | `require_col()`, `require_each()`, `require_fields()`, `require_valid()`, `require_any()`, `allow_null()` |
 | **Extension** | `require_custom()` |
 
 ## Comparison with checkmate

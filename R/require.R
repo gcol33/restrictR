@@ -560,173 +560,6 @@ require_has_cols <- function(restriction, cols) {
 }
 
 
-# ---- Column-level checks ----
-
-#' Require Numeric Column
-#'
-#' Validates that a specific column in a data.frame is numeric. Produces
-#' path-aware error messages (e.g. `newdata$x2: must be numeric`).
-#'
-#' @param restriction a `restriction` object.
-#' @param col character(1) column name.
-#' @param no_na logical; if `TRUE`, rejects NA values in the column.
-#' @param finite logical; if `TRUE`, rejects non-finite values in the column.
-#'
-#' @return The modified `restriction` object.
-#'
-#' @family column checks
-#' @export
-require_col_numeric <- function(restriction, col, no_na = FALSE,
-                                finite = FALSE) {
-  lbl <- sprintf("$%s must be numeric", col)
-  if (no_na) lbl <- paste0(lbl, " (no NA")
-  if (finite) {
-    lbl <- if (no_na) paste0(lbl, ", finite)") else paste0(lbl, " (finite)")
-  } else if (no_na) {
-    lbl <- paste0(lbl, ")")
-  }
-
-  add_step(restriction, list(
-    label = lbl,
-    deps = character(0L),
-    fields = list(col = col, no_na = no_na, finite = finite),
-    fn = function(value, name, ctx) {
-      path <- col_path(name, col)
-      x <- get_col(value, col, name)
-
-      check_numeric(x, path)
-      check_na_finite(x, path, no_na, finite)
-    }
-  ))
-}
-
-
-#' Require Character Column
-#'
-#' Validates that a specific column in a data.frame is character. Produces
-#' path-aware error messages.
-#'
-#' @param restriction a `restriction` object.
-#' @param col character(1) column name.
-#' @param no_na logical; if `TRUE`, rejects NA values in the column.
-#'
-#' @return The modified `restriction` object.
-#'
-#' @family column checks
-#' @export
-require_col_character <- function(restriction, col, no_na = FALSE) {
-  lbl <- sprintf("$%s must be character", col)
-  if (no_na) lbl <- paste0(lbl, " (no NA)")
-
-  add_step(restriction, list(
-    label = lbl,
-    deps = character(0L),
-    fields = list(col = col, no_na = no_na),
-    fn = function(value, name, ctx) {
-      path <- col_path(name, col)
-      x <- get_col(value, col, name)
-
-      if (!is.character(x)) {
-        fail(path, sprintf("must be character, got %s", class(x)[1L]))
-      }
-      if (no_na) check_no_na(x, path)
-    }
-  ))
-}
-
-
-#' Require Column Values in Range
-#'
-#' Validates that all values in a column fall within a specified range.
-#'
-#' @param restriction a `restriction` object.
-#' @param col character(1) column name.
-#' @param lower numeric(1) lower bound (default `-Inf`).
-#' @param upper numeric(1) upper bound (default `Inf`).
-#' @param exclusive_lower logical; if `TRUE`, lower bound is exclusive.
-#' @param exclusive_upper logical; if `TRUE`, upper bound is exclusive.
-#'
-#' @details A non-numeric column fails with a type error. `NA` elements are
-#'   skipped; use `require_col_numeric(col, no_na = TRUE)` to reject them.
-#'
-#' @return The modified `restriction` object.
-#'
-#' @family column checks
-#' @export
-require_col_between <- function(restriction, col, lower = -Inf, upper = Inf,
-                                exclusive_lower = FALSE,
-                                exclusive_upper = FALSE) {
-  lb <- if (exclusive_lower) sprintf("(%s", lower) else sprintf("[%s", lower)
-  ub <- if (exclusive_upper) sprintf("%s)", upper) else sprintf("%s]", upper)
-  lbl <- sprintf("$%s must be in %s, %s", col, lb, ub)
-
-  add_step(restriction, list(
-    label = lbl,
-    deps = character(0L),
-    fields = list(col = col, lower = lower, upper = upper,
-                  exclusive_lower = exclusive_lower,
-                  exclusive_upper = exclusive_upper),
-    fn = function(value, name, ctx) {
-      path <- col_path(name, col)
-      x <- get_col(value, col, name)
-
-      check_numeric(x, path)
-
-      too_low <- if (exclusive_lower) x <= lower else x < lower
-      too_high <- if (exclusive_upper) x >= upper else x > upper
-      bad <- which(too_low | too_high)
-
-      if (length(bad) > 0L) {
-        fail(path, sprintf(
-          "must be %s %s%s",
-          if (exclusive_lower) ">" else ">=", lower,
-          if (is.finite(upper)) sprintf(" and %s %s",
-            if (exclusive_upper) "<" else "<=", upper) else ""
-        ), found = x[bad[1L]], at = bad)
-      }
-    }
-  ))
-}
-
-
-#' Require Column Values from a Set
-#'
-#' Validates that all values in a column are among the allowed values.
-#'
-#' @param restriction a `restriction` object.
-#' @param col character(1) column name.
-#' @param values vector of allowed values.
-#'
-#' @details `NA` elements are skipped; use `require_col_character(col, no_na =
-#'   TRUE)` (or the matching column type check) to reject them.
-#'
-#' @return The modified `restriction` object.
-#'
-#' @family column checks
-#' @export
-require_col_one_of <- function(restriction, col, values) {
-  add_step(restriction, list(
-    label = sprintf('$%s must be one of: %s', col,
-                    paste0('"', values, '"', collapse = ", ")),
-    deps = character(0L),
-    fields = list(col = col, values = values),
-    fn = function(value, name, ctx) {
-      path <- col_path(name, col)
-      x <- get_col(value, col, name)
-
-      bad <- which(!(x %in% values) & !is.na(x))
-      if (length(bad) > 0L) {
-        fail(path, sprintf(
-          'must be one of [%s]',
-          paste0('"', values, '"', collapse = ", ")
-        ), found = paste0('"', unique(x[bad]), '"', collapse = ", "),
-        at = bad)
-      }
-    }
-  ))
-}
-
-
 # ---- Uniqueness checks ----
 
 #' Require Unique Values
@@ -761,26 +594,38 @@ require_unique <- function(restriction) {
 
 #' Require Value in Range
 #'
-#' Validates that all elements of a numeric value fall within a specified range.
+#' Validates that all elements of a value fall within a specified range. The
+#' value can be numeric, `Date`, `POSIXct`, `difftime` or an ordered factor.
 #'
 #' @param restriction a `restriction` object.
-#' @param lower numeric(1) lower bound (default `-Inf`).
-#' @param upper numeric(1) upper bound (default `Inf`).
+#' @param lower lower bound (default `-Inf`, no lower bound).
+#' @param upper upper bound (default `Inf`, no upper bound).
 #' @param exclusive_lower logical; if `TRUE`, lower bound is exclusive.
 #' @param exclusive_upper logical; if `TRUE`, upper bound is exclusive.
 #'
-#' @details Non-numeric input fails with a type error. `NA` elements are
-#'   skipped; chain [require_no_na()] to reject them.
+#' @details The value and the bounds must be the same kind: a `Date` bound
+#'   against a numeric value fails with a type error. Ordered-factor bounds are
+#'   single values of a factor with the same levels as the validated value.
+#'   Other input fails with a type error. `NA` elements are skipped; chain
+#'   [require_no_na()] to reject them.
 #'
 #' @return The modified `restriction` object.
+#'
+#' @examples
+#' period <- restrict("start") |>
+#'   require_between(as.Date("2020-01-01"), as.Date("2020-12-31"))
+#' period(as.Date("2020-06-15"))
+#' try(period(as.Date("2021-01-01")))
 #'
 #' @family value checks
 #' @export
 require_between <- function(restriction, lower = -Inf, upper = Inf,
                             exclusive_lower = FALSE, exclusive_upper = FALSE) {
+  bounds_kind(lower, upper)
   lb <- if (exclusive_lower) "(" else "["
   ub <- if (exclusive_upper) ")" else "]"
-  lbl <- sprintf("must be in %s%s, %s%s", lb, lower, upper, ub)
+  rng <- sprintf("%s%s, %s%s", lb, format_bound(lower), format_bound(upper), ub)
+  lbl <- paste("must be in", rng)
 
   add_step(restriction, list(
     label = lbl,
@@ -789,15 +634,13 @@ require_between <- function(restriction, lower = -Inf, upper = Inf,
                   exclusive_lower = exclusive_lower,
                   exclusive_upper = exclusive_upper),
     fn = function(value, name, ctx) {
-      check_numeric(value, name)
-
-      too_low <- if (exclusive_lower) value <= lower else value < lower
-      too_high <- if (exclusive_upper) value >= upper else value > upper
-      bad <- which(too_low | too_high)
+      p <- check_comparable(value, lower, upper, name)
+      bad <- range_violations(p, exclusive_lower, exclusive_upper)
 
       if (length(bad) > 0L) {
-        fail(name, sprintf("must be in %s%s, %s%s", lb, lower, upper, ub),
-             found = value[bad[1L]],
+        first <- value[bad[1L]]
+        fail(name, lbl,
+             found = if (is.numeric(first)) first else format(first),
              at = if (length(value) > 1L) bad)
       }
     }

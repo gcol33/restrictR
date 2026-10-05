@@ -15,9 +15,9 @@ require_between(
 \arguments{
 \item{restriction}{a \code{restriction} object.}
 
-\item{lower}{numeric(1) lower bound (default \code{-Inf}).}
+\item{lower}{lower bound (default \code{-Inf}, no lower bound).}
 
-\item{upper}{numeric(1) upper bound (default \code{Inf}).}
+\item{upper}{upper bound (default \code{Inf}, no upper bound).}
 
 \item{exclusive_lower}{logical; if \code{TRUE}, lower bound is exclusive.}
 
@@ -27,11 +27,22 @@ require_between(
 The modified \code{restriction} object.
 }
 \description{
-Validates that all elements of a numeric value fall within a specified range.
+Validates that all elements of a value fall within a specified range. The
+value can be numeric, \code{Date}, \code{POSIXct}, \code{difftime} or an ordered factor.
 }
 \details{
-Non-numeric input fails with a type error. \code{NA} elements are
-skipped; chain \code{\link[=require_no_na]{require_no_na()}} to reject them.
+The value and the bounds must be the same kind: a \code{Date} bound
+against a numeric value fails with a type error. Ordered-factor bounds are
+single values of a factor with the same levels as the validated value.
+Other input fails with a type error. \code{NA} elements are skipped; chain
+\code{\link[=require_no_na]{require_no_na()}} to reject them.
+}
+\examples{
+period <- restrict("start") |>
+  require_between(as.Date("2020-01-01"), as.Date("2020-12-31"))
+period(as.Date("2020-06-15"))
+try(period(as.Date("2021-01-01")))
+
 }
 \seealso{
 Other value checks:

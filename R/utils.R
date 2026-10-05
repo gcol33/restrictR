@@ -91,15 +91,21 @@ fail_precondition <- function(path, message, found = NULL, at = NULL) {
 #' programmatic inspection.
 #'
 #' @param failures a list of `restrictR_failure` conditions.
+#' @param max_shown maximum number of failures written into the message; the
+#'   condition keeps all of them in `$failures`.
 #'
 #' @return A condition of class `c("restrictR_failures", "error", "condition")`.
 #'
 #' @noRd
-restrictR_failures <- function(failures) {
+restrictR_failures <- function(failures, max_shown = 20L) {
   n <- length(failures)
   header <- sprintf("%d validation failure%s:", n, if (n == 1L) "" else "s")
-  body <- paste(vapply(failures, conditionMessage, character(1L)),
+  shown <- failures[seq_len(min(n, max_shown))]
+  body <- paste(vapply(shown, conditionMessage, character(1L)),
                 collapse = "\n")
+  if (n > max_shown) {
+    body <- paste0(body, sprintf("\n... and %d more", n - max_shown))
+  }
   structure(
     class = c("restrictR_failures", "error", "condition"),
     list(message = paste0(header, "\n", body), call = NULL,
@@ -170,29 +176,6 @@ col_path <- function(name, col) {
 }
 
 
-#' Extract a Data Frame Column with Path-Aware Guards
-#'
-#' Shared helper for all column-level checks. Confirms the value is a
-#' data.frame and the column exists before returning the column, so callers
-#' never index a non-data.frame and produce an opaque base-R error.
-#'
-#' @param value the value being validated.
-#' @param col the column name.
-#' @param name the validator name (used for error paths).
-#'
-#' @return the extracted column.
-#'
-#' @noRd
-get_col <- function(value, col, name) {
-  check_df(value, name, sprintf('column "%s"', col))
-  x <- value[[col]]
-  if (is.null(x)) {
-    fail_precondition(name, sprintf('column "%s" does not exist', col))
-  }
-  x
-}
-
-
 #' Require a Data Frame
 #'
 #' Shared guard for every check that indexes rows or columns. Fails with a
@@ -251,6 +234,129 @@ check_numeric <- function(x, path) {
 }
 
 
+#' Kind of an Ordered Value
+#'
+#' @param x a vector.
+#'
+#' @return one of `"numeric"`, `"Date"`, `"POSIXct"`, `"difftime"`,
+#'   `"ordered factor"`, or `NA_character_` when `x` has no usable order.
+#'
+#' @noRd
+value_kind <- function(x) {
+  if (inherits(x, "POSIXct")) return("POSIXct")
+  if (inherits(x, "Date")) return("Date")
+  if (inherits(x, "difftime")) return("difftime")
+  if (is.ordered(x)) return("ordered factor")
+  if (is.numeric(x)) return("numeric")
+  NA_character_
+}
+
+
+#' Whether a Range Bound Is Unset
+#'
+#' `-Inf` / `Inf` are the defaults of the range steps and mean "no bound".
+#'
+#' @noRd
+is_open_bound <- function(b) {
+  is.numeric(b) && !inherits(b, "difftime") && length(b) == 1L && is.infinite(b)
+}
+
+
+#' Kind Shared by the Bounds of a Range
+#'
+#' Validates the bounds when a range step is built.
+#'
+#' @param lower,upper the range bounds.
+#'
+#' @return the common kind of the set bounds, or `NULL` when both are open.
+#'
+#' @noRd
+bounds_kind <- function(lower, upper) {
+  kinds <- character(0L)
+  for (b in list(lower, upper)) {
+    if (is_open_bound(b)) next
+    kb <- value_kind(b)
+    if (is.na(kb) || length(b) != 1L || is.na(b)) {
+      stop("range bounds must be single non-NA numbers, Dates, POSIXct, ",
+           "difftimes or ordered factor levels", call. = FALSE)
+    }
+    kinds <- c(kinds, kb)
+  }
+  if (length(unique(kinds)) > 1L) {
+    stop(sprintf("range bounds must be of the same kind, got %s",
+                 paste(kinds, collapse = " and ")), call. = FALSE)
+  }
+  if (length(kinds) == 0L) NULL else kinds[[1L]]
+}
+
+
+#' Format a Range Bound for Messages
+#'
+#' @noRd
+format_bound <- function(b) {
+  if (is.ordered(b)) as.character(b)
+  else if (is.numeric(b)) as.character(b)
+  else format(b)
+}
+
+
+#' Check a Value Is Comparable With Range Bounds
+#'
+#' Shared guard for the range steps. Accepts numeric, `Date`, `POSIXct`,
+#' `difftime` and ordered-factor values, and requires the value and the set
+#' bounds to be the same kind, so a `Date` bound never meets a numeric value
+#' through R's coercion rules.
+#'
+#' @param x the value to check.
+#' @param lower,upper the range bounds.
+#' @param path the full path for error messages.
+#'
+#' @return A list `x`, `lower`, `upper` ready for `<` / `>` (ordered factors as
+#'   level positions; unset bounds of non-numeric kinds as `NULL`).
+#'
+#' @noRd
+check_comparable <- function(x, lower, upper, path) {
+  want <- bounds_kind(lower, upper)
+  kind <- value_kind(x)
+  if (is.na(kind) || (!is.null(want) && kind != want)) {
+    fail_precondition(path, sprintf("must be %s, got %s",
+                                    want %||% "numeric", class(x)[1L]))
+  }
+  prep <- function(b) {
+    if (kind == "numeric") return(b)
+    if (is_open_bound(b)) return(NULL)
+    if (kind == "POSIXct") return(as.numeric(b))
+    if (kind == "ordered factor") {
+      if (!identical(levels(b), levels(x))) {
+        fail_precondition(path, "must have the same levels as the range bounds")
+      }
+      return(as.integer(b))
+    }
+    b
+  }
+  list(x = switch(kind, "ordered factor" = as.integer(x),
+                  POSIXct = as.numeric(x), x),
+       lower = prep(lower), upper = prep(upper))
+}
+
+
+#' Positions Outside a Range
+#'
+#' @param p result of `check_comparable()`.
+#' @param exclusive_lower,exclusive_upper whether each bound is exclusive.
+#'
+#' @return integer positions of elements outside the range (`NA` skipped).
+#'
+#' @noRd
+range_violations <- function(p, exclusive_lower, exclusive_upper) {
+  too_low <- if (is.null(p$lower)) FALSE else
+    if (exclusive_lower) p$x <= p$lower else p$x < p$lower
+  too_high <- if (is.null(p$upper)) FALSE else
+    if (exclusive_upper) p$x >= p$upper else p$x > p$upper
+  which(too_low | too_high)
+}
+
+
 #' Check for NA Values
 #'
 #' Shared helper for NA checking across type and column validators.
@@ -269,7 +375,7 @@ check_no_na <- function(x, path) {
 
 #' Check for NA and Non-Finite Values
 #'
-#' Shared helper used by `require_numeric()` and `require_col_numeric()`.
+#' Shared helper used by `require_numeric()`.
 #'
 #' @param x the numeric vector to check.
 #' @param path the full path for error messages.

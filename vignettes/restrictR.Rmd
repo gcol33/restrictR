@@ -50,11 +50,14 @@ The most common use case: validating a `newdata` argument in a predict-like
 function. Instead of scattering `if`/`stop()` blocks, define the contract once:
 
 ```{r}
+require_feature <- restrict("feature") |>
+  require_numeric(no_na = TRUE, finite = TRUE)
+
 require_newdata <- restrict("newdata") |>
   require_df() |>
   require_has_cols(c("x1", "x2")) |>
-  require_col_numeric("x1", no_na = TRUE, finite = TRUE) |>
-  require_col_numeric("x2", no_na = TRUE, finite = TRUE) |>
+  require_col("x1", require_feature) |>
+  require_col("x2", require_feature) |>
   require_nrow_min(1L)
 ```
 
@@ -165,10 +168,13 @@ value ranges, and categorical fields in one go:
 require_survey <- restrict("survey") |>
   require_df() |>
   require_has_cols(c("age", "income", "status")) |>
-  require_col_numeric("age", no_na = TRUE) |>
-  require_col_between("age", lower = 0, upper = 150) |>
-  require_col_numeric("income", no_na = TRUE, finite = TRUE) |>
-  require_col_one_of("status", c("active", "inactive", "pending"))
+  require_col("age", restrict("age") |>
+                require_numeric(no_na = TRUE) |>
+                require_between(lower = 0, upper = 150)) |>
+  require_col("income", restrict("income") |>
+                require_numeric(no_na = TRUE, finite = TRUE)) |>
+  require_col("status", restrict("status") |>
+                require_one_of(c("active", "inactive", "pending")))
 ```
 
 ```{r}
@@ -187,6 +193,60 @@ bad_survey <- data.frame(
   status = c("active", "inactive", "active")
 )
 require_survey(bad_survey)
+```
+
+## Composing Validators
+
+`require_col()` lifts any validator onto a data frame column, so a rule written
+once serves both a standalone argument and a column. Errors keep the column
+path. `require_each()` applies a validator to every element of a list, and
+`require_fields()` to named fields:
+
+```{r}
+require_age <- restrict("age") |>
+  require_integer(no_na = TRUE) |>
+  require_between(0, 120)
+
+require_people <- restrict("people") |>
+  require_df() |>
+  require_col("age", require_age)
+
+validation_errors(require_people, data.frame(age = c(30L, 150L)))
+```
+
+```{r}
+require_layers <- restrict("layers") |>
+  require_class("list") |>
+  require_each(restrict("layer") |> require_numeric())
+
+validation_errors(require_layers, list(1, "a", 3))
+```
+
+`allow_null()` marks an optional argument: `NULL` passes, anything else must
+satisfy every step. `require_valid()` includes another validator's steps, and
+`require_any()` accepts a value that satisfies at least one alternative:
+
+```{r}
+require_weights <- restrict("weights") |>
+  require_numeric(no_na = TRUE) |>
+  require_positive() |>
+  allow_null()
+require_weights(NULL)
+
+require_num_or_df <- restrict("x") |>
+  require_any(
+    restrict("x") |> require_numeric(),
+    restrict("x") |> require_df() |> require_has_cols("value")
+  )
+validation_errors(require_num_or_df, "a")
+```
+
+`require_between()` also bounds dates, times, durations and ordered factors:
+
+```{r}
+require_period <- restrict("start") |>
+  require_between(as.Date("2020-01-01"), as.Date("2020-12-31"))
+validation_errors(require_period, as.Date("2021-03-01"))
 ```
 
 ## Checking Without Stopping
@@ -289,11 +349,14 @@ validators. Call them at the top of exported functions.
 
 ```r
 # R/contracts.R
+require_feature <- restrict("feature") |>
+  require_numeric(no_na = TRUE, finite = TRUE)
+
 require_newdata <- restrict("newdata") |>
   require_df() |>
   require_has_cols(c("x1", "x2")) |>
-  require_col_numeric("x1", no_na = TRUE, finite = TRUE) |>
-  require_col_numeric("x2", no_na = TRUE, finite = TRUE)
+  require_col("x1", require_feature) |>
+  require_col("x2", require_feature)
 
 require_pred <- restrict("pred") |>
   require_numeric(no_na = TRUE, finite = TRUE) |>

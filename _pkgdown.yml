@@ -95,13 +95,15 @@ reference:
   - require_nrow_min
   - require_nrow_matches
   - require_has_cols
-- title: Column-Level Checks
-  desc: Validate individual columns with path-aware errors
+- title: Composition
+  desc: Apply validators to columns and list elements, combine them, allow NULL
   contents:
-  - require_col_numeric
-  - require_col_character
-  - require_col_between
-  - require_col_one_of
+  - require_col
+  - require_each
+  - require_fields
+  - require_valid
+  - require_any
+  - allow_null
 - title: Value Checks
   desc: Validate value ranges and set membership
   contents:

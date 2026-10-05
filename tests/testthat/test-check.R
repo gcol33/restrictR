@@ -24,8 +24,9 @@ test_that(".on_fail = 'all' surfaces both a frame and a column problem", {
   require_survey <- restrict("survey") |>
     require_df() |>
     require_has_cols(c("age", "status")) |>
-    require_col_between("age", lower = 0, upper = 150) |>
-    require_col_one_of("status", c("active", "inactive"))
+    require_col("age", restrict("age") |> require_between(lower = 0, upper = 150)) |>
+    require_col("status", restrict("status") |>
+                  require_one_of(c("active", "inactive")))
 
   bad <- data.frame(age = c(25, -5, 200), status = "unknown")
 
@@ -89,8 +90,8 @@ test_that(".on_fail = 'all' reports a type failure once per path (#11)", {
 test_that(".on_fail = 'all' dedupes column type failures per column path", {
   v <- restrict("df") |>
     require_df() |>
-    require_col_numeric("x") |>
-    require_col_between("x", 0, 1)
+    require_col("x", restrict("x") |> require_numeric()) |>
+    require_col("x", restrict("x") |> require_between(0, 1))
   errs <- validation_errors(v, data.frame(x = "a"))
   expect_length(errs, 1L)
   expect_match(errs, "df[$]x: must be numeric")

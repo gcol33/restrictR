@@ -32,8 +32,9 @@ Validators are **immutable**: `add_step()` creates a new closure via `make_valid
 
 ### Source files
 
-- **`R/restrict.R`**: Core machinery — `restrict()`, `make_validator()`, `add_step()`, `print.restriction`, `as_contract_text/block()`, `require_custom()`
-- **`R/require.R`**: All 21 built-in `require_*()` steps, organized in sections: type checks, missingness, structure checks, column-level checks, value checks
+- **`R/restrict.R`**: Core machinery — `restrict()`, `make_validator()`, `run_steps()` (the single step runner for "first"/"all" modes), `add_step()`, `print.restriction`, `as_contract_text/block()`, `require_custom()`
+- **`R/require.R`**: Built-in `require_*()` steps, organized in sections: type checks, missingness, structure checks, value checks
+- **`R/compose.R`**: Combinators that apply or combine whole validators — `require_col()`, `require_each()`, `require_fields()` (built on `scoped_step()`), `require_valid()`, `require_any()`, `allow_null()`
 - **`R/utils.R`**: Internal helpers — `fail()` (error formatter), `eval_formula()`, `col_path()`, `check_no_na()`, `check_na_finite()`, `%||%`
 
 ### Step structure
@@ -66,6 +67,6 @@ Formula-based steps (e.g. `require_length_matches(~ nrow(newdata))`) declare `de
 1. Add the function in `R/require.R` under the appropriate section
 2. Use `add_step(restriction, list(label, deps, fields, fn))` — follow existing patterns
 3. Use `fail()` for errors — never raw `stop()` in step functions
-4. Add `@family` tag matching the section (type checks, structure checks, column checks, value checks, missingness checks)
+4. Add `@family` tag matching the section (type checks, structure checks, value checks, missingness checks)
 5. Add `@export` and run `devtools::document()`
 6. Add tests in the corresponding `tests/testthat/test-require-*.R` file
