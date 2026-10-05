@@ -4,24 +4,24 @@
 
 ## Test environments
 
-* local: Windows 11, R 4.6.0
-* win-builder: R-devel and R-release
+* local: Windows 11, R 4.6.1
+* win-builder: R-devel (2026-09-30 r90605) and R-release (4.6.1), Status: OK
 * GitHub Actions: ubuntu-latest (R-devel, release, oldrel-1),
   macOS-latest (release), windows-latest (release)
 
 ## Changes in this version
 
-This is a feature update (0.1.0 -> 0.2.0):
+This is a feature update (0.1.0 -> 0.3.0). The Title and Description no longer
+end in "for R" and no longer single-quote the restrict() function name.
+NEWS.md lists the changes in full. Main points:
 
-* New step require_class() for asserting arbitrary classes.
-* Validators gain a .on_fail = "all" mode that reports every violation in
-  one error instead of stopping at the first.
-* New non-throwing helpers is_valid() and validation_errors().
-* Formula-based steps now resolve non-base functions.
-
-It also addresses the previous reviewer requests: the Title no longer ends
-with "for R", and the Description no longer single-quotes the restrict()
-function name.
+* New steps for character, structure, set, file-system and function
+  arguments, plus testthat expectations expect_valid() and expect_invalid().
+* New combinators require_col(), require_each(), require_fields(),
+  require_valid(), require_any() and allow_null().
+* New .on_fail = "all" mode, is_valid(), validation_errors() and steps().
+* require_col_numeric(), require_col_character(), require_col_between() and
+  require_col_one_of() are replaced by require_col().
 
 ## Downstream dependencies
 
