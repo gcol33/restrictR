@@ -24,7 +24,7 @@ growing the package's built-in API surface. The step function receives
 
     <a class="navbar-brand me-2" href="../index.html">restrictR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -86,7 +86,8 @@ growing the package's built-in API surface. The step function receives
 
 <dt id="arg-fn">fn<a class="anchor" aria-label="anchor" href="#arg-fn"></a></dt>
 <dd><p>a function with signature <code>function(value, name, ctx)</code> that
-calls <code><a href="fail.html">fail()</a></code> on validation failure.</p></dd>
+calls <code><a href="fail.html">fail()</a></code> on validation failure. It must be callable with three
+positional arguments (see <code><a href="require_function.html">require_function()</a></code>).</p></dd>
 
 
 <dt id="arg-deps">deps<a class="anchor" aria-label="anchor" href="#arg-deps"></a></dt>
@@ -106,6 +107,7 @@ calls <code><a href="fail.html">fail()</a></code> on validation failure.</p></dd
 <code><a href="fail.html">fail()</a></code>,
 <code><a href="is_valid.html">is_valid()</a></code>,
 <code><a href="restrict.html">restrict()</a></code>,
+<code><a href="steps.html">steps()</a></code>,
 <code><a href="validation_errors.html">validation_errors()</a></code></p></div>
     </div>
 
@@ -134,7 +136,7 @@ calls <code><a href="fail.html">fail()</a></code> on validation failure.</p></dd
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

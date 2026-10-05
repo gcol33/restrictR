@@ -49,7 +49,8 @@ Other core:
 [`fail()`](https://gillescolling.com/restrictR/reference/fail.md),
 [`is_valid()`](https://gillescolling.com/restrictR/reference/is_valid.md),
 [`require_custom()`](https://gillescolling.com/restrictR/reference/require_custom.md),
-[`restrict()`](https://gillescolling.com/restrictR/reference/restrict.md)
+[`restrict()`](https://gillescolling.com/restrictR/reference/restrict.md),
+[`steps()`](https://gillescolling.com/restrictR/reference/steps.md)
 
 ## Examples
 

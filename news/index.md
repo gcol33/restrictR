@@ -1,5 +1,98 @@
 # Changelog
 
+## restrictR 0.3.0
+
+- New character steps
+  [`require_pattern()`](https://gillescolling.com/restrictR/reference/require_pattern.md),
+  [`require_nchar()`](https://gillescolling.com/restrictR/reference/require_nchar.md)
+  and
+  [`require_nonempty()`](https://gillescolling.com/restrictR/reference/require_nonempty.md).
+- New structure steps
+  [`require_ncol_min()`](https://gillescolling.com/restrictR/reference/require_ncol_min.md),
+  [`require_ncol_matches()`](https://gillescolling.com/restrictR/reference/require_ncol_matches.md),
+  [`require_dim()`](https://gillescolling.com/restrictR/reference/require_dim.md),
+  [`require_names()`](https://gillescolling.com/restrictR/reference/require_names.md)
+  (modes `"identical"`, `"subset"`, `"superset"`, `"permutation"`),
+  [`require_unique_names()`](https://gillescolling.com/restrictR/reference/require_unique_names.md)
+  and
+  [`require_sorted()`](https://gillescolling.com/restrictR/reference/require_sorted.md).
+  [`require_has_cols()`](https://gillescolling.com/restrictR/reference/require_has_cols.md)
+  is the `"superset"` case of the same comparison. A matrix is checked
+  with `require_class("matrix")`.
+- New set and factor steps
+  [`require_contains()`](https://gillescolling.com/restrictR/reference/require_contains.md),
+  [`require_set_equal()`](https://gillescolling.com/restrictR/reference/require_set_equal.md),
+  [`require_levels()`](https://gillescolling.com/restrictR/reference/require_levels.md)
+  and
+  [`require_disjoint()`](https://gillescolling.com/restrictR/reference/require_disjoint.md).
+  [`require_one_of()`](https://gillescolling.com/restrictR/reference/require_one_of.md)
+  is the subset test for vectors.
+- New file-system steps
+  [`require_file_exists()`](https://gillescolling.com/restrictR/reference/require_file_exists.md),
+  [`require_dir_exists()`](https://gillescolling.com/restrictR/reference/require_dir_exists.md),
+  [`require_readable()`](https://gillescolling.com/restrictR/reference/require_readable.md)
+  and
+  [`require_writable()`](https://gillescolling.com/restrictR/reference/require_writable.md).
+- New
+  [`require_function()`](https://gillescolling.com/restrictR/reference/require_function.md)
+  checks callback arguments by argument names or call signature.
+  [`require_custom()`](https://gillescolling.com/restrictR/reference/require_custom.md)
+  now requires a function callable with three positional arguments.
+- New testthat expectations
+  [`expect_valid()`](https://gillescolling.com/restrictR/reference/expect_valid.md)
+  and
+  [`expect_invalid()`](https://gillescolling.com/restrictR/reference/expect_invalid.md).
+- New
+  [`steps()`](https://gillescolling.com/restrictR/reference/steps.md)
+  returns the label, context dependencies and parameters of every step
+  as a data.frame.
+- [`require_nrow_min()`](https://gillescolling.com/restrictR/reference/require_nrow_min.md)
+  and
+  [`require_nrow_matches()`](https://gillescolling.com/restrictR/reference/require_nrow_matches.md)
+  also accept matrices.
+- [`require_integer()`](https://gillescolling.com/restrictR/reference/require_integer.md)
+  rejects `Inf` and `-Inf` in both modes.
+- Formula steps no longer treat the member name in `ref$id` as a context
+  dependency, nor `.value` and `.name`.
+- The failure message of a step is its label, so the two cannot differ:
+  [`require_unique()`](https://gillescolling.com/restrictR/reference/require_unique.md)
+  reports `must contain unique values` and
+  [`require_one_of()`](https://gillescolling.com/restrictR/reference/require_one_of.md)
+  reports `must be one of: ...`.
+- New `require_col(col, validator)` lifts any validator onto a
+  data.frame column with path-aware errors (`newdata$age: ...`). It
+  replaces `require_col_numeric()`, `require_col_character()`,
+  `require_col_between()` and `require_col_one_of()`, which are removed:
+  write `require_col("x", restrict("x") |> require_numeric())` instead.
+- New
+  [`require_each()`](https://gillescolling.com/restrictR/reference/require_each.md)
+  and
+  [`require_fields()`](https://gillescolling.com/restrictR/reference/require_fields.md)
+  validate every element, or named fields, of a list (`layers[[2]]`,
+  `opts$alpha`).
+- New
+  [`allow_null()`](https://gillescolling.com/restrictR/reference/allow_null.md)
+  marks an optional argument: `NULL` passes, otherwise all steps apply.
+- New
+  [`require_valid()`](https://gillescolling.com/restrictR/reference/require_valid.md)
+  includes another validator’s steps and
+  [`require_any()`](https://gillescolling.com/restrictR/reference/require_any.md)
+  accepts a value that satisfies at least one alternative.
+- [`require_between()`](https://gillescolling.com/restrictR/reference/require_between.md)
+  now accepts `Date`, `POSIXct`, `difftime` and ordered factor values
+  and bounds.
+- [`require_nrow_min()`](https://gillescolling.com/restrictR/reference/require_nrow_min.md)
+  and
+  [`require_nrow_matches()`](https://gillescolling.com/restrictR/reference/require_nrow_matches.md)
+  fail with a path-aware error on non-data.frame input, and
+  [`require_length_matches()`](https://gillescolling.com/restrictR/reference/require_length_matches.md)
+  /
+  [`require_nrow_matches()`](https://gillescolling.com/restrictR/reference/require_nrow_matches.md)
+  reject formulas that do not evaluate to a single non-NA number.
+- With `.on_fail = "all"`, a type or structure failure on a path is
+  reported once instead of once per step. The aggregated message lists
+  at most 20 failures; the full list stays in `$failures`.
+
 ## restrictR 0.2.0
 
 - New step
@@ -74,8 +167,7 @@ CRAN release: 2026-03-09
   [`require_length_matches()`](https://gillescolling.com/restrictR/reference/require_length_matches.md),
   [`require_nrow_min()`](https://gillescolling.com/restrictR/reference/require_nrow_min.md),
   [`require_has_cols()`](https://gillescolling.com/restrictR/reference/require_has_cols.md),
-  [`require_col_numeric()`](https://gillescolling.com/restrictR/reference/require_col_numeric.md),
-  [`require_col_character()`](https://gillescolling.com/restrictR/reference/require_col_character.md),
+  `require_col_numeric()`, `require_col_character()`,
   `require_col_range()`, `require_range()`,
   [`require_one_of()`](https://gillescolling.com/restrictR/reference/require_one_of.md).
 - Dependent validation via one-sided formulas with explicit context

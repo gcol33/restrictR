@@ -41,7 +41,7 @@ operator. Define runtime contracts once and enforce them anywhere.
 
     <a class="navbar-brand me-2" href="index.html">restrictR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -105,11 +105,14 @@ operator. Define runtime contracts once and enforce them anywhere.
 </h2>
 <p>Every exported function tends to start with the same <code>if (!is.numeric(...)) stop(...)</code> checks, copied across methods and drifting apart, until one function says <code>"x must be numeric"</code> and another says <code>"expected numeric input"</code>. Define the contract once as a pipe chain, call it at the top of any method, and the rule lives in one place with one error format. Change the rule, change it once.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">require_newdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/restrict.html">restrict</a></span><span class="op">(</span><span class="st">"newdata"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<code class="sourceCode R"><span><span class="va">require_feature</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/restrict.html">restrict</a></span><span class="op">(</span><span class="st">"feature"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/require_numeric.html">require_numeric</a></span><span class="op">(</span>no_na <span class="op">=</span> <span class="cn">TRUE</span>, finite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">require_newdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/restrict.html">restrict</a></span><span class="op">(</span><span class="st">"newdata"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/require_df.html">require_df</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/require_has_cols.html">require_has_cols</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x1"</span>, <span class="st">"x2"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="reference/require_col_numeric.html">require_col_numeric</a></span><span class="op">(</span><span class="st">"x1"</span>, no_na <span class="op">=</span> <span class="cn">TRUE</span>, finite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="reference/require_col_numeric.html">require_col_numeric</a></span><span class="op">(</span><span class="st">"x2"</span>, no_na <span class="op">=</span> <span class="cn">TRUE</span>, finite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/require_col.html">require_col</a></span><span class="op">(</span><span class="st">"x1"</span>, <span class="va">require_feature</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/require_col.html">require_col</a></span><span class="op">(</span><span class="st">"x2"</span>, <span class="va">require_feature</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/require_nrow_min.html">require_nrow_min</a></span><span class="op">(</span><span class="fl">1L</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">predict2</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">object</span>, <span class="va">newdata</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
@@ -188,7 +191,7 @@ x: must not contain NA
 <tr>
 <td><strong>Type checks</strong></td>
 <td>
-<code><a href="reference/require_df.html">require_df()</a></code>, <code><a href="reference/require_numeric.html">require_numeric()</a></code>, <code><a href="reference/require_integer.html">require_integer()</a></code>, <code><a href="reference/require_character.html">require_character()</a></code>, <code><a href="reference/require_logical.html">require_logical()</a></code>
+<code><a href="reference/require_df.html">require_df()</a></code>, <code><a href="reference/require_numeric.html">require_numeric()</a></code>, <code><a href="reference/require_integer.html">require_integer()</a></code>, <code><a href="reference/require_character.html">require_character()</a></code>, <code><a href="reference/require_logical.html">require_logical()</a></code>, <code><a href="reference/require_class.html">require_class()</a></code>
 </td>
 </tr>
 <tr>
@@ -200,24 +203,48 @@ x: must not contain NA
 <tr>
 <td><strong>Structure</strong></td>
 <td>
-<code><a href="reference/require_scalar.html">require_scalar()</a></code>, <code><a href="reference/require_named.html">require_named()</a></code>, <code><a href="reference/require_length.html">require_length()</a></code>, <code><a href="reference/require_length_min.html">require_length_min()</a></code>, <code><a href="reference/require_length_max.html">require_length_max()</a></code>, <code><a href="reference/require_length_matches.html">require_length_matches()</a></code>, <code><a href="reference/require_nrow_min.html">require_nrow_min()</a></code>, <code><a href="reference/require_nrow_matches.html">require_nrow_matches()</a></code>, <code><a href="reference/require_has_cols.html">require_has_cols()</a></code>
+<code><a href="reference/require_scalar.html">require_scalar()</a></code>, <code><a href="reference/require_named.html">require_named()</a></code>, <code><a href="reference/require_length.html">require_length()</a></code>, <code><a href="reference/require_length_min.html">require_length_min()</a></code>, <code><a href="reference/require_length_max.html">require_length_max()</a></code>, <code><a href="reference/require_length_matches.html">require_length_matches()</a></code>, <code><a href="reference/require_nrow_min.html">require_nrow_min()</a></code>, <code><a href="reference/require_nrow_matches.html">require_nrow_matches()</a></code>, <code><a href="reference/require_ncol_min.html">require_ncol_min()</a></code>, <code><a href="reference/require_ncol_matches.html">require_ncol_matches()</a></code>, <code><a href="reference/require_dim.html">require_dim()</a></code>, <code><a href="reference/require_has_cols.html">require_has_cols()</a></code>, <code><a href="reference/require_names.html">require_names()</a></code>, <code><a href="reference/require_unique_names.html">require_unique_names()</a></code>, <code><a href="reference/require_sorted.html">require_sorted()</a></code>
 </td>
 </tr>
 <tr>
 <td><strong>Values</strong></td>
 <td>
-<code><a href="reference/require_positive.html">require_positive()</a></code>, <code><a href="reference/require_negative.html">require_negative()</a></code>, <code><a href="reference/require_between.html">require_between()</a></code>, <code><a href="reference/require_one_of.html">require_one_of()</a></code>, <code><a href="reference/require_unique.html">require_unique()</a></code>
+<code><a href="reference/require_positive.html">require_positive()</a></code>, <code><a href="reference/require_negative.html">require_negative()</a></code>, <code><a href="reference/require_between.html">require_between()</a></code> (numbers, dates, times, durations, ordered factors), <code><a href="reference/require_one_of.html">require_one_of()</a></code>, <code><a href="reference/require_contains.html">require_contains()</a></code>, <code><a href="reference/require_set_equal.html">require_set_equal()</a></code>, <code><a href="reference/require_levels.html">require_levels()</a></code>, <code><a href="reference/require_disjoint.html">require_disjoint()</a></code>, <code><a href="reference/require_unique.html">require_unique()</a></code>
 </td>
 </tr>
 <tr>
-<td><strong>Columns</strong></td>
+<td><strong>Character</strong></td>
 <td>
-<code><a href="reference/require_col_numeric.html">require_col_numeric()</a></code>, <code><a href="reference/require_col_character.html">require_col_character()</a></code>, <code><a href="reference/require_col_between.html">require_col_between()</a></code>, <code><a href="reference/require_col_one_of.html">require_col_one_of()</a></code>
+<code><a href="reference/require_pattern.html">require_pattern()</a></code>, <code><a href="reference/require_nchar.html">require_nchar()</a></code>, <code><a href="reference/require_nonempty.html">require_nonempty()</a></code>
+</td>
+</tr>
+<tr>
+<td><strong>File system</strong></td>
+<td>
+<code><a href="reference/require_file_exists.html">require_file_exists()</a></code>, <code><a href="reference/require_dir_exists.html">require_dir_exists()</a></code>, <code><a href="reference/require_readable.html">require_readable()</a></code>, <code><a href="reference/require_writable.html">require_writable()</a></code>
+</td>
+</tr>
+<tr>
+<td><strong>Functions</strong></td>
+<td><code><a href="reference/require_function.html">require_function()</a></code></td>
+</tr>
+<tr>
+<td><strong>Composition</strong></td>
+<td>
+<code><a href="reference/require_col.html">require_col()</a></code>, <code><a href="reference/require_each.html">require_each()</a></code>, <code><a href="reference/require_fields.html">require_fields()</a></code>, <code><a href="reference/require_valid.html">require_valid()</a></code>, <code><a href="reference/require_any.html">require_any()</a></code>, <code><a href="reference/allow_null.html">allow_null()</a></code>
 </td>
 </tr>
 <tr>
 <td><strong>Extension</strong></td>
-<td><code><a href="reference/require_custom.html">require_custom()</a></code></td>
+<td>
+<code><a href="reference/require_custom.html">require_custom()</a></code>, <code><a href="reference/steps.html">steps()</a></code>
+</td>
+</tr>
+<tr>
+<td><strong>Testing</strong></td>
+<td>
+<code><a href="reference/expect_valid.html">expect_valid()</a></code>, <code><a href="reference/expect_invalid.html">expect_invalid()</a></code>
+</td>
 </tr>
 </tbody>
 </table>
@@ -327,7 +354,7 @@ x: must not contain NA
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

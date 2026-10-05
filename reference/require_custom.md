@@ -26,7 +26,9 @@ require_custom(restriction, label, fn, deps = character(0L))
 
   a function with signature `function(value, name, ctx)` that calls
   [`fail()`](https://gillescolling.com/restrictR/reference/fail.md) on
-  validation failure.
+  validation failure. It must be callable with three positional
+  arguments (see
+  [`require_function()`](https://gillescolling.com/restrictR/reference/require_function.md)).
 
 - deps:
 
@@ -44,6 +46,7 @@ Other core:
 [`fail()`](https://gillescolling.com/restrictR/reference/fail.md),
 [`is_valid()`](https://gillescolling.com/restrictR/reference/is_valid.md),
 [`restrict()`](https://gillescolling.com/restrictR/reference/restrict.md),
+[`steps()`](https://gillescolling.com/restrictR/reference/steps.md),
 [`validation_errors()`](https://gillescolling.com/restrictR/reference/validation_errors.md)
 
 ## Examples

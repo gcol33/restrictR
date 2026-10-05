@@ -52,11 +52,14 @@ place with one error format. Change the rule, change it once.
 
 ``` r
 
+require_feature <- restrict("feature") |>
+  require_numeric(no_na = TRUE, finite = TRUE)
+
 require_newdata <- restrict("newdata") |>
   require_df() |>
   require_has_cols(c("x1", "x2")) |>
-  require_col_numeric("x1", no_na = TRUE, finite = TRUE) |>
-  require_col_numeric("x2", no_na = TRUE, finite = TRUE) |>
+  require_col("x1", require_feature) |>
+  require_col("x2", require_feature) |>
   require_nrow_min(1L)
 
 predict2 <- function(object, newdata, ...) {
@@ -137,12 +140,16 @@ require_weights <- restrict("weights") |>
 
 | Category | Steps |
 |----|----|
-| **Type checks** | [`require_df()`](https://gillescolling.com/restrictR/reference/require_df.md), [`require_numeric()`](https://gillescolling.com/restrictR/reference/require_numeric.md), [`require_integer()`](https://gillescolling.com/restrictR/reference/require_integer.md), [`require_character()`](https://gillescolling.com/restrictR/reference/require_character.md), [`require_logical()`](https://gillescolling.com/restrictR/reference/require_logical.md) |
+| **Type checks** | [`require_df()`](https://gillescolling.com/restrictR/reference/require_df.md), [`require_numeric()`](https://gillescolling.com/restrictR/reference/require_numeric.md), [`require_integer()`](https://gillescolling.com/restrictR/reference/require_integer.md), [`require_character()`](https://gillescolling.com/restrictR/reference/require_character.md), [`require_logical()`](https://gillescolling.com/restrictR/reference/require_logical.md), [`require_class()`](https://gillescolling.com/restrictR/reference/require_class.md) |
 | **Null / missingness** | [`require_not_null()`](https://gillescolling.com/restrictR/reference/require_not_null.md), [`require_no_na()`](https://gillescolling.com/restrictR/reference/require_no_na.md), [`require_finite()`](https://gillescolling.com/restrictR/reference/require_finite.md) |
-| **Structure** | [`require_scalar()`](https://gillescolling.com/restrictR/reference/require_scalar.md), [`require_named()`](https://gillescolling.com/restrictR/reference/require_named.md), [`require_length()`](https://gillescolling.com/restrictR/reference/require_length.md), [`require_length_min()`](https://gillescolling.com/restrictR/reference/require_length_min.md), [`require_length_max()`](https://gillescolling.com/restrictR/reference/require_length_max.md), [`require_length_matches()`](https://gillescolling.com/restrictR/reference/require_length_matches.md), [`require_nrow_min()`](https://gillescolling.com/restrictR/reference/require_nrow_min.md), [`require_nrow_matches()`](https://gillescolling.com/restrictR/reference/require_nrow_matches.md), [`require_has_cols()`](https://gillescolling.com/restrictR/reference/require_has_cols.md) |
-| **Values** | [`require_positive()`](https://gillescolling.com/restrictR/reference/require_positive.md), [`require_negative()`](https://gillescolling.com/restrictR/reference/require_negative.md), [`require_between()`](https://gillescolling.com/restrictR/reference/require_between.md), [`require_one_of()`](https://gillescolling.com/restrictR/reference/require_one_of.md), [`require_unique()`](https://gillescolling.com/restrictR/reference/require_unique.md) |
-| **Columns** | [`require_col_numeric()`](https://gillescolling.com/restrictR/reference/require_col_numeric.md), [`require_col_character()`](https://gillescolling.com/restrictR/reference/require_col_character.md), [`require_col_between()`](https://gillescolling.com/restrictR/reference/require_col_between.md), [`require_col_one_of()`](https://gillescolling.com/restrictR/reference/require_col_one_of.md) |
-| **Extension** | [`require_custom()`](https://gillescolling.com/restrictR/reference/require_custom.md) |
+| **Structure** | [`require_scalar()`](https://gillescolling.com/restrictR/reference/require_scalar.md), [`require_named()`](https://gillescolling.com/restrictR/reference/require_named.md), [`require_length()`](https://gillescolling.com/restrictR/reference/require_length.md), [`require_length_min()`](https://gillescolling.com/restrictR/reference/require_length_min.md), [`require_length_max()`](https://gillescolling.com/restrictR/reference/require_length_max.md), [`require_length_matches()`](https://gillescolling.com/restrictR/reference/require_length_matches.md), [`require_nrow_min()`](https://gillescolling.com/restrictR/reference/require_nrow_min.md), [`require_nrow_matches()`](https://gillescolling.com/restrictR/reference/require_nrow_matches.md), [`require_ncol_min()`](https://gillescolling.com/restrictR/reference/require_ncol_min.md), [`require_ncol_matches()`](https://gillescolling.com/restrictR/reference/require_ncol_matches.md), [`require_dim()`](https://gillescolling.com/restrictR/reference/require_dim.md), [`require_has_cols()`](https://gillescolling.com/restrictR/reference/require_has_cols.md), [`require_names()`](https://gillescolling.com/restrictR/reference/require_names.md), [`require_unique_names()`](https://gillescolling.com/restrictR/reference/require_unique_names.md), [`require_sorted()`](https://gillescolling.com/restrictR/reference/require_sorted.md) |
+| **Values** | [`require_positive()`](https://gillescolling.com/restrictR/reference/require_positive.md), [`require_negative()`](https://gillescolling.com/restrictR/reference/require_negative.md), [`require_between()`](https://gillescolling.com/restrictR/reference/require_between.md) (numbers, dates, times, durations, ordered factors), [`require_one_of()`](https://gillescolling.com/restrictR/reference/require_one_of.md), [`require_contains()`](https://gillescolling.com/restrictR/reference/require_contains.md), [`require_set_equal()`](https://gillescolling.com/restrictR/reference/require_set_equal.md), [`require_levels()`](https://gillescolling.com/restrictR/reference/require_levels.md), [`require_disjoint()`](https://gillescolling.com/restrictR/reference/require_disjoint.md), [`require_unique()`](https://gillescolling.com/restrictR/reference/require_unique.md) |
+| **Character** | [`require_pattern()`](https://gillescolling.com/restrictR/reference/require_pattern.md), [`require_nchar()`](https://gillescolling.com/restrictR/reference/require_nchar.md), [`require_nonempty()`](https://gillescolling.com/restrictR/reference/require_nonempty.md) |
+| **File system** | [`require_file_exists()`](https://gillescolling.com/restrictR/reference/require_file_exists.md), [`require_dir_exists()`](https://gillescolling.com/restrictR/reference/require_dir_exists.md), [`require_readable()`](https://gillescolling.com/restrictR/reference/require_readable.md), [`require_writable()`](https://gillescolling.com/restrictR/reference/require_writable.md) |
+| **Functions** | [`require_function()`](https://gillescolling.com/restrictR/reference/require_function.md) |
+| **Composition** | [`require_col()`](https://gillescolling.com/restrictR/reference/require_col.md), [`require_each()`](https://gillescolling.com/restrictR/reference/require_each.md), [`require_fields()`](https://gillescolling.com/restrictR/reference/require_fields.md), [`require_valid()`](https://gillescolling.com/restrictR/reference/require_valid.md), [`require_any()`](https://gillescolling.com/restrictR/reference/require_any.md), [`allow_null()`](https://gillescolling.com/restrictR/reference/allow_null.md) |
+| **Extension** | [`require_custom()`](https://gillescolling.com/restrictR/reference/require_custom.md), [`steps()`](https://gillescolling.com/restrictR/reference/steps.md) |
+| **Testing** | [`expect_valid()`](https://gillescolling.com/restrictR/reference/expect_valid.md), [`expect_invalid()`](https://gillescolling.com/restrictR/reference/expect_invalid.md) |
 
 ## Comparison with checkmate
 

@@ -1,9 +1,9 @@
 pandoc: 3.8.3
-pkgdown: 2.2.0
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   restrictR: restrictR.html
-last_built: 2026-06-29T15:28Z
+last_built: 2026-10-05T09:20Z
 urls:
   reference: https://gillescolling.com/restrictR/reference
   article: https://gillescolling.com/restrictR/articles

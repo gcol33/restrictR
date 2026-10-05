@@ -2,7 +2,7 @@
 
 Validates that the value belongs to a given class. One verb covers the
 types without a dedicated check, including `factor`, `Date`, `POSIXct`,
-`list`, and fitted-model objects such as `lm`.
+`list`, `matrix`, `environment`, and fitted-model objects such as `lm`.
 
 ## Usage
 
@@ -31,6 +31,15 @@ require_class(restriction, class, exact = FALSE)
 
 The modified `restriction` object.
 
+## Details
+
+A matrix is `require_class("matrix")`
+([`inherits()`](https://rdrr.io/r/base/class.html) is `TRUE` for
+matrices since R 4.0) and an environment is
+`require_class("environment")`; neither needs a dedicated step. Use
+[`require_dim()`](https://gillescolling.com/restrictR/reference/require_dim.md)
+for the shape.
+
 ## See also
 
 Other type checks:
@@ -52,4 +61,8 @@ restrict("f") |> require_class("factor")
 restrict("model") |> require_class("lm")
 #> <restriction model>
 #>   1. must be of class "lm"
+restrict("m") |> require_class("matrix") |> require_dim(c(NA, 3))
+#> <restriction m>
+#>   1. must be of class "matrix"
+#>   2. must have dim (any, 3)
 ```

@@ -29,6 +29,11 @@ require_integer(restriction, no_na = FALSE, strict = FALSE)
 
 The modified `restriction` object.
 
+## Details
+
+`Inf` and `-Inf` are not whole numbers and are rejected in both modes;
+`NaN` counts as `NA`.
+
 ## See also
 
 Other type checks:

@@ -24,7 +24,7 @@ with a value to validate."><script>
 
     <a class="navbar-brand me-2" href="../index.html">restrictR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -100,6 +100,10 @@ before running any steps and errors early if not.</p>
 error. Pass <code>.on_fail = "all"</code> to run every step and report all violations
 in one aggregated error:</p>
 <p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">require_pred</span>(out, <span class="at">.on_fail =</span> <span class="st">"all"</span>)</span></code></pre><p></p></div>
+<p>In <code>"all"</code> mode a type or structure guard (wrong type, not a data.frame,
+missing column) is reported once per path: later steps that fail the same
+guard on the same path are not repeated. Independent value failures are all
+reported.</p>
 <p>For a non-throwing result, use <code><a href="is_valid.html">is_valid()</a></code> or <code><a href="validation_errors.html">validation_errors()</a></code>.</p>
     </div>
     <div class="section level2">
@@ -110,6 +114,7 @@ in one aggregated error:</p>
 <code><a href="fail.html">fail()</a></code>,
 <code><a href="is_valid.html">is_valid()</a></code>,
 <code><a href="require_custom.html">require_custom()</a></code>,
+<code><a href="steps.html">steps()</a></code>,
 <code><a href="validation_errors.html">validation_errors()</a></code></p></div>
     </div>
 
@@ -140,7 +145,7 @@ in one aggregated error:</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

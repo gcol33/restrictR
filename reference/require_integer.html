@@ -24,7 +24,7 @@ integer and numeric types as long as all values are whole
 
     <a class="navbar-brand me-2" href="../index.html">restrictR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -94,6 +94,11 @@ If <code>FALSE</code> (default), accepts any numeric value that is a whole numbe
     <p>The modified <code>restriction</code> object.</p>
     </div>
     <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p><code>Inf</code> and <code>-Inf</code> are not whole numbers and are rejected in both
+modes; <code>NaN</code> counts as <code>NA</code>.</p>
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other type checks:
 <code><a href="require_character.html">require_character()</a></code>,
@@ -112,7 +117,7 @@ If <code>FALSE</code> (default), accepts any numeric value that is a whole numbe
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

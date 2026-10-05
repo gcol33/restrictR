@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">restrictR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,6 +57,31 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.0" id="restrictr-030">restrictR 0.3.0<a class="anchor" aria-label="anchor" href="#restrictr-030"></a></h2>
+<ul><li>New character steps <code><a href="../reference/require_pattern.html">require_pattern()</a></code>, <code><a href="../reference/require_nchar.html">require_nchar()</a></code> and <code><a href="../reference/require_nonempty.html">require_nonempty()</a></code>.</li>
+<li>New structure steps <code><a href="../reference/require_ncol_min.html">require_ncol_min()</a></code>, <code><a href="../reference/require_ncol_matches.html">require_ncol_matches()</a></code>, <code><a href="../reference/require_dim.html">require_dim()</a></code>, <code><a href="../reference/require_names.html">require_names()</a></code> (modes <code>"identical"</code>, <code>"subset"</code>, <code>"superset"</code>, <code>"permutation"</code>), <code><a href="../reference/require_unique_names.html">require_unique_names()</a></code> and <code><a href="../reference/require_sorted.html">require_sorted()</a></code>. <code><a href="../reference/require_has_cols.html">require_has_cols()</a></code> is the <code>"superset"</code> case of the same comparison. A matrix is checked with <code>require_class("matrix")</code>.</li>
+<li>New set and factor steps <code><a href="../reference/require_contains.html">require_contains()</a></code>, <code><a href="../reference/require_set_equal.html">require_set_equal()</a></code>, <code><a href="../reference/require_levels.html">require_levels()</a></code> and <code><a href="../reference/require_disjoint.html">require_disjoint()</a></code>. <code><a href="../reference/require_one_of.html">require_one_of()</a></code> is the subset test for vectors.</li>
+<li>New file-system steps <code><a href="../reference/require_file_exists.html">require_file_exists()</a></code>, <code><a href="../reference/require_dir_exists.html">require_dir_exists()</a></code>, <code><a href="../reference/require_readable.html">require_readable()</a></code> and <code><a href="../reference/require_writable.html">require_writable()</a></code>.</li>
+<li>New <code><a href="../reference/require_function.html">require_function()</a></code> checks callback arguments by argument names or call signature. <code><a href="../reference/require_custom.html">require_custom()</a></code> now requires a function callable with three positional arguments.</li>
+<li>New testthat expectations <code><a href="../reference/expect_valid.html">expect_valid()</a></code> and <code><a href="../reference/expect_invalid.html">expect_invalid()</a></code>.</li>
+<li>New <code><a href="../reference/steps.html">steps()</a></code> returns the label, context dependencies and parameters of every step as a data.frame.</li>
+<li>
+<code><a href="../reference/require_nrow_min.html">require_nrow_min()</a></code> and <code><a href="../reference/require_nrow_matches.html">require_nrow_matches()</a></code> also accept matrices.</li>
+<li>
+<code><a href="../reference/require_integer.html">require_integer()</a></code> rejects <code>Inf</code> and <code>-Inf</code> in both modes.</li>
+<li>Formula steps no longer treat the member name in <code>ref$id</code> as a context dependency, nor <code>.value</code> and <code>.name</code>.</li>
+<li>The failure message of a step is its label, so the two cannot differ: <code><a href="../reference/require_unique.html">require_unique()</a></code> reports <code>must contain unique values</code> and <code><a href="../reference/require_one_of.html">require_one_of()</a></code> reports <code>must be one of: ...</code>.</li>
+<li>New <code>require_col(col, validator)</code> lifts any validator onto a data.frame column with path-aware errors (<code>newdata$age: ...</code>). It replaces <code>require_col_numeric()</code>, <code>require_col_character()</code>, <code>require_col_between()</code> and <code>require_col_one_of()</code>, which are removed: write <code>require_col("x", restrict("x") |&gt; require_numeric())</code> instead.</li>
+<li>New <code><a href="../reference/require_each.html">require_each()</a></code> and <code><a href="../reference/require_fields.html">require_fields()</a></code> validate every element, or named fields, of a list (<code>layers[[2]]</code>, <code>opts$alpha</code>).</li>
+<li>New <code><a href="../reference/allow_null.html">allow_null()</a></code> marks an optional argument: <code>NULL</code> passes, otherwise all steps apply.</li>
+<li>New <code><a href="../reference/require_valid.html">require_valid()</a></code> includes another validator’s steps and <code><a href="../reference/require_any.html">require_any()</a></code> accepts a value that satisfies at least one alternative.</li>
+<li>
+<code><a href="../reference/require_between.html">require_between()</a></code> now accepts <code>Date</code>, <code>POSIXct</code>, <code>difftime</code> and ordered factor values and bounds.</li>
+<li>
+<code><a href="../reference/require_nrow_min.html">require_nrow_min()</a></code> and <code><a href="../reference/require_nrow_matches.html">require_nrow_matches()</a></code> fail with a path-aware error on non-data.frame input, and <code><a href="../reference/require_length_matches.html">require_length_matches()</a></code> / <code><a href="../reference/require_nrow_matches.html">require_nrow_matches()</a></code> reject formulas that do not evaluate to a single non-NA number.</li>
+<li>With <code>.on_fail = "all"</code>, a type or structure failure on a path is reported once instead of once per step. The aggregated message lists at most 20 failures; the full list stays in <code>$failures</code>.</li>
+</ul></div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0" id="restrictr-020">restrictR 0.2.0<a class="anchor" aria-label="anchor" href="#restrictr-020"></a></h2>
 <ul><li>New step <code><a href="../reference/require_class.html">require_class()</a></code>: assert any class (e.g. <code>factor</code>, <code>Date</code>, <code>POSIXct</code>, fitted-model objects) through one verb, with <code>exact</code> for a strict first-class match.</li>
 <li>Validators gain <code>.on_fail = "all"</code>: run every step and report all violations in one aggregated error instead of stopping at the first.</li>
@@ -86,7 +111,7 @@
 <h2 class="pkg-version" data-toc-text="0.1.0" id="restrictr-010">restrictR 0.1.0<a class="anchor" aria-label="anchor" href="#restrictr-010"></a></h2><p class="text-muted">CRAN release: 2026-03-09</p>
 <ul><li>Initial release.</li>
 <li>Core constructor: <code><a href="../reference/restrict.html">restrict()</a></code> for building composable validators.</li>
-<li>Building blocks: <code><a href="../reference/require_df.html">require_df()</a></code>, <code><a href="../reference/require_numeric.html">require_numeric()</a></code>, <code><a href="../reference/require_character.html">require_character()</a></code>, <code><a href="../reference/require_length.html">require_length()</a></code>, <code><a href="../reference/require_length_matches.html">require_length_matches()</a></code>, <code><a href="../reference/require_nrow_min.html">require_nrow_min()</a></code>, <code><a href="../reference/require_has_cols.html">require_has_cols()</a></code>, <code><a href="../reference/require_col_numeric.html">require_col_numeric()</a></code>, <code><a href="../reference/require_col_character.html">require_col_character()</a></code>, <code>require_col_range()</code>, <code>require_range()</code>, <code><a href="../reference/require_one_of.html">require_one_of()</a></code>.</li>
+<li>Building blocks: <code><a href="../reference/require_df.html">require_df()</a></code>, <code><a href="../reference/require_numeric.html">require_numeric()</a></code>, <code><a href="../reference/require_character.html">require_character()</a></code>, <code><a href="../reference/require_length.html">require_length()</a></code>, <code><a href="../reference/require_length_matches.html">require_length_matches()</a></code>, <code><a href="../reference/require_nrow_min.html">require_nrow_min()</a></code>, <code><a href="../reference/require_has_cols.html">require_has_cols()</a></code>, <code>require_col_numeric()</code>, <code>require_col_character()</code>, <code>require_col_range()</code>, <code>require_range()</code>, <code><a href="../reference/require_one_of.html">require_one_of()</a></code>.</li>
 <li>Dependent validation via one-sided formulas with explicit context passing.</li>
 <li>Path-aware error messages (e.g. <code>newdata$x2 must be numeric</code>).</li>
 <li>
@@ -101,7 +126,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

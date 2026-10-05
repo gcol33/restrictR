@@ -40,6 +40,11 @@ violations in one aggregated error:
 
     require_pred(out, .on_fail = "all")
 
+In `"all"` mode a type or structure guard (wrong type, not a data.frame,
+missing column) is reported once per path: later steps that fail the
+same guard on the same path are not repeated. Independent value failures
+are all reported.
+
 For a non-throwing result, use
 [`is_valid()`](https://gillescolling.com/restrictR/reference/is_valid.md)
 or
@@ -53,6 +58,7 @@ Other core:
 [`fail()`](https://gillescolling.com/restrictR/reference/fail.md),
 [`is_valid()`](https://gillescolling.com/restrictR/reference/is_valid.md),
 [`require_custom()`](https://gillescolling.com/restrictR/reference/require_custom.md),
+[`steps()`](https://gillescolling.com/restrictR/reference/steps.md),
 [`validation_errors()`](https://gillescolling.com/restrictR/reference/validation_errors.md)
 
 ## Examples

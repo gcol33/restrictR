@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">restrictR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -99,6 +99,13 @@
 
         </dt>
         <dd>Format a Validation Error</dd>
+
+        <dt>
+
+          <code><a href="steps.html">steps()</a></code>
+
+        </dt>
+        <dd>List the Steps of a Validator</dd>
       </dl></div><div class="section level2">
       <h2 id="checking">Checking<a class="anchor" aria-label="anchor" href="#checking"></a></h2>
 
@@ -206,7 +213,7 @@
       </dl></div><div class="section level2">
       <h2 id="structure-checks">Structure Checks<a class="anchor" aria-label="anchor" href="#structure-checks"></a></h2>
 
-      <div class="section-desc"><p>Validate length, names, columns, and row counts</p></div>
+      <div class="section-desc"><p>Validate length, dimensions, names, columns, and order</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -271,14 +278,56 @@
 
         <dt>
 
+          <code><a href="require_ncol_min.html">require_ncol_min()</a></code>
+
+        </dt>
+        <dd>Require Minimum Number of Columns</dd>
+
+        <dt>
+
+          <code><a href="require_ncol_matches.html">require_ncol_matches()</a></code>
+
+        </dt>
+        <dd>Require Column Count Matching an Expression</dd>
+
+        <dt>
+
+          <code><a href="require_dim.html">require_dim()</a></code>
+
+        </dt>
+        <dd>Require Exact Dimensions</dd>
+
+        <dt>
+
           <code><a href="require_has_cols.html">require_has_cols()</a></code>
 
         </dt>
         <dd>Require Specific Columns</dd>
-      </dl></div><div class="section level2">
-      <h2 id="column-level-checks">Column-Level Checks<a class="anchor" aria-label="anchor" href="#column-level-checks"></a></h2>
 
-      <div class="section-desc"><p>Validate individual columns with path-aware errors</p></div>
+        <dt>
+
+          <code><a href="require_names.html">require_names()</a></code>
+
+        </dt>
+        <dd>Require Names</dd>
+
+        <dt>
+
+          <code><a href="require_unique_names.html">require_unique_names()</a></code>
+
+        </dt>
+        <dd>Require Unique Names</dd>
+
+        <dt>
+
+          <code><a href="require_sorted.html">require_sorted()</a></code>
+
+        </dt>
+        <dd>Require Sorted Values</dd>
+      </dl></div><div class="section level2">
+      <h2 id="composition">Composition<a class="anchor" aria-label="anchor" href="#composition"></a></h2>
+
+      <div class="section-desc"><p>Apply validators to columns and list elements, combine them, allow NULL</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -287,35 +336,49 @@
 
       <dl><dt>
 
-          <code><a href="require_col_numeric.html">require_col_numeric()</a></code>
+          <code><a href="require_col.html">require_col()</a></code>
 
         </dt>
-        <dd>Require Numeric Column</dd>
+        <dd>Validate a Data Frame Column with a Validator</dd>
 
         <dt>
 
-          <code><a href="require_col_character.html">require_col_character()</a></code>
+          <code><a href="require_each.html">require_each()</a></code>
 
         </dt>
-        <dd>Require Character Column</dd>
+        <dd>Validate Every Element of a List</dd>
 
         <dt>
 
-          <code><a href="require_col_between.html">require_col_between()</a></code>
+          <code><a href="require_fields.html">require_fields()</a></code>
 
         </dt>
-        <dd>Require Column Values in Range</dd>
+        <dd>Validate Named Fields of a List</dd>
 
         <dt>
 
-          <code><a href="require_col_one_of.html">require_col_one_of()</a></code>
+          <code><a href="require_valid.html">require_valid()</a></code>
 
         </dt>
-        <dd>Require Column Values from a Set</dd>
+        <dd>Include Another Validator's Steps</dd>
+
+        <dt>
+
+          <code><a href="require_any.html">require_any()</a></code>
+
+        </dt>
+        <dd>Require at Least One of Several Validators</dd>
+
+        <dt>
+
+          <code><a href="allow_null.html">allow_null()</a></code>
+
+        </dt>
+        <dd>Allow NULL</dd>
       </dl></div><div class="section level2">
       <h2 id="value-checks">Value Checks<a class="anchor" aria-label="anchor" href="#value-checks"></a></h2>
 
-      <div class="section-desc"><p>Validate value ranges and set membership</p></div>
+      <div class="section-desc"><p>Validate value ranges, set membership, and factor levels</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -352,10 +415,144 @@
 
         <dt>
 
+          <code><a href="require_contains.html">require_contains()</a></code>
+
+        </dt>
+        <dd>Require All of a Set of Values</dd>
+
+        <dt>
+
+          <code><a href="require_set_equal.html">require_set_equal()</a></code>
+
+        </dt>
+        <dd>Require the Same Set of Values</dd>
+
+        <dt>
+
+          <code><a href="require_levels.html">require_levels()</a></code>
+
+        </dt>
+        <dd>Require Factor Levels</dd>
+
+        <dt>
+
+          <code><a href="require_disjoint.html">require_disjoint()</a></code>
+
+        </dt>
+        <dd>Require Values Disjoint From Context</dd>
+
+        <dt>
+
           <code><a href="require_unique.html">require_unique()</a></code>
 
         </dt>
         <dd>Require Unique Values</dd>
+      </dl></div><div class="section level2">
+      <h2 id="character-checks">Character Checks<a class="anchor" aria-label="anchor" href="#character-checks"></a></h2>
+
+      <div class="section-desc"><p>Validate strings by pattern, length, and blankness</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="require_pattern.html">require_pattern()</a></code>
+
+        </dt>
+        <dd>Require Strings Matching a Pattern</dd>
+
+        <dt>
+
+          <code><a href="require_nchar.html">require_nchar()</a></code>
+
+        </dt>
+        <dd>Require String Length</dd>
+
+        <dt>
+
+          <code><a href="require_nonempty.html">require_nonempty()</a></code>
+
+        </dt>
+        <dd>Require Non-Blank Strings</dd>
+      </dl></div><div class="section level2">
+      <h2 id="file-system-checks">File-System Checks<a class="anchor" aria-label="anchor" href="#file-system-checks"></a></h2>
+
+      <div class="section-desc"><p>Validate input paths and output locations</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="require_file_exists.html">require_file_exists()</a></code>
+
+        </dt>
+        <dd>Require Existing Files</dd>
+
+        <dt>
+
+          <code><a href="require_dir_exists.html">require_dir_exists()</a></code>
+
+        </dt>
+        <dd>Require Existing Directories</dd>
+
+        <dt>
+
+          <code><a href="require_readable.html">require_readable()</a></code>
+
+        </dt>
+        <dd>Require Readable Paths</dd>
+
+        <dt>
+
+          <code><a href="require_writable.html">require_writable()</a></code>
+
+        </dt>
+        <dd>Require Writable Paths</dd>
+      </dl></div><div class="section level2">
+      <h2 id="function-checks">Function Checks<a class="anchor" aria-label="anchor" href="#function-checks"></a></h2>
+
+      <div class="section-desc"><p>Validate callback arguments</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="require_function.html">require_function()</a></code>
+
+        </dt>
+        <dd>Require a Function</dd>
+      </dl></div><div class="section level2">
+      <h2 id="testing">Testing<a class="anchor" aria-label="anchor" href="#testing"></a></h2>
+
+      <div class="section-desc"><p>testthat expectations that report validator messages</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="expect_valid.html">expect_valid()</a></code>
+
+        </dt>
+        <dd>Expect a Value to Pass a Validator</dd>
+
+        <dt>
+
+          <code><a href="expect_invalid.html">expect_invalid()</a></code>
+
+        </dt>
+        <dd>Expect a Value to Fail a Validator</dd>
       </dl></div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
@@ -366,7 +563,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>
