@@ -245,7 +245,7 @@ test_that("require_valid() keeps NULL tolerance local to the spliced steps", {
   expect_invisible(v(NULL))
   expect_error(v("a"), "must be numeric")
   expect_error((restrict("x") |> require_valid(opt) |> require_scalar())(NULL),
-               "must be a scalar|length 1")
+               "must be scalar")
 })
 
 num_or_df <- restrict("x") |>

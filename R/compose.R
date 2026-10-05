@@ -37,10 +37,8 @@ scoped_step <- function(label, deps, fields, targets) {
     }
     failures
   }
-  list(
-    label = label,
-    deps = deps,
-    fields = fields,
+  new_step(
+    label, deps = deps, fields = fields,
     fn = function(value, name, ctx) {
       run(value, name, ctx, "first")
       invisible(NULL)
@@ -100,12 +98,11 @@ inner_label <- function(validator) {
 allow_null <- function(restriction) {
   check_restriction(restriction, "restriction")
   if (restriction_null_ok(restriction)) return(restriction)
-  add_step(restriction, list(
-    label = "may be NULL",
-    deps = character(0L),
+  add_step(restriction, new_step(
+    "may be NULL",
+    fn = function(value, name, ctx) invisible(NULL),
     fields = list(null_ok = TRUE),
-    null_ok = TRUE,
-    fn = function(value, name, ctx) invisible(NULL)
+    null_ok = TRUE
   ))
 }
 
@@ -410,8 +407,8 @@ require_any <- function(restriction, ..., .label = NULL) {
           collapse = " | ")
   )
 
-  add_step(restriction, list(
-    label = lbl,
+  add_step(restriction, new_step(
+    lbl,
     deps = unique(unlist(lapply(alts, restriction_deps))),
     fields = list(alternatives = alts),
     fn = function(value, name, ctx) {

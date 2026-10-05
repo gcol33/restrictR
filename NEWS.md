@@ -1,5 +1,30 @@
 # restrictR (development version)
 
+* New character steps `require_pattern()`, `require_nchar()` and
+  `require_nonempty()`.
+* New structure steps `require_ncol_min()`, `require_ncol_matches()`,
+  `require_dim()`, `require_names()` (modes `"identical"`, `"subset"`,
+  `"superset"`, `"permutation"`), `require_unique_names()` and
+  `require_sorted()`. `require_has_cols()` is the `"superset"` case of the
+  same comparison. A matrix is checked with `require_class("matrix")`.
+* New set and factor steps `require_contains()`, `require_set_equal()`,
+  `require_levels()` and `require_disjoint()`. `require_one_of()` is the subset
+  test for vectors.
+* New file-system steps `require_file_exists()`, `require_dir_exists()`,
+  `require_readable()` and `require_writable()`.
+* New `require_function()` checks callback arguments by argument names or
+  call signature. `require_custom()` now requires a function callable with
+  three positional arguments.
+* New testthat expectations `expect_valid()` and `expect_invalid()`.
+* New `steps()` returns the label, context dependencies and parameters of every
+  step as a data.frame.
+* `require_nrow_min()` and `require_nrow_matches()` also accept matrices.
+* `require_integer()` rejects `Inf` and `-Inf` in both modes.
+* Formula steps no longer treat the member name in `ref$id` as a context
+  dependency, nor `.value` and `.name`.
+* The failure message of a step is its label, so the two cannot differ:
+  `require_unique()` reports `must contain unique values` and
+  `require_one_of()` reports `must be one of: ...`.
 * New `require_col(col, validator)` lifts any validator onto a data.frame
   column with path-aware errors (`newdata$age: ...`). It replaces
   `require_col_numeric()`, `require_col_character()`, `require_col_between()`

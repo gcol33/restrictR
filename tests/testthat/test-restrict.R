@@ -92,3 +92,33 @@ test_that("pipe steps are immutable (branching is safe)", {
   expect_error(v2(-1), "must be in")
   expect_invisible(v1(-1))
 })
+
+test_that("steps() lists label, deps and fields per step", {
+  v <- restrict("x") |>
+    require_numeric(no_na = TRUE) |>
+    require_between(0, 1) |>
+    require_length_matches(~ nrow(newdata))
+  s <- steps(v)
+  expect_s3_class(s, "data.frame")
+  expect_named(s, c("step", "label", "deps", "fields"))
+  expect_equal(s$step, 1:3)
+  expect_equal(s$label, c("must be numeric, no NA", "must be in [0, 1]",
+                          "length must match nrow(newdata)"))
+  expect_equal(s$deps[[3]], "newdata")
+  expect_equal(s$deps[[1]], character(0))
+  expect_equal(s$fields[[1]], list(no_na = TRUE, finite = FALSE))
+  expect_equal(s$fields[[2]]$upper, 1)
+})
+
+test_that("steps() on an empty validator is an empty data.frame", {
+  s <- steps(restrict("x"))
+  expect_equal(nrow(s), 0L)
+  expect_named(s, c("step", "label", "deps", "fields"))
+  expect_error(steps(1), "restriction object")
+})
+
+test_that("steps() agrees with print()", {
+  v <- restrict("x") |> require_numeric() |> require_scalar() |> allow_null()
+  expect_equal(nrow(steps(v)), 3L)
+  expect_equal(steps(v)$label[3], "may be NULL")
+})

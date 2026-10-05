@@ -69,6 +69,7 @@ Other core:
 \code{\link[=fail]{fail()}},
 \code{\link[=is_valid]{is_valid()}},
 \code{\link[=require_custom]{require_custom()}},
+\code{\link[=steps]{steps()}},
 \code{\link[=validation_errors]{validation_errors()}}
 }
 \concept{core}

@@ -22,6 +22,10 @@ Validates that the value contains whole numbers. By default accepts both
 \code{integer} and \code{numeric} types as long as all values are whole
 (\code{x == floor(x)}). Set \code{strict = TRUE} to require the R \code{integer} type.
 }
+\details{
+\code{Inf} and \code{-Inf} are not whole numbers and are rejected in both
+modes; \code{NaN} counts as \code{NA}.
+}
 \seealso{
 Other type checks:
 \code{\link[=require_character]{require_character()}},

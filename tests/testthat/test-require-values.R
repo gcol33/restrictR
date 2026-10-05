@@ -20,9 +20,9 @@ test_that("require_unique() accepts unique values", {
 
 test_that("require_unique() rejects duplicates", {
   v <- restrict("x") |> require_unique()
-  expect_error(v(c(1, 2, 1, 3, 2)), "contains duplicate values")
+  expect_error(v(c(1, 2, 1, 3, 2)), "must contain unique values")
   expect_error(v(c(1, 2, 1, 3, 2)), "At: 3, 5")
-  expect_error(v(c("a", "b", "a")), "contains duplicate values")
+  expect_error(v(c("a", "b", "a")), "must contain unique values")
 })
 
 test_that("require_unique() shows Found: with duplicated values", {

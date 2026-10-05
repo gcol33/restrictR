@@ -63,6 +63,7 @@ reference:
   - as_contract_block
   - require_custom
   - fail
+  - steps
 - title: Checking
   desc: Run a validator without throwing
   contents:
@@ -84,7 +85,7 @@ reference:
   - require_no_na
   - require_finite
 - title: Structure Checks
-  desc: Validate length, names, columns, and row counts
+  desc: Validate length, dimensions, names, columns, and order
   contents:
   - require_scalar
   - require_named
@@ -94,7 +95,13 @@ reference:
   - require_length_matches
   - require_nrow_min
   - require_nrow_matches
+  - require_ncol_min
+  - require_ncol_matches
+  - require_dim
   - require_has_cols
+  - require_names
+  - require_unique_names
+  - require_sorted
 - title: Composition
   desc: Apply validators to columns and list elements, combine them, allow NULL
   contents:
@@ -105,13 +112,39 @@ reference:
   - require_any
   - allow_null
 - title: Value Checks
-  desc: Validate value ranges and set membership
+  desc: Validate value ranges, set membership, and factor levels
   contents:
   - require_positive
   - require_negative
   - require_between
   - require_one_of
+  - require_contains
+  - require_set_equal
+  - require_levels
+  - require_disjoint
   - require_unique
+- title: Character Checks
+  desc: Validate strings by pattern, length, and blankness
+  contents:
+  - require_pattern
+  - require_nchar
+  - require_nonempty
+- title: File-System Checks
+  desc: Validate input paths and output locations
+  contents:
+  - require_file_exists
+  - require_dir_exists
+  - require_readable
+  - require_writable
+- title: Function Checks
+  desc: Validate callback arguments
+  contents:
+  - require_function
+- title: Testing
+  desc: testthat expectations that report validator messages
+  contents:
+  - expect_valid
+  - expect_invalid
 articles:
 - title: Getting Started
   navbar: ~

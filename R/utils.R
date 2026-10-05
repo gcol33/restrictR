@@ -142,7 +142,7 @@ eval_formula <- function(formula, value, name, ctx) {
   tryCatch(
     eval(expr, envir = env),
     error = function(e) {
-      vars <- all.vars(expr)
+      vars <- formula_vars(expr)
       missing_vars <- vars[!vars %in% names(env_data)]
       hint <- if (length(missing_vars) > 0L) {
         sprintf(
@@ -158,6 +158,44 @@ eval_formula <- function(formula, value, name, ctx) {
       ))
     }
   )
+}
+
+
+#' Variables a Formula Reads
+#'
+#' Walks the parse tree and returns the symbols evaluated as variables.
+#' Function names are not variables, and neither is the member name after `$`
+#' or `@` (`ref$id` reads `ref`).
+#'
+#' @param x a language object (the formula body).
+#'
+#' @return character vector of unique variable names.
+#'
+#' @noRd
+formula_vars <- function(x) {
+  if (is.symbol(x)) return(Filter(nzchar, as.character(x)))
+  if (!is.call(x)) return(character(0L))
+  fn <- x[[1L]]
+  args <- as.list(x)[-1L]
+  if (is.symbol(fn) && as.character(fn) %in% c("$", "@") && length(args) == 2L) {
+    args <- args[1L]
+  }
+  vars <- c(if (is.call(fn)) formula_vars(fn),
+            unlist(lapply(args, formula_vars)))
+  unique(vars)
+}
+
+
+#' Context Names a Formula Depends On
+#'
+#' The variables of the formula body, without `.value` and `.name`, which
+#' `eval_formula()` always supplies.
+#'
+#' @param formula a one-sided formula.
+#'
+#' @noRd
+formula_deps <- function(formula) {
+  setdiff(formula_vars(formula[[2L]]), c(".value", ".name"))
 }
 
 
@@ -217,19 +255,43 @@ eval_count <- function(formula, value, name, ctx, expr_text) {
 }
 
 
-#' Require Numeric Type
+#' Require a Type
 #'
-#' Shared guard used by every check that compares with `<`/`>`/etc. Fails with
-#' a clear type error before any comparison, so a non-numeric input never falls
-#' through to R's coercion rules.
+#' Shared guard for the type steps and for every check that depends on one.
+#' Fails with a precondition error before any comparison, so a wrongly typed
+#' input never falls through to R's coercion rules.
 #'
 #' @param x the value to check.
 #' @param path the full path for error messages.
+#' @param ok predicate `function(x)` returning `TRUE` for an acceptable type.
+#' @param what the expected type as shown in the message, e.g. `"numeric"`.
 #'
 #' @noRd
-check_numeric <- function(x, path) {
-  if (!is.numeric(x)) {
-    fail_precondition(path, sprintf("must be numeric, got %s", class(x)[1L]))
+check_type <- function(x, path, ok, what) {
+  if (!ok(x)) {
+    fail_precondition(path, sprintf("must be %s, got %s", what, class(x)[1L]))
+  }
+}
+
+
+check_numeric <- function(x, path) check_type(x, path, is.numeric, "numeric")
+
+
+check_character <- function(x, path) check_type(x, path, is.character, "character")
+
+
+#' Require a Data Frame or Matrix
+#'
+#' Shared guard for the steps that read `dim()`.
+#'
+#' @inheritParams check_df
+#'
+#' @noRd
+check_tabular <- function(value, name, what) {
+  if (!is.data.frame(value) && !is.matrix(value)) {
+    fail_precondition(name, sprintf(
+      "must be a data.frame or matrix to check %s, got %s",
+      what, class(value)[1L]))
   }
 }
 
@@ -290,13 +352,11 @@ bounds_kind <- function(lower, upper) {
 }
 
 
-#' Format a Range Bound for Messages
+#' Format a Value for Messages
 #'
 #' @noRd
-format_bound <- function(b) {
-  if (is.ordered(b)) as.character(b)
-  else if (is.numeric(b)) as.character(b)
-  else format(b)
+format_value <- function(x) {
+  if (is.ordered(x) || is.numeric(x)) as.character(x) else format(x)
 }
 
 
@@ -357,6 +417,10 @@ range_violations <- function(p, exclusive_lower, exclusive_upper) {
 }
 
 
+msg_no_na <- "must not contain NA"
+msg_finite <- "must be finite"
+
+
 #' Check for NA Values
 #'
 #' Shared helper for NA checking across type and column validators.
@@ -368,7 +432,7 @@ range_violations <- function(p, exclusive_lower, exclusive_upper) {
 check_no_na <- function(x, path) {
   na_pos <- which(is.na(x))
   if (length(na_pos) > 0L) {
-    fail(path, "must not contain NA", at = na_pos)
+    fail(path, msg_no_na, at = na_pos)
   }
 }
 
@@ -389,9 +453,115 @@ check_na_finite <- function(x, path, no_na, finite) {
     non_finite <- which(!is.finite(x))
     if (no_na) non_finite <- setdiff(non_finite, which(is.na(x)))
     if (length(non_finite) > 0L) {
-      fail(path, "must be finite", at = non_finite)
+      fail(path, msg_finite, at = non_finite)
     }
   }
+}
+
+
+#' Evaluate a Formula to a Vector
+#'
+#' Evaluates `formula` via `eval_formula()` and requires an atomic vector (or
+#' `NULL`), so the set comparison in the calling step is well-defined.
+#'
+#' @inheritParams eval_count
+#'
+#' @return the evaluated vector, factors converted to character.
+#'
+#' @noRd
+eval_vector <- function(formula, value, name, ctx, expr_text) {
+  other <- eval_formula(formula, value, name, ctx)
+  if (!is.null(other) && !is.atomic(other)) {
+    fail(name, sprintf("`%s` must evaluate to a vector", expr_text),
+         found = class(other)[1L])
+  }
+  if (is.factor(other)) as.character(other) else other
+}
+
+
+#' Validate a One-Sided Formula Argument
+#'
+#' @param formula the argument to check.
+#' @param example example shown in the error message.
+#'
+#' @noRd
+check_one_sided <- function(formula, example) {
+  if (!inherits(formula, "formula") || length(formula) != 2L) {
+    stop(sprintf("`formula` must be a one-sided formula (e.g. %s)", example),
+         call. = FALSE)
+  }
+}
+
+
+#' Quote Values for Messages
+#'
+#' @param x vector of values.
+#' @param max number of values shown before the list is cut with `...`.
+#'
+#' @noRd
+quoted <- function(x, max = Inf) {
+  x <- as.character(x)
+  out <- paste0('"', x[seq_len(min(length(x), max))], '"', collapse = ", ")
+  if (length(x) > max) paste0(out, ", ...") else out
+}
+
+
+#' Count With Its Unit
+#'
+#' @noRd
+count_noun <- function(k, unit) {
+  sprintf("%d %s%s", k, unit, if (k == 1L) "" else "s")
+}
+
+
+#' Fail on Offending Positions
+#'
+#' The `Found:` / `At:` tail shared by the element-wise steps: the first
+#' offender, and the positions when the value has more than one element.
+#'
+#' @param path the full path for error messages.
+#' @param message the failure message.
+#' @param value the validated vector.
+#' @param bad integer positions of the offending elements.
+#' @param found what to show on the `Found:` line.
+#'
+#' @noRd
+fail_values <- function(path, message, value, bad, found = value[bad[1L]]) {
+  fail(path, message, found = found, at = if (length(value) > 1L) bad)
+}
+
+
+#' Absolute Path for Messages
+#'
+#' Normalizes `p` and anchors a relative path that does not exist at the
+#' working directory, so a relative-path mix-up is visible in the message.
+#'
+#' @param p character vector of paths.
+#'
+#' @noRd
+absolute_path <- function(p) {
+  out <- normalizePath(p, winslash = "/", mustWork = FALSE)
+  rel <- !grepl("^(/|~|[A-Za-z]:)", out)
+  out[rel] <- file.path(normalizePath(getwd(), winslash = "/"),
+                        sub("^\\./", "", out[rel]))
+  out
+}
+
+
+#' Build a Validation Step
+#'
+#' The single constructor for step lists, so every step carries the same four
+#' fields.
+#'
+#' @param label human-readable description shown by `print()`.
+#' @param fn check `function(value, name, ctx)` that calls `fail()`.
+#' @param deps context names the step requires.
+#' @param fields step parameters, exposed by `steps()`.
+#' @param ... extra step attributes (`null_ok`, `collect`).
+#'
+#' @noRd
+new_step <- function(label, fn, deps = character(0L), fields = NULL, ...) {
+  list(label = label, deps = deps, fields = fields, fn = fn, ...)
 }
 
 

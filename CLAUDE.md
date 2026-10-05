@@ -10,16 +10,16 @@ Composable runtime contracts for R. Validators built from `require_*()` building
 
 ```bash
 # Full check
-"/mnt/c/Program Files/R/R-4.5.2/bin/Rscript.exe" -e 'devtools::check(args = "--no-manual")'
+"/c/Program Files/R/R-4.6.1/bin/Rscript.exe" -e 'devtools::check(args = "--no-manual")'
 
 # Document (regenerate NAMESPACE + man/)
-"/mnt/c/Program Files/R/R-4.5.2/bin/Rscript.exe" -e 'devtools::document()'
+"/c/Program Files/R/R-4.6.1/bin/Rscript.exe" -e 'devtools::document()'
 
 # Run all tests
-"/mnt/c/Program Files/R/R-4.5.2/bin/Rscript.exe" -e 'devtools::test()'
+"/c/Program Files/R/R-4.6.1/bin/Rscript.exe" -e 'devtools::test()'
 
 # Run a single test file
-"/mnt/c/Program Files/R/R-4.5.2/bin/Rscript.exe" -e 'devtools::test(filter = "require-type")'
+"/c/Program Files/R/R-4.6.1/bin/Rscript.exe" -e 'devtools::test(filter = "require-type")'
 ```
 
 ## Architecture
@@ -32,17 +32,22 @@ Validators are **immutable**: `add_step()` creates a new closure via `make_valid
 
 ### Source files
 
-- **`R/restrict.R`**: Core machinery — `restrict()`, `make_validator()`, `run_steps()` (the single step runner for "first"/"all" modes), `add_step()`, `print.restriction`, `as_contract_text/block()`, `require_custom()`
-- **`R/require.R`**: Built-in `require_*()` steps, organized in sections: type checks, missingness, structure checks, value checks
+- **`R/restrict.R`**: Core machinery — `restrict()`, `make_validator()`, `run_steps()` (the single step runner for "first"/"all" modes), `add_step()`, `steps()`, `print.restriction`, `as_contract_text/block()`, `require_custom()`
+- **`R/require.R`**: Type, missingness, length/row/column/dim, order and value steps. Shared builders: `count_bound_step()` / `count_matches_step()` (length, rows, columns), `sign_step()` (positive/negative)
+- **`R/require-sets.R`**: One set-relation engine (`set_step()`, `set_mismatch()`) behind `require_names()`, `require_has_cols()`, `require_levels()`, `require_contains()`, `require_set_equal()`; plus `require_unique_names()`, `require_disjoint()`
+- **`R/require-character.R`**: `require_pattern()`, `require_nchar()`, `require_nonempty()` over `string_step()`
+- **`R/require-files.R`**: `require_file_exists()`, `require_dir_exists()`, `require_readable()`, `require_writable()` over `path_step()`
+- **`R/require-function.R`**: `require_function()`
+- **`R/expect.R`**: testthat expectations `expect_valid()` / `expect_invalid()` (testthat is Suggests, checked at call time)
 - **`R/compose.R`**: Combinators that apply or combine whole validators — `require_col()`, `require_each()`, `require_fields()` (built on `scoped_step()`), `require_valid()`, `require_any()`, `allow_null()`
-- **`R/utils.R`**: Internal helpers — `fail()` (error formatter), `eval_formula()`, `col_path()`, `check_no_na()`, `check_na_finite()`, `%||%`
+- **`R/utils.R`**: Internal helpers — `new_step()`, `fail()` (error formatter), `fail_values()`, `eval_formula()`, `formula_deps()`, `check_type()`, `col_path()`, `check_no_na()`, `check_na_finite()`, `%||%`
 
 ### Step structure
 
-Each step is a list with four fields:
+Each step is built by `new_step()` and is a list with four fields:
 - `label` (character): human-readable description for `print()`
 - `deps` (character vector): context variable names required (extracted from formulas)
-- `fields` (named list or NULL): step parameters for introspection
+- `fields` (named list or NULL): step parameters, exposed by `steps()`
 - `fn` (function(value, name, ctx)): the actual check; calls `fail()` on error
 
 ### Error format
@@ -51,7 +56,7 @@ All validation errors go through `fail(path, message, found, at)`. Format: `path
 
 ### Context / dependency system
 
-Formula-based steps (e.g. `require_length_matches(~ nrow(newdata))`) declare `deps` extracted via `all.vars()`. At call time, the validator checks all deps are present in `...`/`.ctx` before running any steps. `eval_formula()` evaluates in a locked-down environment (parent = `baseenv()`).
+Formula-based steps (e.g. `require_length_matches(~ nrow(newdata))`) declare `deps` extracted via `all.vars()`. At call time, the validator checks all deps are present in `...`/`.ctx` before running any steps. `eval_formula()` evaluates in an environment holding the context plus `.value`/`.name`; its parent is the formula's own environment, so functions resolve where the formula was written. Deps come from `formula_deps()`, which walks the parse tree.
 
 ## Key Design Constraints
 
@@ -64,9 +69,9 @@ Formula-based steps (e.g. `require_length_matches(~ nrow(newdata))`) declare `de
 
 ## Adding a new `require_*()` step
 
-1. Add the function in `R/require.R` under the appropriate section
-2. Use `add_step(restriction, list(label, deps, fields, fn))` — follow existing patterns
-3. Use `fail()` for errors — never raw `stop()` in step functions
-4. Add `@family` tag matching the section (type checks, structure checks, value checks, missingness checks)
+1. Add the function in the file for its topic (`R/require.R`, `require-sets.R`, ...). Prefer a call to a shared builder (`count_bound_step()`, `set_step()`, `string_step()`, `path_step()`) over a new closure
+2. Otherwise use `add_step(restriction, new_step(label, fn, deps, fields))`
+3. Use `fail()` for errors — never raw `stop()` in step functions. The failure message is the label, or the label plus detail, never a second spelling
+4. Add `@family` tag matching the section (type checks, structure checks, value checks, missingness checks, character checks, file checks, function checks) and list the function in `_pkgdown.yml`
 5. Add `@export` and run `devtools::document()`
 6. Add tests in the corresponding `tests/testthat/test-require-*.R` file

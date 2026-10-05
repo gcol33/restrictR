@@ -44,6 +44,7 @@ Other core:
 \code{\link[=fail]{fail()}},
 \code{\link[=is_valid]{is_valid()}},
 \code{\link[=require_custom]{require_custom()}},
-\code{\link[=restrict]{restrict()}}
+\code{\link[=restrict]{restrict()}},
+\code{\link[=steps]{steps()}}
 }
 \concept{core}

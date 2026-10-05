@@ -21,12 +21,19 @@ The modified \code{restriction} object.
 \description{
 Validates that the value belongs to a given class. One verb covers the
 types without a dedicated check, including \code{factor}, \code{Date}, \code{POSIXct},
-\code{list}, and fitted-model objects such as \code{lm}.
+\code{list}, \code{matrix}, \code{environment}, and fitted-model objects such as \code{lm}.
+}
+\details{
+A matrix is \code{require_class("matrix")} (\code{inherits()} is \code{TRUE} for
+matrices since R 4.0) and an environment is
+\code{require_class("environment")}; neither needs a dedicated step. Use
+\code{\link[=require_dim]{require_dim()}} for the shape.
 }
 \examples{
 restrict("d") |> require_class("Date")
 restrict("f") |> require_class("factor")
 restrict("model") |> require_class("lm")
+restrict("m") |> require_class("matrix") |> require_dim(c(NA, 3))
 
 }
 \seealso{

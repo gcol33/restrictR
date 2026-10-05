@@ -172,8 +172,7 @@ run_steps <- function(steps, value, name, ctx, on_fail) {
 #' the original.
 #'
 #' @param restriction a `restriction` object.
-#' @param step a list with `label` (character), `deps` (character vector),
-#'   `fields` (named list or NULL), and `fn` (function(value, name, ctx)).
+#' @param step a step list built by `new_step()`.
 #'
 #' @return A new `restriction` object with the step appended.
 #'
@@ -301,6 +300,38 @@ print.restriction <- function(x, ...) {
 }
 
 
+#' List the Steps of a Validator
+#'
+#' Returns the steps of a validator as a data.frame, one row per step in the
+#' order they run, for introspection and tooling. It shows the same steps as
+#' `print()`.
+#'
+#' @param x a `restriction` object.
+#'
+#' @return A data.frame with the columns `step` (position), `label` (the
+#'   description shown by `print()`), `deps` (list column: context names the
+#'   step needs) and `fields` (list column: the parameters the step was built
+#'   with, `NULL` when it has none).
+#'
+#' @examples
+#' v <- restrict("x") |> require_numeric(no_na = TRUE) |> require_between(0, 1)
+#' steps(v)
+#' steps(v)$fields[[2]]
+#'
+#' @family core
+#' @export
+steps <- function(x) {
+  check_restriction(x, "x")
+  s <- restriction_steps(x)
+  out <- data.frame(step = seq_along(s),
+                    label = vapply(s, function(st) st$label, character(1L)),
+                    stringsAsFactors = FALSE)
+  out$deps <- lapply(s, function(st) st$deps)
+  out$fields <- lapply(s, function(st) st$fields)
+  out
+}
+
+
 #' Convert a Validator to Plain Text
 #'
 #' Produces a single-line text summary suitable for roxygen `@param`
@@ -377,7 +408,8 @@ as_contract_block <- function(x) {
 #' @param restriction a `restriction` object.
 #' @param label character(1) human-readable description for printing.
 #' @param fn a function with signature `function(value, name, ctx)` that
-#'   calls [fail()] on validation failure.
+#'   calls [fail()] on validation failure. It must be callable with three
+#'   positional arguments (see [require_function()]).
 #' @param deps character vector of context names this step requires
 #'   (default: none).
 #'
@@ -399,14 +431,7 @@ as_contract_block <- function(x) {
 #' @family core
 #' @export
 require_custom <- function(restriction, label, fn, deps = character(0L)) {
-  if (!is.function(fn)) {
-    stop("`fn` must be a function with signature function(value, name, ctx)",
-         call. = FALSE)
-  }
-  add_step(restriction, list(
-    label = label,
-    deps = deps,
-    fields = list(custom = TRUE),
-    fn = fn
-  ))
+  restrict("fn") |> require_function(nargs = 3L) |> (\(v) v(fn))()
+  add_step(restriction, new_step(label, fn, deps = deps,
+                                 fields = list(custom = TRUE)))
 }

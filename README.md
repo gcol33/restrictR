@@ -126,12 +126,16 @@ require_weights <- restrict("weights") |>
 
 | Category | Steps |
 |----------|-------|
-| **Type checks** | `require_df()`, `require_numeric()`, `require_integer()`, `require_character()`, `require_logical()` |
+| **Type checks** | `require_df()`, `require_numeric()`, `require_integer()`, `require_character()`, `require_logical()`, `require_class()` |
 | **Null / missingness** | `require_not_null()`, `require_no_na()`, `require_finite()` |
-| **Structure** | `require_scalar()`, `require_named()`, `require_length()`, `require_length_min()`, `require_length_max()`, `require_length_matches()`, `require_nrow_min()`, `require_nrow_matches()`, `require_has_cols()` |
-| **Values** | `require_positive()`, `require_negative()`, `require_between()` (numbers, dates, times, durations, ordered factors), `require_one_of()`, `require_unique()` |
+| **Structure** | `require_scalar()`, `require_named()`, `require_length()`, `require_length_min()`, `require_length_max()`, `require_length_matches()`, `require_nrow_min()`, `require_nrow_matches()`, `require_ncol_min()`, `require_ncol_matches()`, `require_dim()`, `require_has_cols()`, `require_names()`, `require_unique_names()`, `require_sorted()` |
+| **Values** | `require_positive()`, `require_negative()`, `require_between()` (numbers, dates, times, durations, ordered factors), `require_one_of()`, `require_contains()`, `require_set_equal()`, `require_levels()`, `require_disjoint()`, `require_unique()` |
+| **Character** | `require_pattern()`, `require_nchar()`, `require_nonempty()` |
+| **File system** | `require_file_exists()`, `require_dir_exists()`, `require_readable()`, `require_writable()` |
+| **Functions** | `require_function()` |
 | **Composition** | `require_col()`, `require_each()`, `require_fields()`, `require_valid()`, `require_any()`, `allow_null()` |
-| **Extension** | `require_custom()` |
+| **Extension** | `require_custom()`, `steps()` |
+| **Testing** | `expect_valid()`, `expect_invalid()` |
 
 ## Comparison with checkmate
 

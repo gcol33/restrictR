@@ -15,16 +15,23 @@ require_one_of(restriction, values)
 The modified \code{restriction} object.
 }
 \description{
-Validates that all elements of the value are among the allowed values.
+Validates that all elements of the value are among the allowed values. For
+a vector this is the subset test: every element must be one of \code{values}.
 }
 \details{
 \code{NA} elements are skipped; chain \code{\link[=require_no_na]{require_no_na()}} to reject them.
+Use \code{\link[=require_contains]{require_contains()}} for the reverse direction (the value must hold
+all of \code{values}) and \code{\link[=require_set_equal]{require_set_equal()}} for both.
 }
 \seealso{
 Other value checks:
 \code{\link[=require_between]{require_between()}},
+\code{\link[=require_contains]{require_contains()}},
+\code{\link[=require_disjoint]{require_disjoint()}},
+\code{\link[=require_levels]{require_levels()}},
 \code{\link[=require_negative]{require_negative()}},
 \code{\link[=require_positive]{require_positive()}},
+\code{\link[=require_set_equal]{require_set_equal()}},
 \code{\link[=require_unique]{require_unique()}}
 }
 \concept{value checks}

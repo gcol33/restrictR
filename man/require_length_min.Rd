@@ -19,13 +19,19 @@ Validates that the value has at least length \code{n}.
 }
 \seealso{
 Other structure checks:
+\code{\link[=require_dim]{require_dim()}},
 \code{\link[=require_has_cols]{require_has_cols()}},
 \code{\link[=require_length]{require_length()}},
 \code{\link[=require_length_matches]{require_length_matches()}},
 \code{\link[=require_length_max]{require_length_max()}},
 \code{\link[=require_named]{require_named()}},
+\code{\link[=require_names]{require_names()}},
+\code{\link[=require_ncol_matches]{require_ncol_matches()}},
+\code{\link[=require_ncol_min]{require_ncol_min()}},
 \code{\link[=require_nrow_matches]{require_nrow_matches()}},
 \code{\link[=require_nrow_min]{require_nrow_min()}},
-\code{\link[=require_scalar]{require_scalar()}}
+\code{\link[=require_scalar]{require_scalar()}},
+\code{\link[=require_sorted]{require_sorted()}},
+\code{\link[=require_unique_names]{require_unique_names()}}
 }
 \concept{structure checks}

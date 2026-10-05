@@ -249,6 +249,43 @@ require_period <- restrict("start") |>
 validation_errors(require_period, as.Date("2021-03-01"))
 ```
 
+## Strings, Paths, and Factor Levels
+
+Character steps check every non-`NA` element: `require_pattern()` matches a
+regular expression, `require_nchar()` bounds the length and `require_nonempty()`
+rejects blank strings.
+
+```{r}
+require_code <- restrict("code") |>
+  require_character() |>
+  require_nonempty() |>
+  require_pattern("^[A-Z]{3}-[0-9]{2}$")
+validation_errors(require_code, c("ABC-12", "abc-12", " "))
+```
+
+File-system steps catch a bad input path or output directory at the top of a
+function. `Found:` shows the normalized path, so a relative path resolved against
+the wrong working directory is visible:
+
+```{r}
+require_input <- restrict("path") |> require_file_exists(extension = "csv")
+validation_errors(require_input, "data/missing.csv")
+```
+
+A factor with a level the model has not seen is the classic `predict()`
+failure. `require_levels()` compares against the training levels, and
+`require_names()` does the same for column names:
+
+```{r}
+train <- data.frame(g = factor(c("a", "b")), x = 1:2)
+require_newdata <- restrict("newdata") |>
+  require_names(c("g", "x"), mode = "superset") |>
+  require_col("g", restrict("g") |>
+                 require_levels(levels(train$g), mode = "subset"))
+validation_errors(require_newdata,
+                  data.frame(g = factor("c"), x = 3L))
+```
+
 ## Checking Without Stopping
 
 By default a validator stops at the first failing step. Pass `.on_fail =
@@ -270,6 +307,25 @@ the value passes:
 ```{r}
 is_valid(require_survey, good_survey)
 validation_errors(require_survey, messy_survey)
+```
+
+## Testing Validators
+
+`expect_valid()` and `expect_invalid()` are testthat expectations that report
+the validator's own messages:
+
+```{r, eval = FALSE}
+test_that("newdata contract", {
+  expect_valid(require_newdata, data.frame(g = factor("a"), x = 1L))
+  expect_invalid(require_newdata, data.frame(x = 1L), regexp = "missing required")
+})
+```
+
+`steps()` returns the steps of a validator as a data.frame (label, context
+dependencies, parameters) for tooling:
+
+```{r}
+steps(require_code)[, c("step", "label")]
 ```
 
 ## Custom Steps

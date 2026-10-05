@@ -26,8 +26,12 @@ skipped; chain \code{\link[=require_no_na]{require_no_na()}} to reject them.
 \seealso{
 Other value checks:
 \code{\link[=require_between]{require_between()}},
+\code{\link[=require_contains]{require_contains()}},
+\code{\link[=require_disjoint]{require_disjoint()}},
+\code{\link[=require_levels]{require_levels()}},
 \code{\link[=require_one_of]{require_one_of()}},
 \code{\link[=require_positive]{require_positive()}},
+\code{\link[=require_set_equal]{require_set_equal()}},
 \code{\link[=require_unique]{require_unique()}}
 }
 \concept{value checks}

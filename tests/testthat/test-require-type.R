@@ -139,3 +139,13 @@ test_that("require_class() honours inheritance unless exact = TRUE", {
     'must be of class "numeric", got special'
   )
 })
+
+test_that("require_integer() rejects infinite values in both modes", {
+  v <- restrict("x") |> require_integer()
+  expect_error(v(Inf), "must be whole number")
+  expect_error(v(c(1, -Inf, 3)), "Found: -Inf")
+  expect_error(v(c(1, -Inf, 3)), "At: 2")
+  expect_invisible(v(c(1, NaN, NA)))
+  expect_error(restrict("x") |> require_integer(strict = TRUE) |> (\(s) s(Inf))(),
+               "must be integer type, got numeric")
+})

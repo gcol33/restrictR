@@ -176,10 +176,10 @@ test_that("row-count steps reject non-data.frame input through fail()", {
   nmatch <- restrict("df") |> require_nrow_matches(~ nrow(ref))
   ref <- data.frame(a = 1:2)
   for (bad in list(1:3, list(1, 2), NULL)) {
-    expect_error(nmin(bad), "df: must be a data.frame to check row count",
+    expect_error(nmin(bad), "df: must be a data.frame or matrix to check row count",
                  class = "restrictR_failure")
     expect_error(nmatch(bad, ref = ref),
-                 "df: must be a data.frame to check row count",
+                 "df: must be a data.frame or matrix to check row count",
                  class = "restrictR_failure")
   }
   expect_error(nmin(1:3), "got integer")
@@ -195,4 +195,18 @@ test_that("length/nrow formulas must evaluate to a single non-NA number", {
   expect_error(len_v(1:2, ref = c(2, 2)), "single non-NA number")
   expect_error(len_v(1:2, ref = NULL), "single non-NA number")
   expect_silent(len_v(1:2, ref = 2))
+})
+
+test_that("formula deps are the variables read, not members or built-in names", {
+  expect_equal(formula_vars(quote(nrow(ref$id))), "ref")
+  expect_equal(formula_vars(quote(length(a) + length(b$x$y))), c("a", "b"))
+  expect_equal(formula_vars(quote(x[, 1])), "x")
+  expect_equal(formula_deps(~ length(.value) + length(ref)), "ref")
+
+  v <- restrict("x") |> require_length_matches(~ nrow(ref$tbl))
+  expect_identical(environment(v)$all_deps, "ref")
+  expect_invisible(v(1:2, ref = list(tbl = data.frame(a = 1:2))))
+
+  w <- restrict("x") |> require_length_matches(~ length(.value))
+  expect_invisible(w(1:3))
 })

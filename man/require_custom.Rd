@@ -12,7 +12,8 @@ require_custom(restriction, label, fn, deps = character(0L))
 \item{label}{character(1) human-readable description for printing.}
 
 \item{fn}{a function with signature \verb{function(value, name, ctx)} that
-calls \code{\link[=fail]{fail()}} on validation failure.}
+calls \code{\link[=fail]{fail()}} on validation failure. It must be callable with three
+positional arguments (see \code{\link[=require_function]{require_function()}}).}
 
 \item{deps}{character vector of context names this step requires
 (default: none).}
@@ -46,6 +47,7 @@ Other core:
 \code{\link[=fail]{fail()}},
 \code{\link[=is_valid]{is_valid()}},
 \code{\link[=restrict]{restrict()}},
+\code{\link[=steps]{steps()}},
 \code{\link[=validation_errors]{validation_errors()}}
 }
 \concept{core}

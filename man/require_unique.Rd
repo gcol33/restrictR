@@ -19,8 +19,12 @@ of duplicated elements.
 \seealso{
 Other value checks:
 \code{\link[=require_between]{require_between()}},
+\code{\link[=require_contains]{require_contains()}},
+\code{\link[=require_disjoint]{require_disjoint()}},
+\code{\link[=require_levels]{require_levels()}},
 \code{\link[=require_negative]{require_negative()}},
 \code{\link[=require_one_of]{require_one_of()}},
-\code{\link[=require_positive]{require_positive()}}
+\code{\link[=require_positive]{require_positive()}},
+\code{\link[=require_set_equal]{require_set_equal()}}
 }
 \concept{value checks}
