@@ -8,7 +8,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/gcol33/restrictR/blob/v0.3.0/inst/CITATION)
+[`inst/CITATION`](https://github.com/gcol33/restrictR/blob/main/inst/CITATION)
 
 Colling G (2026). *restrictR: Composable Runtime Contracts for R*.
 <https://github.com/gcol33/restrictR>.

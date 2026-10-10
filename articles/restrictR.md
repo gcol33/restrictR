@@ -1,5 +1,15 @@
 # Runtime Contracts for R Functions
 
+## Installation
+
+``` r
+
+install.packages("restrictR")            # CRAN
+
+install.packages("pak")                  # development version
+pak::pak("gcol33/restrictR")
+```
+
 ``` r
 
 library(restrictR)

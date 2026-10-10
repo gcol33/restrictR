@@ -2,6 +2,8 @@
 
 ## restrictR 0.3.0
 
+CRAN release: 2026-10-05
+
 - New character steps
   [`require_pattern()`](https://gillescolling.com/restrictR/reference/require_pattern.md),
   [`require_nchar()`](https://gillescolling.com/restrictR/reference/require_nchar.md)

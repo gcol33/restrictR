@@ -25,6 +25,18 @@ structured `path: message` format. No DSL, no operator overloading; a
 validator is an ordinary R closure you can pass around, print, and read
 back as documentation.
 
+## Installation
+
+``` r
+
+install.packages("restrictR")            # CRAN
+
+install.packages("pak")                  # development version
+pak::pak("gcol33/restrictR")
+```
+
+## Quick start
+
 ``` r
 
 library(restrictR)
@@ -190,16 +202,6 @@ across functions, and have it document itself, that is what `restrictR`
 is built for. The two also coexist: a
 [`require_custom()`](https://gillescolling.com/restrictR/reference/require_custom.md)
 step can call a checkmate assertion inside it.
-
-## Installation
-
-``` r
-
-install.packages("restrictR")            # CRAN
-
-install.packages("pak")                  # development version
-pak::pak("gcol33/restrictR")
-```
 
 ## Documentation
 
