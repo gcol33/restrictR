@@ -21,6 +21,15 @@ knitr::opts_chunk$set(
 )
 ```
 
+## Installation
+
+```{r, eval = FALSE}
+install.packages("restrictR")            # CRAN
+
+install.packages("pak")                  # development version
+pak::pak("gcol33/restrictR")
+```
+
 ```{r setup}
 library(restrictR)
 ```
