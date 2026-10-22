@@ -1,58 +1,97 @@
+
 # restrictR
 
 *the same input check, written once*
 
-[![CRAN status](https://www.r-pkg.org/badges/version/restrictR)](https://CRAN.R-project.org/package=restrictR)
-[![CRAN downloads](https://cranlogs.r-pkg.org/badges/grand-total/restrictR)](https://cran.r-project.org/package=restrictR)
-[![Monthly downloads](https://cranlogs.r-pkg.org/badges/restrictR)](https://cran.r-project.org/package=restrictR)
+<!-- badges: start -->
+
 [![R-CMD-check](https://github.com/gcol33/restrictR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/gcol33/restrictR/actions/workflows/R-CMD-check.yaml)
-[![Codecov test coverage](https://codecov.io/gh/gcol33/restrictR/graph/badge.svg)](https://app.codecov.io/gh/gcol33/restrictR)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Codecov test
+coverage](https://codecov.io/gh/gcol33/restrictR/graph/badge.svg)](https://app.codecov.io/gh/gcol33/restrictR)
+[![License:
+MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/restrictR)](https://CRAN.R-project.org/package=restrictR)
+<!-- badges: end -->
 
-**Composable runtime contracts for R, built from base pipe chains into immutable validator closures.**
+restrictR checks the arguments of R functions against contracts, such as
+“a single non-negative number” or “a data frame with numeric columns
+`x1` and `x2`”, that are written once and called at the top of every
+function that takes the argument.
 
-Write each input contract once. `restrictR` turns a `|>` chain of small `require_*()`
-steps into a callable validator you drop at the top of any function. Every `|>`
-returns a new validator, so you branch from a shared base without touching it, and
-every failure comes back in one structured `path: message` format. No DSL, no operator
-overloading; a validator is an ordinary R closure you can pass around, print, and read
-back as documentation.
+A contract is built with the base pipe: `restrict()` names the argument
+and each `require_*()` step adds one check. The result is a validator,
+an ordinary R function that stops with a message of the form
+`path: message` when a value fails. Each pipe returns a new validator
+and leaves the one it started from unchanged, so a shared base can be
+extended in several directions. You decide which contracts share a base
+and where each validator is called. restrictR supports:
+
+- **One rule for many functions.** A validator defined once is called by
+  every function that takes the same argument, so the rule and its error
+  message live in one place.
+- **Rules that depend on other arguments.** A one-sided formula such as
+  `~ nrow(newdata)` refers to another argument, which is passed to the
+  validator when it is called.
+- **Errors that point to the value.** A failure names the path to the
+  offending element (`newdata$x2`), what was expected and what was
+  found, with the positions of missing values.
+- **Contracts as documentation.** A validator prints its steps as a
+  numbered list, and
+  [`as_contract_text()`](https://gillescolling.com/restrictR/reference/as_contract_text.html)
+  renders them as text for a roxygen `@param`.
+- **Checks without stopping.** `is_valid()` returns `TRUE` or `FALSE`,
+  `validation_errors()` returns the messages, and `expect_valid()` and
+  `expect_invalid()` test a validator with
+  [testthat](https://testthat.r-lib.org).
+
+restrictR is written in base R and imports no other package.
 
 ## Installation
 
-```r
-install.packages("restrictR")            # CRAN
+``` r
+install.packages("restrictR")
+```
 
-install.packages("pak")                  # development version
+Development version:
+
+``` r
+# install.packages("pak")
 pak::pak("gcol33/restrictR")
 ```
 
-## Quick start
+## Usage
 
-```r
+1.  Name the argument with `restrict()`.
+2.  Add one `require_*()` step per condition with `|>`.
+3.  Call the validator at the top of each function that takes the
+    argument.
+
+``` r
 library(restrictR)
 
-# define once
-require_positive_scalar <- restrict("x") |>
-  require_numeric(no_na = TRUE) |>
+require_dose <- restrict("dose") |>
+  require_numeric() |>
   require_length(1L) |>
-  require_between(lower = 0, exclusive_lower = TRUE)
+  require_positive()
 
-# enforce anywhere
-require_positive_scalar(3.14)   # passes silently
-require_positive_scalar(-1)     # Error: x: must be in (0, Inf]
-                                #   Found: -1
+require_dose(2.5)
+require_dose(-1)
+#> Error:
+#> ! dose: must be non-negative
+#>   Found: -1
 ```
 
-## One contract, not scattered guard clauses
+A value that passes returns invisibly, so the call prints nothing. A
+value that fails stops with the argument name, the condition and the
+value found.
 
-Every exported function tends to start with the same `if (!is.numeric(...)) stop(...)`
-checks, copied across methods and drifting apart, until one function says `"x must be
-numeric"` and another says `"expected numeric input"`. Define the contract once as a
-pipe chain, call it at the top of any method, and the rule lives in one place with one
-error format. Change the rule, change it once.
+## One rule for many functions
 
-```r
+A contract for a data frame combines steps on the whole object with
+validators for single columns:
+
+``` r
 require_feature <- restrict("feature") |>
   require_numeric(no_na = TRUE, finite = TRUE)
 
@@ -63,156 +102,129 @@ require_newdata <- restrict("newdata") |>
   require_col("x2", require_feature) |>
   require_nrow_min(1L)
 
-predict2 <- function(object, newdata, ...) {
-  require_newdata(newdata)
-  predict(object, newdata = newdata)
-}
+require_newdata(data.frame(x1 = 1:3, x2 = c("a", "b", "c")))
+#> Error:
+#> ! newdata$x2: must be numeric, got character
 ```
+
+`predict()`, `simulate()` or any other function that takes `newdata`
+calls `require_newdata(newdata)` as its first line. A change to the rule
+is made once, in the definition.
 
 ## Rules that depend on other arguments
 
-A one-sided formula references another argument by name. Context is passed
-explicitly when you call the validator, so evaluation never reaches into parent
-frames for it.
+A one-sided formula names another argument, and that argument is passed
+to the validator by name when it is called:
 
-```r
+``` r
 require_pred <- restrict("pred") |>
   require_numeric(no_na = TRUE) |>
   require_length_matches(~ nrow(newdata))
 
-require_pred(predictions, newdata = df)
+newdata <- data.frame(x1 = 1:3, x2 = c(0.5, 1.5, 2.5))
+require_pred(c(0.1, 0.2), newdata = newdata)
+#> Error:
+#> ! pred: length must match nrow(newdata) (3)
+#>   Found: length 2
 ```
 
-## Path-aware error messages
-
-Failures report the exact path and position, in one shared format:
-
-```
-newdata$x2: must be numeric, got character
-
-pred: length must match nrow(newdata) (100)
-  Found: length 50
-
-x: must not contain NA
-  At: 2, 5, 9
-```
+The validator reads `newdata` only from its arguments, never from the
+calling environment.
 
 ## A validator that documents itself
 
-The same step list that runs the checks also prints the contract and renders it
-as text for roxygen, so `@param` documentation and enforcement stay in sync:
+Printing a validator lists its steps, and `as_contract_text()` turns the
+same list into the text of a roxygen `@param`, so the documentation of
+an argument follows its contract:
 
-```r
-print(require_newdata)
+``` r
+require_newdata
 #> <restriction newdata>
 #>   1. must be a data.frame
 #>   2. must have columns: "x1", "x2"
-#>   3. $x1 must be numeric (no NA, finite)
-#>   4. $x2 must be numeric (no NA, finite)
+#>   3. $x1: must be numeric, no NA, finite
+#>   4. $x2: must be numeric, no NA, finite
 #>   5. must have at least 1 row
+```
 
+``` r
 #' @param newdata `r as_contract_text(require_newdata)`
 ```
 
-## Custom steps
+`require_custom()` adds a step with a check of your own, reported in the
+same format through `fail()`. The [reference
+index](https://gillescolling.com/restrictR/reference/) lists every
+built-in step, grouped into type, missingness, structure, value,
+character, file-system and function checks.
 
-When a contract needs a domain-specific invariant, `require_custom()` runs your
-own check while keeping the same error format through `fail()`:
+## Compared with checkmate
 
-```r
-require_weights <- restrict("weights") |>
-  require_numeric(no_na = TRUE) |>
-  require_between(lower = 0, upper = 1) |>
-  require_custom(
-    label = "must sum to 1",
-    fn = function(value, name, ctx) {
-      if (abs(sum(value) - 1) > 1e-8) {
-        fail(name, "must sum to 1", found = sprintf("sum = %g", sum(value)))
-      }
-    }
-  )
-```
-
-## Built-in steps
-
-| Category | Steps |
-|----------|-------|
-| **Type checks** | `require_df()`, `require_numeric()`, `require_integer()`, `require_character()`, `require_logical()`, `require_class()` |
-| **Null / missingness** | `require_not_null()`, `require_no_na()`, `require_finite()` |
-| **Structure** | `require_scalar()`, `require_named()`, `require_length()`, `require_length_min()`, `require_length_max()`, `require_length_matches()`, `require_nrow_min()`, `require_nrow_matches()`, `require_ncol_min()`, `require_ncol_matches()`, `require_dim()`, `require_has_cols()`, `require_names()`, `require_unique_names()`, `require_sorted()` |
-| **Values** | `require_positive()`, `require_negative()`, `require_between()` (numbers, dates, times, durations, ordered factors), `require_one_of()`, `require_contains()`, `require_set_equal()`, `require_levels()`, `require_disjoint()`, `require_unique()` |
-| **Character** | `require_pattern()`, `require_nchar()`, `require_nonempty()` |
-| **File system** | `require_file_exists()`, `require_dir_exists()`, `require_readable()`, `require_writable()` |
-| **Functions** | `require_function()` |
-| **Composition** | `require_col()`, `require_each()`, `require_fields()`, `require_valid()`, `require_any()`, `allow_null()` |
-| **Extension** | `require_custom()`, `steps()` |
-| **Testing** | `expect_valid()`, `expect_invalid()` |
-
-## Comparison with checkmate
-
-[checkmate](https://CRAN.R-project.org/package=checkmate) is a fast, C-backed
-toolkit for argument checking. It offers `assert*`, `check*`, `test*`, and
-`expect*` families so that, inside a function, you write one call per argument:
-`assertNumeric(x, lower = 0, len = 1)` either passes or raises an error on the
-spot. Checks are expressed as direct function calls and run where they are
-written.
-
-`restrictR` works one level up. Instead of calling checks inline, you build a
-named validator once as a `|>` chain of `require_*()` steps and reuse that object
-across every function that takes the same argument. The two packages differ along
-a few axes:
-
-- **Reuse.** A `restrictR` validator is a callable closure you define once and
-  call at the top of many functions, so the rule for `newdata` lives in one
-  place. checkmate checks are written inline at each call site.
-- **Composition.** Validators compose with the base pipe and branch immutably:
-  `base |> require_length(1L)` and `base |> require_between(lower = 0)` share a
-  base without modifying it. checkmate composes by listing several `assert*`
-  calls in sequence.
-- **Self-documentation.** A validator prints its own contract, and
-  `as_contract_text()` renders it for a roxygen `@param`, so enforcement and
-  documentation stay in sync.
-- **Dependent rules.** Cross-argument constraints use one-sided formulas
-  (`require_length_matches(~ nrow(newdata))`) with context passed explicitly at
-  call time. checkmate expresses such relationships with ordinary R between the
-  checks.
-- **Dependencies.** checkmate uses compiled C code for speed. `restrictR` is
-  pure base R with zero runtime dependencies.
-
-If you want fast, inline per-argument assertions, checkmate is a mature and
-well-tested choice. If you want to name a contract once, reuse it across
-functions, and have it document itself, that is what `restrictR` is built for.
-The two also coexist: a `require_custom()` step can call a checkmate assertion
-inside it.
+[checkmate](https://CRAN.R-project.org/package=checkmate) provides
+`assert*()`, `check*()` and `test*()` functions in C that are called
+inline, one per argument, where the check is needed. restrictR names a
+contract once, reuses it across functions, and prints it as
+documentation. The two work together: a `require_custom()` step can call
+a checkmate assertion. [Relation to
+checkmate](https://gillescolling.com/restrictR/articles/restrictR.html#relation-to-checkmate)
+compares them further.
 
 ## Documentation
 
-- [Runtime Contracts for R Functions](https://gillescolling.com/restrictR/articles/restrictR.html)
+Start with [Runtime Contracts for R
+Functions](https://gillescolling.com/restrictR/articles/restrictR.html):
+reusable schemas, dependent rules, composition, custom steps, testing
+and contracts in a package.
+
+- [Full reference](https://gillescolling.com/restrictR/reference/):
+  every step, grouped by job.
+
+## Getting help
+
+Questions and bug reports go to the [GitHub
+issues](https://github.com/gcol33/restrictR/issues). A bug report is
+easiest to act on with a small reproducible example, for instance made
+with [reprex](https://reprex.tidyverse.org/).
 
 ## Support
 
-> "Software is like sex: it's better when it's free." -- Linus Torvalds
+> “Software is like sex: it’s better when it’s free.” — Linus Torvalds
 
-I'm a PhD student who builds R packages in my free time because I believe good tools
-should be free and open. I started these projects for my own work and figured others
-might find them useful too.
+I’m a PhD student who builds R packages in my free time because I
+believe good tools should be free and open. I started these projects for
+my own work and figured others might find them useful too.
 
-If this package saved you some time, buying me a coffee is a nice way to say thanks.
-It helps with my coffee addiction.
+If this package saved you some time, buying me a coffee is a nice way to
+say thanks. It helps with my coffee addiction.
 
-[![Buy Me A Coffee](https://img.shields.io/badge/-Buy%20me%20a%20coffee-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/gcol33)
+[![Buy Me A
+Coffee](https://img.shields.io/badge/-Buy%20me%20a%20coffee-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/gcol33)
 
 ## License
 
-MIT (see the LICENSE file)
+restrictR is licensed under MIT.
 
 ## Citation
 
-```bibtex
-@software{restrictR,
-  author = {Colling, Gilles},
-  title = {restrictR: Composable Runtime Contracts for R},
+``` text
+Colling G (2026). _restrictR: Composable Runtime Contracts_.
+doi:10.32614/CRAN.package.restrictR
+<https://doi.org/10.32614/CRAN.package.restrictR>. R package version
+0.3.0, <https://gillescolling.com/restrictR/>.
+```
+
+BibTeX:
+
+``` bibtex
+@Manual{colling2026restrictr,
+  title = {restrictR: Composable Runtime Contracts},
+  author = {Gilles Colling},
   year = {2026},
-  url = {https://github.com/gcol33/restrictR}
+  note = {R package version 0.3.0},
+  doi = {10.32614/CRAN.package.restrictR},
+  url = {https://gillescolling.com/restrictR/},
 }
 ```
+
+Download the citation as
+[BibTeX](https://gillescolling.com/restrictR/restrictR.bib) or
+[RIS](https://gillescolling.com/restrictR/restrictR.ris).

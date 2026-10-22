@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: If you use this software, please cite it as below.
+type: software
+title: 'restrictR: Composable Runtime Contracts'
+version: 0.3.0
+authors:
+- family-names: Colling
+  given-names: Gilles
+  orcid: https://orcid.org/0000-0003-3070-6066
+license: MIT
+repository-code: https://github.com/gcol33/restrictR
+url: https://gillescolling.com/restrictR/
+preferred-citation:
+  type: software
+  title: 'restrictR: Composable Runtime Contracts'
+  authors:
+  - family-names: Colling
+    given-names: Gilles
+    orcid: https://orcid.org/0000-0003-3070-6066
+  year: 2026
+  doi: 10.32614/CRAN.package.restrictR
+  url: https://gillescolling.com/restrictR/
+  notes: R package version 0.3.0

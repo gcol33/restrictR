@@ -7,3 +7,6 @@
 *.Rproj
 docs/
 inst/doc
+
+# Local run scripts
+.run*

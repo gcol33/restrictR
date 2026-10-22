@@ -1,7 +1,10 @@
 bibentry(
   bibtype  = "Manual",
-  title    = "restrictR: Composable Runtime Contracts for R",
-  author   = person("Gilles", "Colling"),
+  key      = "colling2026restrictr",
+  title    = paste0("restrictR: ", meta$Title),
+  author   = person("Gilles", "Colling", comment = c(ORCID = "0000-0003-3070-6066")),
   year     = "2026",
-  url      = "https://github.com/gcol33/restrictR"
+  note     = paste("R package version", meta$Version),
+  doi      = "10.32614/CRAN.package.restrictR",
+  url      = "https://gillescolling.com/restrictR/"
 )

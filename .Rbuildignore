@@ -16,3 +16,6 @@
 .*\.Rcheck$
 ^build_site\.R$
 ^dev_notes$
+^\.run.*$
+^sidecars$
+^CITATION\.cff$
