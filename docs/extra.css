@@ -1,0 +1,463 @@
+/* Plot styling - match code block borders */
+/* Bootstrap 5 Sandstone uses --bs-border-radius: .375rem for pre/code */
+/* Figures fill the column, flush with the code blocks. Text size is handled */
+/* separately, by the figure text scale below. */
+img.r-plt,
+.figure img,
+figure img,
+img.figure-img,
+svg.inline-svg {
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+  border: 1px solid #DFD7CA;
+  border-radius: .375rem;
+  overflow: hidden;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 1rem;
+}
+
+/* Figure containers - full width like code blocks */
+.figure,
+figure {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Mobile: code block text wrapping (LaTeX-style) */
+/* Wrap at spaces, break long tokens only when necessary, no horizontal scroll */
+@media (max-width: 575.98px) {
+  pre.sourceCode,
+  .sourceCode pre {
+    white-space: pre-wrap !important;
+    word-break: break-all !important;
+    overflow-x: hidden !important;
+    hyphens: auto !important;
+    -webkit-hyphens: auto !important;
+  }
+  pre.sourceCode code,
+  .sourceCode pre code {
+    white-space: pre-wrap !important;
+    word-break: break-all !important;
+    hyphens: auto !important;
+    -webkit-hyphens: auto !important;
+  }
+}
+
+/* Mobile: page title on one line beside the logo */
+/* Headings inherit hyphens: auto, which split a package name mid-word next to
+   the floated logo. A smaller logo and a viewport-scaled title keep a
+   one-word name on one line down to 320 px; a longer title wraps at spaces
+   only, and a word that still does not fit moves below the logo whole. */
+@media (max-width: 575.98px) {
+  .page-header img.logo {
+    width: 90px;
+    margin-left: 16px;
+  }
+  .page-header h1 {
+    font-size: min(1.75rem, 6.2vw);
+    hyphens: manual;
+    -webkit-hyphens: manual;
+    overflow-wrap: normal;
+  }
+}
+
+/* Mobile: match code block full-width behavior */
+/* Code blocks use negative margins to expand on mobile - plots should too */
+/* Use :has() to target the parent <p> that contains an SVG/img */
+@media (max-width: 575.98px) {
+  /* Target the p element wrapping standalone SVGs/imgs to expand full width.
+     A .svg-container that is a section-level sibling (its <p> auto-closed) is
+     bled here; one nested in a .figure is left to the .figure rule below to
+     avoid a double negative margin. */
+  p:has(> svg.inline-svg),
+  p:has(> img.r-plt),
+  .svg-container:not(.figure *) {
+    margin-left: calc(var(--bs-gutter-x, 1.5rem) * -.5) !important;
+    margin-right: calc(var(--bs-gutter-x, 1.5rem) * -.5) !important;
+    width: calc(100% + var(--bs-gutter-x, 1.5rem)) !important;
+    max-width: none !important;
+  }
+  /* SVGs/imgs inside the expanded p, and SVGs wrapped directly in .svg-container.
+     The svg-container is created when an <img> is inlined; depending on the source
+     markup it is either a section-level sibling or nested in a .figure. Either way,
+     square its corners on mobile to match code blocks. */
+  p > svg.inline-svg,
+  p > img.r-plt,
+  .svg-container > svg.inline-svg {
+    border-radius: 0 !important;
+    border: 1px solid #DFD7CA !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+  /* Dark mode mobile border - must use full border shorthand to override */
+  [data-bs-theme="dark"] p > svg.inline-svg,
+  [data-bs-theme="dark"] p > img.r-plt,
+  [data-bs-theme="dark"] .svg-container > svg.inline-svg {
+    border: 1px solid #495057 !important;
+  }
+  /* Figure elements */
+  .section .figure,
+  .section figure,
+  div > div > .figure,
+  div > div > figure {
+    margin-left: calc(var(--bs-gutter-x, 1.5rem) * -.5) !important;
+    margin-right: calc(var(--bs-gutter-x, 1.5rem) * -.5) !important;
+    width: calc(100% + var(--bs-gutter-x, 1.5rem)) !important;
+    max-width: none !important;
+    border-radius: 0;
+  }
+  .section .figure img,
+  .section figure img,
+  div > div > .figure img,
+  div > div > figure img {
+    border-radius: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+}
+
+/* Dark mode border */
+[data-bs-theme="dark"] img.r-plt,
+[data-bs-theme="dark"] .figure img,
+[data-bs-theme="dark"] figure img,
+[data-bs-theme="dark"] img.figure-img,
+[data-bs-theme="dark"] svg.inline-svg {
+  border-color: #495057;
+}
+
+/* pkgdown inverts figures and widgets in dark mode, which turns the white plot */
+/* background black and flips every colour of a raster map. SVG figures are */
+/* inlined and themed below; raster figures and widgets are shown as drawn. */
+[data-bs-theme="dark"] img.r-plt,
+[data-bs-theme="dark"] pre .r-plt.img img,
+[data-bs-theme="dark"] .cell-output-display img,
+[data-bs-theme="dark"] .html-widget {
+  filter: none;
+}
+
+/* Dark mode colors for inline SVG elements (base R svg format) */
+/* Use !important to override embedded SVG <style> blocks */
+[data-bs-theme="dark"] .theme-bg {
+  fill: #343739 !important;
+}
+
+[data-bs-theme="dark"] .theme-text {
+  fill: #DFD7CA !important;
+}
+
+/* Hide clipPath rects - they should not be visible */
+svg.inline-svg clipPath rect,
+svg.inline-svg defs rect {
+  stroke: none !important;
+  fill: none !important;
+}
+
+/* Dark mode colors for svglite format */
+/* Override the embedded styles in inline SVGs */
+/* No stroke on svg-bg - the outer CSS border handles rounding */
+[data-bs-theme="dark"] svg.inline-svg .svg-bg {
+  fill: #343739 !important;
+  stroke: none !important;
+}
+
+/* Light mode - ensure svg-bg has no stroke */
+svg.inline-svg .svg-bg {
+  stroke: none !important;
+}
+
+/* Dark mode stroke - only elements drawn in the theme default stroke color */
+/* Colored strokes (blue edges, red threshold lines) are left alone: they are */
+/* a deliberate part of the figure and read on both backgrounds */
+[data-bs-theme="dark"] svg.inline-svg .svglite line:not([style*="stroke:"]),
+[data-bs-theme="dark"] svg.inline-svg .svglite polyline:not([style*="stroke:"]),
+[data-bs-theme="dark"] svg.inline-svg .svglite polygon:not([style*="stroke:"]),
+[data-bs-theme="dark"] svg.inline-svg .svglite path:not([style*="stroke:"]),
+[data-bs-theme="dark"] svg.inline-svg .svglite circle:not([style*="stroke:"]) {
+  stroke: #DFD7CA !important;
+}
+
+/* Same for elements carrying the light theme stroke color inline */
+[data-bs-theme="dark"] svg.inline-svg .svglite line[style*="stroke: #3E3F3A"],
+[data-bs-theme="dark"] svg.inline-svg .svglite polyline[style*="stroke: #3E3F3A"],
+[data-bs-theme="dark"] svg.inline-svg .svglite polygon[style*="stroke: #3E3F3A"],
+[data-bs-theme="dark"] svg.inline-svg .svglite path[style*="stroke: #3E3F3A"],
+[data-bs-theme="dark"] svg.inline-svg .svglite circle[style*="stroke: #3E3F3A"] {
+  stroke: #DFD7CA !important;
+}
+
+/* Shape fills that follow the theme instead of staying at the device default */
+/* theme-fill-bg: white fills (node interiors, legend keys, filled polygons) */
+/* theme-fill-fg: black fills (pch 19 points, legend dots, arrow heads) */
+[data-bs-theme="dark"] svg.inline-svg .theme-fill-bg {
+  fill: #343739 !important;
+}
+
+[data-bs-theme="dark"] svg.inline-svg .theme-fill-fg {
+  fill: #DFD7CA !important;
+}
+
+/* Dark mode text color - but NOT for text on custom legend backgrounds */
+[data-bs-theme="dark"] svg.inline-svg .svglite text:not(.preserve-color) {
+  fill: #DFD7CA !important;
+}
+
+/* Text on custom legend backgrounds keeps dark color for contrast */
+svg.inline-svg .svglite text.preserve-color {
+  fill: #3E3F3A !important;
+}
+
+/* Rect strokes (histogram bars, etc.) keep their light-mode outline in dark */
+/* mode: the fill stays colored, so a light outline would lose the contrast */
+
+/* Plot frame rects - remove stroke, CSS border handles the frame */
+/* Target unfilled rects (no inline fill style) excluding legend backgrounds, */
+/* and rounded frame rects, which the outer CSS border already draws */
+svg.inline-svg .svglite > rect:not([style*="fill:"]),
+svg.inline-svg .svglite > g > rect:not([style*="fill:"]):not(.legend-bg),
+svg.inline-svg .svglite > g > rect[rx] {
+  stroke: none !important;
+}
+
+/* Plot background rects - remove stroke when it matches the fill */
+/* These rects have inline stroke matching their fill (invisible in light mode) */
+/* but in dark mode the fill changes while the stroke stays light = visible outline */
+/* Only target rects with inline light stroke, not legend boxes (which have no inline stroke) */
+svg.inline-svg .svglite rect.legend-bg[style*="stroke: #F5F6F8"],
+svg.inline-svg .svglite rect.legend-bg[style*="stroke: #f5f6f8"] {
+  stroke: none !important;
+}
+
+/* Legend box backgrounds - override inline fill */
+/* Exclude svg-bg which is the main plot background */
+[data-bs-theme="dark"] svg.inline-svg .svglite rect[style*="fill: #F5F6F8"]:not(.svg-bg),
+[data-bs-theme="dark"] svg.inline-svg .svglite rect.legend-bg {
+  fill: #343739 !important;
+}
+
+/* Grid lines */
+/* White grid lines need to become dark in light mode, stay light in dark mode */
+/* Light mode: dark grid on light bg */
+svg.inline-svg .svglite polyline[style*="stroke: #FFFFFF"],
+svg.inline-svg .svglite polyline[style*="stroke: #ffffff"] {
+  stroke: #3E3F3A !important;
+}
+/* Dark mode: light grid on dark bg */
+[data-bs-theme="dark"] svg.inline-svg .svglite polyline[style*="stroke: #FFFFFF"],
+[data-bs-theme="dark"] svg.inline-svg .svglite polyline[style*="stroke: #ffffff"],
+[data-bs-theme="dark"] svg.inline-svg .svglite polyline[style*="stroke: #3E3F3A"],
+[data-bs-theme="dark"] svg.inline-svg .svglite polyline[style*="stroke: #3e3f3a"] {
+  stroke: #DFD7CA !important;
+}
+
+/* ggplot2 theme_minimal() gridlines - light grey, adapt to dark mode */
+[data-bs-theme="dark"] svg.inline-svg .svglite line[style*="stroke: #EBEBEB"],
+[data-bs-theme="dark"] svg.inline-svg .svglite line[style*="stroke: #ebebeb"],
+[data-bs-theme="dark"] svg.inline-svg .svglite polyline[style*="stroke: #EBEBEB"],
+[data-bs-theme="dark"] svg.inline-svg .svglite polyline[style*="stroke: #ebebeb"],
+[data-bs-theme="dark"] svg.inline-svg .svglite polyline[style*="stroke: #DFD7CA"],
+[data-bs-theme="dark"] svg.inline-svg .svglite polyline[style*="stroke: #dfd7ca"] {
+  stroke: #495057 !important;
+}
+
+/* Base R and other grey gridline variants */
+[data-bs-theme="dark"] svg.inline-svg line[style*="stroke: #EBEBEB"],
+[data-bs-theme="dark"] svg.inline-svg line[style*="stroke: #ebebeb"],
+[data-bs-theme="dark"] svg.inline-svg line[style*="stroke: grey"],
+[data-bs-theme="dark"] svg.inline-svg line[style*="stroke: gray"] {
+  stroke: #495057 !important;
+}
+
+/* SVG copy button - container positioning */
+.svg-container {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+/* SVG copy button styling - matches code block copy button */
+.btn-copy-svg {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
+  z-index: 10;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* Show button on hover */
+.svg-container:hover .btn-copy-svg,
+.svg-container:focus-within .btn-copy-svg {
+  opacity: 1;
+}
+
+/* Keep button visible when focused (for keyboard users) */
+.btn-copy-svg:focus {
+  opacity: 1;
+}
+
+/* Mobile: show button on tap/focus (no hover on touch) */
+@media (max-width: 575.98px) {
+  /* Adjust position for full-width mobile SVGs */
+  .svg-container {
+    position: relative;
+  }
+}
+
+/* Math equations - responsive on mobile */
+/* MathJax display equations */
+.MathJax_Display,
+mjx-container[display="true"],
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+  padding: 0.5rem 0;
+}
+
+/* Inline math - allow wrapping */
+mjx-container:not([display="true"]),
+.katex:not(.katex-display .katex) {
+  display: inline-block;
+  max-width: 100%;
+  overflow-x: auto;
+  vertical-align: middle;
+}
+
+/* Wide tables scroll inside their own box on phones */
+@media (max-width: 767px) {
+  .contents table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+}
+
+/* Figure text scale */
+/* One SVG serves every breakpoint and scales to the width it is given, so */
+/* text sized to stay legible on a phone renders about twice as large in a */
+/* desktop column. Figure text is authored in em against this root size, */
+/* which steps down as the column widens so on-figure text tracks prose. */
+/* Figure width is untouched: figures stay flush with the code blocks. */
+
+svg.inline-svg {
+  font-size: 10.5px;
+}
+
+@media (min-width: 768px) {
+  svg.inline-svg {
+    font-size: 10.5px;
+  }
+}
+
+@media (min-width: 992px) {
+  svg.inline-svg {
+    font-size: 7.25px;
+  }
+}
+
+@media (min-width: 1400px) {
+  svg.inline-svg {
+    font-size: 8.19px;
+  }
+}
+
+/* Figure palette - dark mode counterparts */
+/* Authored with the light hex; swapped here so saturated color survives */
+/* both themes. Colors outside this table are passed through untouched. */
+
+/* blue */
+[data-bs-theme="dark"] svg.inline-svg .svglite [style*="stroke: #2E6F9E"] {
+  stroke: #7FB2D9 !important;
+}
+
+[data-bs-theme="dark"] svg.inline-svg .svglite [style*="fill: #2E6F9E"] {
+  fill: #7FB2D9 !important;
+}
+
+[data-bs-theme="dark"] svg.inline-svg .svglite text[style*="fill: #2E6F9E"] {
+  fill: #7FB2D9 !important;
+}
+
+/* red */
+[data-bs-theme="dark"] svg.inline-svg .svglite [style*="stroke: #B5342B"] {
+  stroke: #E8837A !important;
+}
+
+[data-bs-theme="dark"] svg.inline-svg .svglite [style*="fill: #B5342B"] {
+  fill: #E8837A !important;
+}
+
+[data-bs-theme="dark"] svg.inline-svg .svglite text[style*="fill: #B5342B"] {
+  fill: #E8837A !important;
+}
+
+/* green */
+[data-bs-theme="dark"] svg.inline-svg .svglite [style*="stroke: #3F7A3D"] {
+  stroke: #86C384 !important;
+}
+
+[data-bs-theme="dark"] svg.inline-svg .svglite [style*="fill: #3F7A3D"] {
+  fill: #86C384 !important;
+}
+
+[data-bs-theme="dark"] svg.inline-svg .svglite text[style*="fill: #3F7A3D"] {
+  fill: #86C384 !important;
+}
+
+/* orange */
+[data-bs-theme="dark"] svg.inline-svg .svglite [style*="stroke: #9E5E0F"] {
+  stroke: #E2A85A !important;
+}
+
+[data-bs-theme="dark"] svg.inline-svg .svglite [style*="fill: #9E5E0F"] {
+  fill: #E2A85A !important;
+}
+
+[data-bs-theme="dark"] svg.inline-svg .svglite text[style*="fill: #9E5E0F"] {
+  fill: #E2A85A !important;
+}
+
+/* purple */
+[data-bs-theme="dark"] svg.inline-svg .svglite [style*="stroke: #7A4F9E"] {
+  stroke: #BFA0DC !important;
+}
+
+[data-bs-theme="dark"] svg.inline-svg .svglite [style*="fill: #7A4F9E"] {
+  fill: #BFA0DC !important;
+}
+
+[data-bs-theme="dark"] svg.inline-svg .svglite text[style*="fill: #7A4F9E"] {
+  fill: #BFA0DC !important;
+}
+
+/* teal */
+[data-bs-theme="dark"] svg.inline-svg .svglite [style*="stroke: #2A7A7A"] {
+  stroke: #6FC0C0 !important;
+}
+
+[data-bs-theme="dark"] svg.inline-svg .svglite [style*="fill: #2A7A7A"] {
+  fill: #6FC0C0 !important;
+}
+
+[data-bs-theme="dark"] svg.inline-svg .svglite text[style*="fill: #2A7A7A"] {
+  fill: #6FC0C0 !important;
+}
+
+/* grey */
+[data-bs-theme="dark"] svg.inline-svg .svglite [style*="stroke: #5C6166"] {
+  stroke: #A9B0B5 !important;
+}
+
+[data-bs-theme="dark"] svg.inline-svg .svglite [style*="fill: #5C6166"] {
+  fill: #A9B0B5 !important;
+}
+
+[data-bs-theme="dark"] svg.inline-svg .svglite text[style*="fill: #5C6166"] {
+  fill: #A9B0B5 !important;
+}
+

@@ -1,0 +1,415 @@
+# restrictR
+
+*the same input check, written once*
+
+restrictR checks the arguments of R functions against contracts, such as
+“a single non-negative number” or “a data frame with numeric columns
+`x1` and `x2`”, that are written once and called at the top of every
+function that takes the argument.
+
+A contract is built with the base pipe:
+[`restrict()`](https://gillescolling.com/restrictR/reference/restrict.md)
+names the argument and each `require_*()` step adds one check. The
+result is a validator, an ordinary R function that stops with a message
+of the form `path: message` when a value fails. Each pipe returns a new
+validator and leaves the one it started from unchanged, so a shared base
+can be extended in several directions. You decide which contracts share
+a base and where each validator is called. restrictR supports:
+
+- **One rule for many functions.** A validator defined once is called by
+  every function that takes the same argument, so the rule and its error
+  message live in one place.
+- **Rules that depend on other arguments.** A one-sided formula such as
+  `~ nrow(newdata)` refers to another argument, which is passed to the
+  validator when it is called.
+- **Errors that point to the value.** A failure names the path to the
+  offending element (`newdata$x2`), what was expected and what was
+  found, with the positions of missing values.
+- **Contracts as documentation.** A validator prints its steps as a
+  numbered list, and
+  [`as_contract_text()`](https://gillescolling.com/restrictR/reference/as_contract_text.html)
+  renders them as text for a roxygen `@param`.
+- **Checks without stopping.**
+  [`is_valid()`](https://gillescolling.com/restrictR/reference/is_valid.md)
+  returns `TRUE` or `FALSE`,
+  [`validation_errors()`](https://gillescolling.com/restrictR/reference/validation_errors.md)
+  returns the messages, and
+  [`expect_valid()`](https://gillescolling.com/restrictR/reference/expect_valid.md)
+  and
+  [`expect_invalid()`](https://gillescolling.com/restrictR/reference/expect_invalid.md)
+  test a validator with [testthat](https://testthat.r-lib.org).
+
+restrictR is written in base R and imports no other package.
+
+## Installation
+
+``` r
+
+install.packages("restrictR")
+```
+
+Development version:
+
+``` r
+
+# install.packages("pak")
+pak::pak("gcol33/restrictR")
+```
+
+## Usage
+
+1.  Name the argument with
+    [`restrict()`](https://gillescolling.com/restrictR/reference/restrict.md).
+2.  Add one `require_*()` step per condition with `|>`.
+3.  Call the validator at the top of each function that takes the
+    argument.
+
+``` r
+
+library(restrictR)
+
+require_dose <- restrict("dose") |>
+  require_numeric() |>
+  require_length(1L) |>
+  require_positive()
+
+require_dose(2.5)
+require_dose(-1)
+#> Error:
+#> ! dose: must be non-negative
+#>   Found: -1
+```
+
+A value that passes returns invisibly, so the call prints nothing. A
+value that fails stops with the argument name, the condition and the
+value found.
+
+## One rule for many functions
+
+A contract for a data frame combines steps on the whole object with
+validators for single columns:
+
+``` r
+
+require_feature <- restrict("feature") |>
+  require_numeric(no_na = TRUE, finite = TRUE)
+
+require_newdata <- restrict("newdata") |>
+  require_df() |>
+  require_has_cols(c("x1", "x2")) |>
+  require_col("x1", require_feature) |>
+  require_col("x2", require_feature) |>
+  require_nrow_min(1L)
+
+require_newdata(data.frame(x1 = 1:3, x2 = c("a", "b", "c")))
+#> Error:
+#> ! newdata$x2: must be numeric, got character
+```
+
+[`predict()`](https://rdrr.io/r/stats/predict.html),
+[`simulate()`](https://rdrr.io/r/stats/simulate.html) or any other
+function that takes `newdata` calls `require_newdata(newdata)` as its
+first line. A change to the rule is made once, in the definition.
+
+## Rules that depend on other arguments
+
+A one-sided formula names another argument, and that argument is passed
+to the validator by name when it is called:
+
+``` r
+
+require_pred <- restrict("pred") |>
+  require_numeric(no_na = TRUE) |>
+  require_length_matches(~ nrow(newdata))
+
+newdata <- data.frame(x1 = 1:3, x2 = c(0.5, 1.5, 2.5))
+require_pred(c(0.1, 0.2), newdata = newdata)
+#> Error:
+#> ! pred: length must match nrow(newdata) (3)
+#>   Found: length 2
+```
+
+The validator reads `newdata` only from its arguments, never from the
+calling environment.
+
+## A validator that documents itself
+
+Printing a validator lists its steps, and
+[`as_contract_text()`](https://gillescolling.com/restrictR/reference/as_contract_text.md)
+turns the same list into the text of a roxygen `@param`, so the
+documentation of an argument follows its contract:
+
+``` r
+
+require_newdata
+#> <restriction newdata>
+#>   1. must be a data.frame
+#>   2. must have columns: "x1", "x2"
+#>   3. $x1: must be numeric, no NA, finite
+#>   4. $x2: must be numeric, no NA, finite
+#>   5. must have at least 1 row
+```
+
+``` r
+
+#' @param newdata `r as_contract_text(require_newdata)`
+```
+
+[`require_custom()`](https://gillescolling.com/restrictR/reference/require_custom.md)
+adds a step with a check of your own, reported in the same format
+through
+[`fail()`](https://gillescolling.com/restrictR/reference/fail.md). The
+[reference index](https://gillescolling.com/restrictR/reference/) lists
+every built-in step, grouped into type, missingness, structure, value,
+character, file-system and function checks.
+
+## Compared with checkmate
+
+[checkmate](https://CRAN.R-project.org/package=checkmate) provides
+`assert*()`, `check*()` and `test*()` functions in C that are called
+inline, one per argument, where the check is needed. restrictR names a
+contract once, reuses it across functions, and prints it as
+documentation. The two work together: a
+[`require_custom()`](https://gillescolling.com/restrictR/reference/require_custom.md)
+step can call a checkmate assertion. [Relation to
+checkmate](https://gillescolling.com/restrictR/articles/restrictR.html#relation-to-checkmate)
+compares them further.
+
+## Documentation
+
+Start with [Runtime Contracts for R
+Functions](https://gillescolling.com/restrictR/articles/restrictR.html):
+reusable schemas, dependent rules, composition, custom steps, testing
+and contracts in a package.
+
+- [Full reference](https://gillescolling.com/restrictR/reference/):
+  every step, grouped by job.
+
+## Getting help
+
+Questions and bug reports go to the [GitHub
+issues](https://github.com/gcol33/restrictR/issues). A bug report is
+easiest to act on with a small reproducible example, for instance made
+with [reprex](https://reprex.tidyverse.org/).
+
+## Support
+
+> “Software is like sex: it’s better when it’s free.” — Linus Torvalds
+
+I’m a PhD student who builds R packages in my free time because I
+believe good tools should be free and open. I started these projects for
+my own work and figured others might find them useful too.
+
+If this package saved you some time, buying me a coffee is a nice way to
+say thanks. It helps with my coffee addiction.
+
+[![Buy Me A
+Coffee](https://img.shields.io/badge/-Buy%20me%20a%20coffee-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/gcol33)
+
+## License
+
+restrictR is licensed under MIT.
+
+## Citation
+
+``` text
+Colling G (2026). _restrictR: Composable Runtime Contracts_.
+doi:10.32614/CRAN.package.restrictR
+<https://doi.org/10.32614/CRAN.package.restrictR>. R package version
+0.3.0, <https://gillescolling.com/restrictR/>.
+```
+
+BibTeX:
+
+``` bibtex
+@Manual{colling2026restrictr,
+  title = {restrictR: Composable Runtime Contracts},
+  author = {Gilles Colling},
+  year = {2026},
+  note = {R package version 0.3.0},
+  doi = {10.32614/CRAN.package.restrictR},
+  url = {https://gillescolling.com/restrictR/},
+}
+```
+
+Download the citation as
+[BibTeX](https://gillescolling.com/restrictR/restrictR.bib) or
+[RIS](https://gillescolling.com/restrictR/restrictR.ris).
+
+# Package index
+
+## Core
+
+Create and inspect validators
+
+- [`restrict()`](https://gillescolling.com/restrictR/reference/restrict.md)
+  : Create a Composable Validator
+- [`as_contract_text()`](https://gillescolling.com/restrictR/reference/as_contract_text.md)
+  : Convert a Validator to Plain Text
+- [`as_contract_block()`](https://gillescolling.com/restrictR/reference/as_contract_block.md)
+  : Convert a Validator to a Multi-Line Block
+- [`require_custom()`](https://gillescolling.com/restrictR/reference/require_custom.md)
+  : Create a Custom Validation Step
+- [`fail()`](https://gillescolling.com/restrictR/reference/fail.md) :
+  Format a Validation Error
+- [`steps()`](https://gillescolling.com/restrictR/reference/steps.md) :
+  List the Steps of a Validator
+
+## Checking
+
+Run a validator without throwing
+
+- [`is_valid()`](https://gillescolling.com/restrictR/reference/is_valid.md)
+  : Test Whether a Value Satisfies a Validator
+- [`validation_errors()`](https://gillescolling.com/restrictR/reference/validation_errors.md)
+  : Collect Validation Errors Without Throwing
+
+## Type Checks
+
+Validate value types
+
+- [`require_df()`](https://gillescolling.com/restrictR/reference/require_df.md)
+  : Require a Data Frame
+- [`require_numeric()`](https://gillescolling.com/restrictR/reference/require_numeric.md)
+  : Require Numeric Type
+- [`require_integer()`](https://gillescolling.com/restrictR/reference/require_integer.md)
+  : Require Integer Values
+- [`require_character()`](https://gillescolling.com/restrictR/reference/require_character.md)
+  : Require Character Type
+- [`require_logical()`](https://gillescolling.com/restrictR/reference/require_logical.md)
+  : Require Logical Type
+- [`require_class()`](https://gillescolling.com/restrictR/reference/require_class.md)
+  : Require a Specific Class
+
+## Null & Missingness
+
+Check for NULL, NA, and non-finite values
+
+- [`require_not_null()`](https://gillescolling.com/restrictR/reference/require_not_null.md)
+  : Require Non-NULL Value
+- [`require_no_na()`](https://gillescolling.com/restrictR/reference/require_no_na.md)
+  : Require No NA Values
+- [`require_finite()`](https://gillescolling.com/restrictR/reference/require_finite.md)
+  : Require Finite Values
+
+## Structure Checks
+
+Validate length, dimensions, names, columns, and order
+
+- [`require_scalar()`](https://gillescolling.com/restrictR/reference/require_scalar.md)
+  : Require Scalar Value
+- [`require_named()`](https://gillescolling.com/restrictR/reference/require_named.md)
+  : Require Named Value
+- [`require_length()`](https://gillescolling.com/restrictR/reference/require_length.md)
+  : Require Specific Length
+- [`require_length_min()`](https://gillescolling.com/restrictR/reference/require_length_min.md)
+  : Require Minimum Length
+- [`require_length_max()`](https://gillescolling.com/restrictR/reference/require_length_max.md)
+  : Require Maximum Length
+- [`require_length_matches()`](https://gillescolling.com/restrictR/reference/require_length_matches.md)
+  : Require Length Matching an Expression
+- [`require_nrow_min()`](https://gillescolling.com/restrictR/reference/require_nrow_min.md)
+  : Require Minimum Number of Rows
+- [`require_nrow_matches()`](https://gillescolling.com/restrictR/reference/require_nrow_matches.md)
+  : Require Row Count Matching an Expression
+- [`require_ncol_min()`](https://gillescolling.com/restrictR/reference/require_ncol_min.md)
+  : Require Minimum Number of Columns
+- [`require_ncol_matches()`](https://gillescolling.com/restrictR/reference/require_ncol_matches.md)
+  : Require Column Count Matching an Expression
+- [`require_dim()`](https://gillescolling.com/restrictR/reference/require_dim.md)
+  : Require Exact Dimensions
+- [`require_has_cols()`](https://gillescolling.com/restrictR/reference/require_has_cols.md)
+  : Require Specific Columns
+- [`require_names()`](https://gillescolling.com/restrictR/reference/require_names.md)
+  : Require Names
+- [`require_unique_names()`](https://gillescolling.com/restrictR/reference/require_unique_names.md)
+  : Require Unique Names
+- [`require_sorted()`](https://gillescolling.com/restrictR/reference/require_sorted.md)
+  : Require Sorted Values
+
+## Composition
+
+Apply validators to columns and list elements, combine them, allow NULL
+
+- [`require_col()`](https://gillescolling.com/restrictR/reference/require_col.md)
+  : Validate a Data Frame Column with a Validator
+- [`require_each()`](https://gillescolling.com/restrictR/reference/require_each.md)
+  : Validate Every Element of a List
+- [`require_fields()`](https://gillescolling.com/restrictR/reference/require_fields.md)
+  : Validate Named Fields of a List
+- [`require_valid()`](https://gillescolling.com/restrictR/reference/require_valid.md)
+  : Include Another Validator's Steps
+- [`require_any()`](https://gillescolling.com/restrictR/reference/require_any.md)
+  : Require at Least One of Several Validators
+- [`allow_null()`](https://gillescolling.com/restrictR/reference/allow_null.md)
+  : Allow NULL
+
+## Value Checks
+
+Validate value ranges, set membership, and factor levels
+
+- [`require_positive()`](https://gillescolling.com/restrictR/reference/require_positive.md)
+  : Require Positive Values
+- [`require_negative()`](https://gillescolling.com/restrictR/reference/require_negative.md)
+  : Require Negative Values
+- [`require_between()`](https://gillescolling.com/restrictR/reference/require_between.md)
+  : Require Value in Range
+- [`require_one_of()`](https://gillescolling.com/restrictR/reference/require_one_of.md)
+  : Require Value from a Set
+- [`require_contains()`](https://gillescolling.com/restrictR/reference/require_contains.md)
+  : Require All of a Set of Values
+- [`require_set_equal()`](https://gillescolling.com/restrictR/reference/require_set_equal.md)
+  : Require the Same Set of Values
+- [`require_levels()`](https://gillescolling.com/restrictR/reference/require_levels.md)
+  : Require Factor Levels
+- [`require_disjoint()`](https://gillescolling.com/restrictR/reference/require_disjoint.md)
+  : Require Values Disjoint From Context
+- [`require_unique()`](https://gillescolling.com/restrictR/reference/require_unique.md)
+  : Require Unique Values
+
+## Character Checks
+
+Validate strings by pattern, length, and blankness
+
+- [`require_pattern()`](https://gillescolling.com/restrictR/reference/require_pattern.md)
+  : Require Strings Matching a Pattern
+- [`require_nchar()`](https://gillescolling.com/restrictR/reference/require_nchar.md)
+  : Require String Length
+- [`require_nonempty()`](https://gillescolling.com/restrictR/reference/require_nonempty.md)
+  : Require Non-Blank Strings
+
+## File-System Checks
+
+Validate input paths and output locations
+
+- [`require_file_exists()`](https://gillescolling.com/restrictR/reference/require_file_exists.md)
+  : Require Existing Files
+- [`require_dir_exists()`](https://gillescolling.com/restrictR/reference/require_dir_exists.md)
+  : Require Existing Directories
+- [`require_readable()`](https://gillescolling.com/restrictR/reference/require_readable.md)
+  : Require Readable Paths
+- [`require_writable()`](https://gillescolling.com/restrictR/reference/require_writable.md)
+  : Require Writable Paths
+
+## Function Checks
+
+Validate callback arguments
+
+- [`require_function()`](https://gillescolling.com/restrictR/reference/require_function.md)
+  : Require a Function
+
+## Testing
+
+testthat expectations that report validator messages
+
+- [`expect_valid()`](https://gillescolling.com/restrictR/reference/expect_valid.md)
+  : Expect a Value to Pass a Validator
+- [`expect_invalid()`](https://gillescolling.com/restrictR/reference/expect_invalid.md)
+  : Expect a Value to Fail a Validator
+
+# Articles
+
+### Getting Started
+
+- [Runtime Contracts for R
+  Functions](https://gillescolling.com/restrictR/articles/restrictR.md):

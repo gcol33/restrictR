@@ -1,0 +1,44 @@
+# Require Negative Values
+
+Validates that all elements are negative. By default uses `<= 0`
+(non-positive); set `strict = TRUE` for `< 0`.
+
+## Usage
+
+``` r
+require_negative(restriction, strict = FALSE)
+```
+
+## Arguments
+
+- restriction:
+
+  a `restriction` object.
+
+- strict:
+
+  logical; if `TRUE`, requires `< 0`. If `FALSE` (default), requires
+  `<= 0`.
+
+## Value
+
+The modified `restriction` object.
+
+## Details
+
+Non-numeric input fails with a type error. `NA` elements are skipped;
+chain
+[`require_no_na()`](https://gillescolling.com/restrictR/reference/require_no_na.md)
+to reject them.
+
+## See also
+
+Other value checks:
+[`require_between()`](https://gillescolling.com/restrictR/reference/require_between.md),
+[`require_contains()`](https://gillescolling.com/restrictR/reference/require_contains.md),
+[`require_disjoint()`](https://gillescolling.com/restrictR/reference/require_disjoint.md),
+[`require_levels()`](https://gillescolling.com/restrictR/reference/require_levels.md),
+[`require_one_of()`](https://gillescolling.com/restrictR/reference/require_one_of.md),
+[`require_positive()`](https://gillescolling.com/restrictR/reference/require_positive.md),
+[`require_set_equal()`](https://gillescolling.com/restrictR/reference/require_set_equal.md),
+[`require_unique()`](https://gillescolling.com/restrictR/reference/require_unique.md)

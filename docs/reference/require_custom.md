@@ -1,0 +1,66 @@
+# Create a Custom Validation Step
+
+Allows advanced users to define their own validation step without
+growing the package's built-in API surface. The step function receives
+`(value, name, ctx)` and should call
+[`fail()`](https://gillescolling.com/restrictR/reference/fail.md) on
+validation failure.
+
+## Usage
+
+``` r
+require_custom(restriction, label, fn, deps = character(0L))
+```
+
+## Arguments
+
+- restriction:
+
+  a `restriction` object.
+
+- label:
+
+  character(1) human-readable description for printing.
+
+- fn:
+
+  a function with signature `function(value, name, ctx)` that calls
+  [`fail()`](https://gillescolling.com/restrictR/reference/fail.md) on
+  validation failure. It must be callable with three positional
+  arguments (see
+  [`require_function()`](https://gillescolling.com/restrictR/reference/require_function.md)).
+
+- deps:
+
+  character vector of context names this step requires (default: none).
+
+## Value
+
+A new `restriction` object with the custom step appended.
+
+## See also
+
+Other core:
+[`as_contract_block()`](https://gillescolling.com/restrictR/reference/as_contract_block.md),
+[`as_contract_text()`](https://gillescolling.com/restrictR/reference/as_contract_text.md),
+[`fail()`](https://gillescolling.com/restrictR/reference/fail.md),
+[`is_valid()`](https://gillescolling.com/restrictR/reference/is_valid.md),
+[`restrict()`](https://gillescolling.com/restrictR/reference/restrict.md),
+[`steps()`](https://gillescolling.com/restrictR/reference/steps.md),
+[`validation_errors()`](https://gillescolling.com/restrictR/reference/validation_errors.md)
+
+## Examples
+
+``` r
+# Custom step: require all values to be unique
+require_unique_id <- restrict("id") |>
+  require_custom(
+    label = "must contain unique values",
+    fn = function(value, name, ctx) {
+      dupes <- which(duplicated(value))
+      if (length(dupes) > 0L) {
+        fail(name, "contains duplicates", at = dupes)
+      }
+    }
+  )
+```
