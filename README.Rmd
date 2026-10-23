@@ -16,6 +16,8 @@ options(width = 80)
 [![Codecov test coverage](https://codecov.io/gh/gcol33/restrictR/graph/badge.svg)](https://app.codecov.io/gh/gcol33/restrictR)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![CRAN status](https://www.r-pkg.org/badges/version/restrictR)](https://CRAN.R-project.org/package=restrictR)
+[![CRAN downloads](https://cranlogs.r-pkg.org/badges/grand-total/restrictR)](https://cran.r-project.org/package=restrictR)
+[![Monthly downloads](https://cranlogs.r-pkg.org/badges/restrictR)](https://cran.r-project.org/package=restrictR)
 <!-- badges: end -->
 
 restrictR checks the arguments of R functions against contracts, such as "a single non-negative number" or "a data frame with numeric columns `x1` and `x2`", that are written once and called at the top of every function that takes the argument.

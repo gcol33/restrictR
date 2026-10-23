@@ -12,6 +12,10 @@ coverage](https://codecov.io/gh/gcol33/restrictR/graph/badge.svg)](https://app.c
 MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/restrictR)](https://CRAN.R-project.org/package=restrictR)
+[![CRAN
+downloads](https://cranlogs.r-pkg.org/badges/grand-total/restrictR)](https://cran.r-project.org/package=restrictR)
+[![Monthly
+downloads](https://cranlogs.r-pkg.org/badges/restrictR)](https://cran.r-project.org/package=restrictR)
 <!-- badges: end -->
 
 restrictR checks the arguments of R functions against contracts, such as
